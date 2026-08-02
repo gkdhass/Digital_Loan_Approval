@@ -50,7 +50,11 @@ const isVercelPreviewURL = (origin) => {
   return origin && origin.match(/^https:\/\/.*\.vercel\.app$/);
 };
 
+// Auto-allow Vercel preview URLs if running on Vercel
+const isRunningOnVercel = process.env.VERCEL === '1';
+
 console.log('🔒 CORS Allowed Origins:', allowedOrigins);
+console.log('🚀 Running on Vercel:', isRunningOnVercel);
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -63,8 +67,8 @@ app.use(cors({
       return callback(null, true);
     }
     
-    // Allow Vercel preview URLs if enabled (set ALLOW_VERCEL_PREVIEWS=true in env)
-    if (process.env.ALLOW_VERCEL_PREVIEWS === 'true' && isVercelPreviewURL(origin)) {
+    // Allow Vercel preview URLs if running on Vercel or explicitly enabled
+    if ((isRunningOnVercel || process.env.ALLOW_VERCEL_PREVIEWS === 'true') && isVercelPreviewURL(origin)) {
       console.log('✅ CORS allowed (Vercel preview):', origin);
       return callback(null, true);
     }
