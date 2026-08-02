@@ -9,9 +9,12 @@ import {
   FileText,
   User,
   Briefcase,
+  Upload,
 } from 'lucide-react';
 import api from '../services/api';
 import { useCountUp } from '../hooks/useCountUp';
+import DocumentUpload from '../components/DocumentUpload';
+import { documentsAPI } from '../services/api';
 
 const ApplyLoan = () => {
   const navigate = useNavigate();
@@ -22,6 +25,9 @@ const ApplyLoan = () => {
   const [emiCalculation, setEmiCalculation] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [applicationId, setApplicationId] = useState(null);
+  const [documents, setDocuments] = useState([]);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
 
   const [formData, setFormData] = useState({
     loanType: location.state?.loanType?._id || '',
@@ -41,6 +47,7 @@ const ApplyLoan = () => {
     { title: 'Loan Details', icon: FileText },
     { title: 'Employment', icon: Briefcase },
     { title: 'Eligibility', icon: User },
+    { title: 'Documents', icon: Upload },
     { title: 'Review', icon: CheckCircle },
   ];
 
@@ -89,7 +96,10 @@ const ApplyLoan = () => {
       const response = await api.post('/loan-types/check-eligibility', {
         loanTypeId: formData.loanType,
         loanAmount: parseFloat(formData.loanAmount),
+        durationMonths: parseInt(formData.durationMonths),
         monthlyIncome: parseFloat(formData.employmentDetails.monthlyIncome),
+        employmentType: formData.employmentDetails.employmentType,
+        workExperienceYears: parseInt(formData.employmentDetails.workExperienceYears),
       });
       setEligibility(response.data.data);
       setLoading(false);
@@ -118,12 +128,43 @@ const ApplyLoan = () => {
         },
       });
 
-      navigate(`/applications/${response.data.data._id}`, {
-        state: { showSuccess: true },
-      });
+      setApplicationId(response.data.data._id);
+      return response.data.data._id;
     } catch (err) {
       setError(err.response?.data?.message || 'Application failed');
       setLoading(false);
+      return null;
+    }
+  };
+
+  const handleDocumentUpload = async (formData) => {
+    try {
+      setUploadingDoc(true);
+      const response = await documentsAPI.upload(formData);
+      setDocuments([...documents, response.data]);
+      setUploadingDoc(false);
+      return response.data;
+    } catch (err) {
+      setUploadingDoc(false);
+      throw err;
+    }
+  };
+
+  const handleDeleteDocument = async (docId) => {
+    try {
+      await documentsAPI.delete(docId);
+      setDocuments(documents.filter(doc => doc._id !== docId));
+    } catch (err) {
+      console.error('Failed to delete document:', err);
+    }
+  };
+
+  const fetchDocuments = async (appId) => {
+    try {
+      const response = await documentsAPI.getByApplication(appId);
+      setDocuments(response.data);
+    } catch (err) {
+      console.error('Failed to fetch documents:', err);
     }
   };
 
@@ -135,10 +176,21 @@ const ApplyLoan = () => {
       } else {
         setCurrentStep(currentStep + 1);
       }
+    } else if (currentStep === 2) {
+      // After eligibility check, create application and move to documents
+      const appId = await handleSubmit();
+      if (appId) {
+        setApplicationId(appId);
+        await fetchDocuments(appId);
+        setCurrentStep(currentStep + 1);
+      }
     } else if (currentStep < steps.length - 1) {
       setCurrentStep(currentStep + 1);
     } else {
       await handleSubmit();
+      navigate(`/applications/${applicationId}`, {
+        state: { showSuccess: true },
+      });
     }
   };
 
@@ -174,6 +226,12 @@ const ApplyLoan = () => {
     if (currentStep === 1) {
       const emp = formData.employmentDetails;
       return emp.employmentType && emp.companyName && emp.designation && emp.workExperienceYears && emp.monthlyIncome;
+    }
+    if (currentStep === 2) {
+      return eligibility !== null;
+    }
+    if (currentStep === 3) {
+      return applicationId !== null;
     }
     return true;
   };
@@ -510,6 +568,40 @@ const ApplyLoan = () => {
                 transition={{ duration: 0.3 }}
               >
                 <h2 className="text-2xl font-bold text-navy-900 mb-6">
+                  Upload Documents
+                </h2>
+
+                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
+                  <p className="text-sm text-blue-900">
+                    <strong>Required Documents:</strong> Please upload the following documents for your {selectedLoanType?.name} application.
+                  </p>
+                </div>
+
+                {applicationId ? (
+                  <DocumentUpload
+                    onUpload={handleDocumentUpload}
+                    documentTypes={selectedLoanType?.requiredDocuments || []}
+                    applicationId={applicationId}
+                    existingDocuments={documents}
+                    onDeleteDocument={handleDeleteDocument}
+                  />
+                ) : (
+                  <div className="text-center py-12 text-gray-500">
+                    <p>Complete the previous steps to upload documents</p>
+                  </div>
+                )}
+              </motion.div>
+            )}
+
+            {currentStep === 4 && (
+              <motion.div
+                key="step5"
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+              >
+                <h2 className="text-2xl font-bold text-navy-900 mb-6">
                   Review & Submit
                 </h2>
 
@@ -550,10 +642,40 @@ const ApplyLoan = () => {
                         <span className="font-semibold">{formData.employmentDetails.companyName}</span>
                       </div>
                       <div className="flex justify-between">
+                        <span className="text-navy-600">Designation:</span>
+                        <span className="font-semibold">{formData.employmentDetails.designation}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-navy-600">Experience:</span>
+                        <span className="font-semibold">{formData.employmentDetails.workExperienceYears} years</span>
+                      </div>
+                      <div className="flex justify-between">
                         <span className="text-navy-600">Monthly Income:</span>
                         <span className="font-semibold">₹{parseFloat(formData.employmentDetails.monthlyIncome).toLocaleString()}</span>
                       </div>
                     </div>
+                  </div>
+
+                  <div className="bg-navy-50 rounded-xl p-6">
+                    <h3 className="font-bold text-navy-900 mb-4">Uploaded Documents</h3>
+                    {documents.length > 0 ? (
+                      <div className="space-y-2 text-sm">
+                        {documents.map((doc) => (
+                          <div key={doc._id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
+                            <span className="text-navy-700">{doc.fileName}</span>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              doc.verificationStatus === 'verified' ? 'bg-emerald-100 text-emerald-800' :
+                              doc.verificationStatus === 'rejected' ? 'bg-red-100 text-red-800' :
+                              'bg-gray-100 text-gray-800'
+                            }`}>
+                              {doc.verificationStatus || 'Pending'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-500">No documents uploaded yet</p>
+                    )}
                   </div>
 
                   {error && (
@@ -579,11 +701,13 @@ const ApplyLoan = () => {
 
             <button
               onClick={nextStep}
-              disabled={!isStepValid() || loading}
+              disabled={!isStepValid() || loading || uploadingDoc}
               className="btn-primary flex items-center gap-2"
             >
               {currentStep === steps.length - 1 ? (
                 loading ? 'Submitting...' : 'Submit Application'
+              ) : currentStep === 3 ? (
+                uploadingDoc ? 'Uploading...' : 'Review & Submit'
               ) : (
                 <>
                   Next

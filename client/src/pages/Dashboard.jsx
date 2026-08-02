@@ -5,7 +5,7 @@ import {
   TrendingUp, DollarSign, FileText, Clock, 
   ArrowRight, CheckCircle 
 } from 'lucide-react';
-import { pageVariants, cardVariants, stagger Container } from '../animations/variants';
+import { pageVariants, cardVariants, staggerContainer } from '../animations/variants';
 import { dashboardAPI, formatCurrency } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import useCountUp from '../hooks/useCountUp';
@@ -202,45 +202,55 @@ const Dashboard = () => {
 
         {recentApplications && recentApplications.length > 0 ? (
           <div className="space-y-4">
-            {recentApplications.map((app) => (
-              <Link
+            {recentApplications.map((app, index) => (
+              <motion.div
                 key={app._id}
-                to={`/applications/${app._id}`}
-                className="block p-4 border border-gray-200 rounded-xl hover:border-accent-300 hover:bg-accent-50/50 transition-all"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
               >
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 bg-accent-50 rounded-lg flex items-center justify-center">
-                      <FileText className="h-5 w-5 text-accent-600" />
+                <Link
+                  to={`/applications/${app._id}`}
+                  className="block p-4 border border-gray-200 rounded-xl hover:border-accent-300 hover:bg-accent-50/50 transition-all"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 bg-accent-50 rounded-lg flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-accent-600" />
+                      </div>
+                      <div>
+                        <p className="font-semibold text-navy-900">
+                          {app.loanType?.name}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          {app.applicationNumber}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-semibold text-navy-900">
-                        {app.loanType?.name}
-                      </p>
-                      <p className="text-sm text-gray-600">
-                        {app.applicationNumber}
-                      </p>
-                    </div>
+                    <StatusBadge status={app.status} />
                   </div>
-                  <StatusBadge status={app.status} />
-                </div>
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">
-                    Amount: <span className="font-semibold text-navy-900">
-                      {formatCurrency(app.loanAmount)}
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">
+                      Amount: <span className="font-semibold text-navy-900">
+                        {formatCurrency(app.loanAmount)}
+                      </span>
                     </span>
-                  </span>
-                  <span className="text-gray-600">
-                    EMI: <span className="font-semibold text-navy-900">
-                      {formatCurrency(app.emi)}
+                    <span className="text-gray-600">
+                      EMI: <span className="font-semibold text-navy-900">
+                        {formatCurrency(app.emi)}
+                      </span>
                     </span>
-                  </span>
-                </div>
-              </Link>
+                  </div>
+                </Link>
+              </motion.div>
             ))}
           </div>
         ) : (
-          <div className="text-center py-12">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="text-center py-12"
+          >
             <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
             <p className="text-gray-600 mb-4">No applications yet</p>
             <Link

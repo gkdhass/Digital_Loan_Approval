@@ -16,6 +16,7 @@ import LoanTypes from './pages/LoanTypes';
 import ApplyLoan from './pages/ApplyLoan';
 import Applications from './pages/Applications';
 import ApplicationDetail from './pages/ApplicationDetail';
+import EmiCalculator from './pages/EmiCalculator';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApplications from './pages/admin/AdminApplications';
 
@@ -31,6 +32,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/loan-types" element={<LoanTypes />} />
+            <Route path="/emi-calculator" element={<EmiCalculator />} />
 
             {/* Protected Customer Routes */}
             <Route

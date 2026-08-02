@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Bell, User, LogOut, LayoutDashboard, FileText, Home } from 'lucide-react';
+import { Menu, X, Bell, User, LogOut, LayoutDashboard, FileText, Home, Calculator } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { buttonVariants } from '../animations/variants';
 
@@ -23,12 +23,14 @@ const Navbar = () => {
     ? [
         { name: 'Dashboard', path: isAdmin ? '/admin/dashboard' : '/dashboard', icon: LayoutDashboard },
         { name: 'Loan Types', path: '/loan-types', icon: FileText },
+        { name: 'EMI Calculator', path: '/emi-calculator', icon: Calculator },
         ...(!isAdmin ? [{ name: 'My Applications', path: '/applications', icon: FileText }] : []),
         ...(isAdmin ? [{ name: 'All Applications', path: '/admin/applications', icon: FileText }] : [])
       ]
     : [
         { name: 'Home', path: '/', icon: Home },
-        { name: 'Loan Types', path: '/loan-types', icon: FileText }
+        { name: 'Loan Types', path: '/loan-types', icon: FileText },
+        { name: 'EMI Calculator', path: '/emi-calculator', icon: Calculator }
       ];
 
   return (

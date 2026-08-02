@@ -1,12 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const {
-  getCustomerDashboard,
+  getUserDashboard,
   getAdminDashboard,
+  getAnalytics,
 } = require('../controllers/dashboardController');
 const { authenticate, authorizeRole } = require('../middleware/auth');
 
-router.get('/customer', authenticate, getCustomerDashboard);
+router.get('/user', authenticate, getUserDashboard);
 router.get('/admin', authenticate, authorizeRole('admin'), getAdminDashboard);
+router.get('/analytics', authenticate, authorizeRole('admin'), getAnalytics);
 
 module.exports = router;

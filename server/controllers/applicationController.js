@@ -2,6 +2,8 @@ const LoanApplication = require('../models/LoanApplication');
 const LoanType = require('../models/LoanType');
 const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
+const User = require('../models/User');
+const { generateLoanAgreement } = require('../utils/pdfGenerator');
 
 // @desc    Create loan application
 // @route   POST /api/applications
@@ -251,6 +253,48 @@ exports.deleteApplication = async (req, res, next) => {
       success: true,
       message: 'Application deleted successfully',
     });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Generate loan agreement PDF
+// @route   GET /api/applications/:id/agreement
+// @access  Private
+exports.generateAgreement = async (req, res, next) => {
+  try {
+    const application = await LoanApplication.findById(req.params.id)
+      .populate('loanType')
+      .populate('user');
+
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found',
+      });
+    }
+
+    // Check authorization
+    if (application.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized to view this agreement',
+      });
+    }
+
+    // Only allow agreement generation for approved applications
+    if (application.status !== 'approved' && application.status !== 'disbursed') {
+      return res.status(400).json({
+        success: false,
+        message: 'Agreement can only be generated for approved loans',
+      });
+    }
+
+    const pdfBuffer = await generateLoanAgreement(application, application.user, application.loanType);
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Disposition', `attachment; filename=loan-agreement-${application.applicationNumber}.pdf`);
+    res.send(pdfBuffer);
   } catch (error) {
     next(error);
   }

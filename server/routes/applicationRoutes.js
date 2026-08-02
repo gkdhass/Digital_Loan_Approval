@@ -7,6 +7,7 @@ const {
   getAllApplications,
   updateApplicationStatus,
   deleteApplication,
+  generateAgreement,
 } = require('../controllers/applicationController');
 const { authenticate, authorizeRole } = require('../middleware/auth');
 const { validate, validationRules } = require('../middleware/validator');
@@ -15,6 +16,7 @@ router.post('/', authenticate, validationRules.loanApplication, validate, create
 router.get('/', authenticate, getUserApplications);
 router.get('/admin/all', authenticate, authorizeRole('admin'), getAllApplications);
 router.get('/:id', authenticate, getApplicationById);
+router.get('/:id/agreement', authenticate, generateAgreement);
 router.put('/:id/status', authenticate, authorizeRole('admin'), updateApplicationStatus);
 router.delete('/:id', authenticate, deleteApplication);
 

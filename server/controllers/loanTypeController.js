@@ -1,4 +1,6 @@
 const LoanType = require('../models/LoanType');
+const User = require('../models/User');
+const { checkEligibility } = require('../utils/eligibilityEngine');
 
 // @desc    Get all loan types
 // @route   GET /api/loan-types
@@ -84,7 +86,14 @@ exports.calculateEMI = async (req, res, next) => {
 // @access  Private
 exports.checkEligibility = async (req, res, next) => {
   try {
-    const { loanTypeId, loanAmount, monthlyIncome } = req.body;
+    const { 
+      loanTypeId, 
+      loanAmount, 
+      durationMonths, 
+      monthlyIncome, 
+      employmentType,
+      workExperienceYears 
+    } = req.body;
 
     const loanType = await LoanType.findById(loanTypeId);
     if (!loanType) {
@@ -94,43 +103,28 @@ exports.checkEligibility = async (req, res, next) => {
       });
     }
 
-    let score = 0;
-    const reasons = [];
+    // Get user data for additional context
+    const user = await User.findById(req.user._id);
 
-    // Check minimum income
-    if (monthlyIncome >= loanType.minIncome) {
-      score += 40;
-    } else {
-      reasons.push(`Minimum monthly income of ₹${loanType.minIncome.toLocaleString()} required`);
-    }
+    // Prepare application data for eligibility engine
+    const applicationData = {
+      loanAmount: parseFloat(loanAmount),
+      durationMonths: parseInt(durationMonths) || 12,
+      monthlyIncome: parseFloat(monthlyIncome),
+      employmentType: employmentType || user?.employmentType,
+      employmentDetails: {
+        employmentType: employmentType || user?.employmentType,
+        workExperienceYears: workExperienceYears || 0
+      }
+    };
 
-    // Check loan amount
-    if (loanAmount <= loanType.maxAmount) {
-      score += 30;
-    } else {
-      reasons.push(`Maximum loan amount is ₹${loanType.maxAmount.toLocaleString()}`);
-    }
-
-    // EMI to income ratio (should be < 50%)
-    const monthlyRate = loanType.interestRate / 12 / 100;
-    const emi = (loanAmount * monthlyRate * Math.pow(1 + monthlyRate, 12)) /
-                (Math.pow(1 + monthlyRate, 12) - 1);
-    const emiRatio = (emi / monthlyIncome) * 100;
-
-    if (emiRatio < 50) {
-      score += 30;
-    } else {
-      reasons.push('EMI exceeds 50% of monthly income');
-    }
-
-    const isEligible = score >= 70;
+    // Use the comprehensive eligibility engine
+    const eligibilityResult = checkEligibility(loanType, user, applicationData);
 
     res.json({
       success: true,
       data: {
-        isEligible,
-        score,
-        reasons: isEligible ? ['You meet the eligibility criteria'] : reasons,
+        ...eligibilityResult,
         loanType: loanType.name,
       },
     });
