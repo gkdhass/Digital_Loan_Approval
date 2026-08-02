@@ -6,6 +6,8 @@ import './index.css';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
+import ToastContainer from './components/ToastContainer';
+import { ToastProvider } from './hooks/useToast';
 
 // Pages
 import Home from './pages/Home';
@@ -17,16 +19,23 @@ import ApplyLoan from './pages/ApplyLoan';
 import Applications from './pages/Applications';
 import ApplicationDetail from './pages/ApplicationDetail';
 import EmiCalculator from './pages/EmiCalculator';
+import LoanHistory from './pages/LoanHistory';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApplications from './pages/admin/AdminApplications';
+import AdminApplicationDetail from './pages/admin/AdminApplicationDetail';
+import AdminUsers from './pages/admin/AdminUsers';
+import AdminAuditLogs from './pages/admin/AdminAuditLogs';
+import AdminReports from './pages/admin/AdminReports';
+import AdminLoanTypes from './pages/admin/AdminLoanTypes';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <Router>
-      <AuthProvider>
-        <div className="min-h-screen bg-gray-50">
-          <Navbar />
-          <Routes>
+      <ToastProvider>
+        <AuthProvider>
+          <div className="min-h-screen bg-gray-50">
+            <Navbar />
+            <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -67,6 +76,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/loan-history"
+              element={
+                <ProtectedRoute>
+                  <LoanHistory />
+                </ProtectedRoute>
+              }
+            />
 
             {/* Protected Admin Routes */}
             <Route
@@ -85,9 +102,50 @@ ReactDOM.createRoot(document.getElementById('root')).render(
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/admin/applications/:id"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminApplicationDetail />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/users"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/audit-logs"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminAuditLogs />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/reports"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminReports />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/admin/loan-types"
+              element={
+                <ProtectedRoute adminOnly>
+                  <AdminLoanTypes />
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </div>
       </AuthProvider>
+      </ToastProvider>
     </Router>
   </React.StrictMode>
 );

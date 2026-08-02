@@ -4,6 +4,12 @@ const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const User = require('../models/User');
 const { generateLoanAgreement } = require('../utils/pdfGenerator');
+const {
+  sendApplicationSubmittedEmail,
+  sendApplicationApprovedEmail,
+  sendApplicationRejectedEmail,
+  sendDocumentsRequestedEmail,
+} = require('../utils/emailService');
 
 // @desc    Create loan application
 // @route   POST /api/applications
@@ -52,6 +58,13 @@ exports.createApplication = async (req, res, next) => {
       message: `Your loan application ${application.applicationNumber} has been submitted successfully`,
       type: 'success',
     });
+
+    // Send email
+    try {
+      await sendApplicationSubmittedEmail(req.user, application, loanTypeData);
+    } catch (emailError) {
+      console.error('Failed to send submission email:', emailError);
+    }
 
     // Audit log
     await AuditLog.create({
@@ -129,15 +142,36 @@ exports.getApplicationById = async (req, res, next) => {
 // @access  Private/Admin
 exports.getAllApplications = async (req, res, next) => {
   try {
-    const { status, search, page = 1, limit = 10 } = req.query;
+    const { status, search, page = 1, limit = 10, sortBy = 'createdAt', sortOrder = 'desc' } = req.query;
 
     const query = {};
     if (status) query.status = status;
 
+    // Search functionality
+    if (search) {
+      query.$or = [
+        { 'user.fullName': { $regex: search, $options: 'i' } },
+        { 'user.email': { $regex: search, $options: 'i' } },
+        { applicationNumber: { $regex: search, $options: 'i' } }
+      ];
+    }
+
+    // Sort options
+    const sortObj = {};
+    if (sortBy === 'user.fullName') {
+      sortObj['user.fullName'] = sortOrder;
+    } else if (sortBy === 'loanAmount') {
+      sortObj.loanAmount = sortOrder;
+    } else if (sortBy === 'status') {
+      sortObj.status = sortOrder;
+    } else {
+      sortObj.createdAt = sortOrder;
+    }
+
     const applications = await LoanApplication.find(query)
       .populate('loanType', 'name')
       .populate('user', 'fullName email phone')
-      .sort('-createdAt')
+      .sort(sortObj)
       .limit(limit * 1)
       .skip((page - 1) * limit);
 
@@ -170,6 +204,7 @@ exports.updateApplicationStatus = async (req, res, next) => {
       });
     }
 
+    const previousStatus = application.status;
     application.status = status;
     application.reviewedBy = req.user._id;
     application.reviewedAt = Date.now();
@@ -182,13 +217,17 @@ exports.updateApplicationStatus = async (req, res, next) => {
 
     await application.save();
 
+    // Get user for email
+    const user = await User.findById(application.user);
+    const loanType = await LoanType.findById(application.loanType);
+
     // Create notification for user
     const statusMessages = {
       under_review: 'Your application is under review',
-      documents_requested: 'Additional documents requested for your application',
+      documents_requested: `Additional documents requested for your application. ${adminNotes || 'Please upload the required documents.'}`,
       approved: 'Congratulations! Your loan application has been approved',
-      rejected: 'Your loan application has been rejected',
-      disbursed: 'Your loan has been disbursed',
+      rejected: `Your loan application has been rejected. ${rejectionReason || 'Contact support for more information.'}`,
+      disbursed: 'Your loan has been disbursed to your account',
     };
 
     await Notification.create({
@@ -199,13 +238,33 @@ exports.updateApplicationStatus = async (req, res, next) => {
       type: status === 'approved' || status === 'disbursed' ? 'success' : status === 'rejected' ? 'error' : 'info',
     });
 
+    // Send email based on status
+    if (user) {
+      try {
+        if (status === 'approved') {
+          await sendApplicationApprovedEmail(user, application);
+        } else if (status === 'rejected') {
+          await sendApplicationRejectedEmail(user, application, rejectionReason);
+        } else if (status === 'documents_requested') {
+          await sendDocumentsRequestedEmail(user, application, adminNotes);
+        }
+      } catch (emailError) {
+        console.error('Failed to send status email:', emailError);
+      }
+    }
+
     // Audit log
     await AuditLog.create({
       user: req.user._id,
       action: `update_status_${status}`,
       entityType: 'application',
       entityId: application._id,
-      changes: { status, adminNotes, rejectionReason },
+      changes: { 
+        previousStatus, 
+        newStatus: status, 
+        adminNotes, 
+        rejectionReason 
+      },
     });
 
     res.json({

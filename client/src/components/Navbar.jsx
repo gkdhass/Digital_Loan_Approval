@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Bell, User, LogOut, LayoutDashboard, FileText, Home, Calculator } from 'lucide-react';
+import { Menu, X, Bell, User, LogOut, LayoutDashboard, FileText, Home, Calculator, Users, BarChart3, FileCheck, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { buttonVariants } from '../animations/variants';
+import Notifications from './Notifications';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,8 +25,17 @@ const Navbar = () => {
         { name: 'Dashboard', path: isAdmin ? '/admin/dashboard' : '/dashboard', icon: LayoutDashboard },
         { name: 'Loan Types', path: '/loan-types', icon: FileText },
         { name: 'EMI Calculator', path: '/emi-calculator', icon: Calculator },
-        ...(!isAdmin ? [{ name: 'My Applications', path: '/applications', icon: FileText }] : []),
-        ...(isAdmin ? [{ name: 'All Applications', path: '/admin/applications', icon: FileText }] : [])
+        ...(!isAdmin ? [
+          { name: 'My Applications', path: '/applications', icon: FileText },
+          { name: 'Loan History', path: '/loan-history', icon: History },
+        ] : []),
+        ...(isAdmin ? [
+          { name: 'Applications', path: '/admin/applications', icon: FileText },
+          { name: 'Users', path: '/admin/users', icon: Users },
+          { name: 'Loan Types', path: '/admin/loan-types', icon: FileCheck },
+          { name: 'Audit Logs', path: '/admin/audit-logs', icon: History },
+          { name: 'Reports', path: '/admin/reports', icon: BarChart3 },
+        ] : [])
       ]
     : [
         { name: 'Home', path: '/', icon: Home },
@@ -75,16 +85,7 @@ const Navbar = () => {
             {isAuthenticated ? (
               <>
                 {/* Notifications */}
-                <motion.button
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                  className="relative p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
-                  onClick={() => navigate('/notifications')}
-                >
-                  <Bell className="h-5 w-5" />
-                  {/* <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" /> */}
-                </motion.button>
+                <Notifications />
 
                 {/* Profile Menu */}
                 <div className="relative">

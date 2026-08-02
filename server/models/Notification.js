@@ -10,6 +10,10 @@ const notificationSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'LoanApplication',
   },
+  document: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Document',
+  },
   title: {
     type: String,
     required: true,

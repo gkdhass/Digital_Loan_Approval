@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { FileText, Search, ChevronLeft, ChevronRight } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FileText, Search, ChevronLeft, ChevronRight, Filter, ArrowUpDown } from 'lucide-react';
 import api from '../../services/api';
 import StatusBadge from '../../components/StatusBadge';
 import { SkeletonTable } from '../../components/SkeletonLoader';
@@ -11,18 +11,29 @@ const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [sortBy, setSortBy] = useState('createdAt');
+  const [sortOrder, setSortOrder] = useState('desc');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     fetchApplications();
-  }, [filter, currentPage]);
+  }, [filter, currentPage, searchTerm, sortBy, sortOrder]);
 
   const fetchApplications = async () => {
     try {
       setLoading(true);
       const response = await api.get('/applications/admin/all', {
-        params: { status: filter || undefined, page: currentPage, limit: 10 },
+        params: { 
+          status: filter || undefined, 
+          page: currentPage, 
+          limit: 10,
+          search: searchTerm || undefined,
+          sortBy,
+          sortOrder
+        },
       });
       setApplications(response.data.data);
       setTotalPages(response.data.totalPages || 1);
@@ -31,6 +42,23 @@ const AdminApplications = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortBy(field);
+      setSortOrder('desc');
+    }
+  };
+
+  const clearFilters = () => {
+    setFilter('');
+    setSearchTerm('');
+    setSortBy('createdAt');
+    setSortOrder('desc');
+    setCurrentPage(1);
   };
 
   if (loading && currentPage === 1) {
@@ -53,39 +81,114 @@ const AdminApplications = () => {
           <p className="text-navy-600">Review and manage loan applications</p>
         </div>
 
-        {/* Filters */}
+        {/* Search and Filters */}
         <div className="card mb-6">
-          <div className="flex flex-wrap gap-3">
-            <button
-              onClick={() => {
-                setFilter('');
-                setCurrentPage(1);
-              }}
-              className={`px-4 py-2 rounded-xl font-medium transition-colors ${
-                filter === ''
-                  ? 'bg-accent-600 text-white'
-                  : 'bg-navy-100 text-navy-700 hover:bg-navy-200'
-              }`}
+          <div className="flex flex-col md:flex-row gap-4">
+            {/* Search */}
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Search by name, email, or application number..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+              />
+            </div>
+
+            {/* Filter Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => setShowFilters(!showFilters)}
+              className="flex items-center gap-2 px-4 py-2 bg-navy-100 text-navy-700 rounded-lg hover:bg-navy-200 transition-colors"
             >
-              All
-            </button>
-            {['submitted', 'under_review', 'documents_requested', 'approved', 'rejected'].map((status) => (
-              <button
-                key={status}
-                onClick={() => {
-                  setFilter(status);
-                  setCurrentPage(1);
-                }}
-                className={`px-4 py-2 rounded-xl font-medium transition-colors ${
-                  filter === status
-                    ? 'bg-accent-600 text-white'
-                    : 'bg-navy-100 text-navy-700 hover:bg-navy-200'
-                }`}
+              <Filter size={16} />
+              Filters
+              {(filter || searchTerm) && (
+                <span className="h-2 w-2 bg-accent-600 rounded-full" />
+              )}
+            </motion.button>
+
+            {/* Clear Filters */}
+            {(filter || searchTerm) && (
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                onClick={clearFilters}
+                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
-                {status.replace('_', ' ').toUpperCase()}
-              </button>
-            ))}
+                Clear
+              </motion.button>
+            )}
           </div>
+
+          {/* Expandable Filters */}
+          <AnimatePresence>
+            {showFilters && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="mt-4 pt-4 border-t border-gray-200"
+              >
+                <div className="flex flex-wrap gap-3">
+                  <button
+                    onClick={() => {
+                      setFilter('');
+                      setCurrentPage(1);
+                    }}
+                    className={`px-4 py-2 rounded-xl font-medium transition-colors ${
+                      filter === ''
+                        ? 'bg-accent-600 text-white'
+                        : 'bg-navy-100 text-navy-700 hover:bg-navy-200'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {['submitted', 'under_review', 'documents_requested', 'approved', 'rejected'].map((status) => (
+                    <button
+                      key={status}
+                      onClick={() => {
+                        setFilter(status);
+                        setCurrentPage(1);
+                      }}
+                      className={`px-4 py-2 rounded-xl font-medium transition-colors ${
+                        filter === status
+                          ? 'bg-accent-600 text-white'
+                          : 'bg-navy-100 text-navy-700 hover:bg-navy-200'
+                      }`}
+                    >
+                      {status.replace('_', ' ').toUpperCase()}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Sort Options */}
+                <div className="mt-4 flex items-center gap-3">
+                  <span className="text-sm text-gray-600">Sort by:</span>
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  >
+                    <option value="createdAt">Date Applied</option>
+                    <option value="loanAmount">Loan Amount</option>
+                    <option value="user.fullName">Customer Name</option>
+                    <option value="status">Status</option>
+                  </select>
+                  <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')}
+                    className="p-2 bg-navy-100 rounded-lg hover:bg-navy-200 transition-colors"
+                  >
+                    <ArrowUpDown size={16} className={sortOrder === 'asc' ? 'rotate-180' : ''} />
+                  </motion.button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
         {/* Applications Table */}

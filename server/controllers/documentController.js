@@ -1,6 +1,10 @@
 const Document = require('../models/Document');
 const LoanApplication = require('../models/LoanApplication');
+const Notification = require('../models/Notification');
+const AuditLog = require('../models/AuditLog');
+const User = require('../models/User');
 const cloudinary = require('../config/cloudinary');
+const { sendDocumentVerifiedEmail, sendDocumentRejectedEmail } = require('../utils/emailService');
 const fs = require('fs');
 
 // @desc    Upload document
@@ -121,6 +125,7 @@ exports.verifyDocument = async (req, res, next) => {
       });
     }
 
+    const previousStatus = document.verificationStatus;
     document.verificationStatus = verificationStatus;
     document.verifiedBy = req.user._id;
     document.verifiedAt = Date.now();
@@ -130,6 +135,65 @@ exports.verifyDocument = async (req, res, next) => {
     }
 
     await document.save();
+
+    // Get user and application for notifications
+    const user = await User.findById(document.user);
+    const application = await LoanApplication.findById(document.application);
+
+    // Create notification and email for rejection
+    if (verificationStatus === 'rejected' && previousStatus !== 'rejected') {
+      await Notification.create({
+        user: document.user,
+        document: document._id,
+        application: document.application,
+        title: 'Document Rejected',
+        message: `Your document "${document.fileName}" was rejected. ${rejectionReason ? `Reason: ${rejectionReason}` : 'Please upload a revised version.'}`,
+        type: 'error',
+      });
+
+      // Send email
+      if (user && application) {
+        try {
+          await sendDocumentRejectedEmail(user, document, application, rejectionReason);
+        } catch (emailError) {
+          console.error('Failed to send rejection email:', emailError);
+        }
+      }
+    }
+
+    // Create notification and email for verification
+    if (verificationStatus === 'verified' && previousStatus !== 'verified') {
+      await Notification.create({
+        user: document.user,
+        document: document._id,
+        application: document.application,
+        title: 'Document Verified',
+        message: `Your document "${document.fileName}" has been verified successfully.`,
+        type: 'success',
+      });
+
+      // Send email
+      if (user && application) {
+        try {
+          await sendDocumentVerifiedEmail(user, document, application);
+        } catch (emailError) {
+          console.error('Failed to send verification email:', emailError);
+        }
+      }
+    }
+
+    // Audit log
+    await AuditLog.create({
+      user: req.user._id,
+      action: `verify_document_${verificationStatus}`,
+      entityType: 'document',
+      entityId: document._id,
+      changes: {
+        previousStatus,
+        newStatus: verificationStatus,
+        rejectionReason,
+      },
+    });
 
     res.json({
       success: true,
