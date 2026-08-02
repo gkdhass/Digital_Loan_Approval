@@ -14,8 +14,8 @@ const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
   'http://localhost:3000',
-  process.env.CLIENT_URL, // Production frontend URL
-].filter(Boolean); // Remove undefined values
+  ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(url => url.trim()) : []),
+];
 
 app.use(cors({
   origin: (origin, callback) => {
@@ -25,7 +25,8 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      // Return false instead of throwing error to avoid 500
+      callback(null, false);
     }
   },
   credentials: true,
