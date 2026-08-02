@@ -13,21 +13,22 @@ const TIMEOUT_MS = parseInt(process.env.OPENAI_TIMEOUT) || 30000;
 
 /**
  * Extract text from an image URL using Tesseract OCR
+ * Processes images in-memory (no disk writes) for serverless compatibility
  * @param {string} imageUrl - URL of the image to process
  * @returns {Promise<string>} - Extracted text
  */
 const extractTextFromImage = async (imageUrl) => {
   try {
-    // Download image
+    // Download image into memory buffer
     const response = await axios.get(imageUrl, {
       responseType: 'arraybuffer',
       timeout: 10000,
     });
 
-    // Convert to buffer
+    // Convert to buffer (stays in memory, no disk write)
     const imageBuffer = Buffer.from(response.data);
 
-    // Run OCR
+    // Run OCR directly on the buffer (in-memory processing)
     const result = await Tesseract.recognize(imageBuffer, 'eng', {
       logger: (m) => {
         if (m.status === 'recognizing text') {

@@ -6,7 +6,6 @@ const User = require('../models/User');
 const cloudinary = require('../config/cloudinary');
 const { sendDocumentVerifiedEmail, sendDocumentRejectedEmail } = require('../utils/emailService');
 const { triggerAIAssessmentAsync, generateAIAssessment } = require('../utils/aiAssessmentService');
-const fs = require('fs');
 
 // @desc    Upload document
 // @route   POST /api/documents/upload
@@ -25,7 +24,6 @@ exports.uploadDocument = async (req, res, next) => {
     // Verify application exists and belongs to user
     const application = await LoanApplication.findById(applicationId);
     if (!application) {
-      fs.unlinkSync(req.file.path);
       return res.status(404).json({
         success: false,
         message: 'Application not found',
@@ -33,21 +31,21 @@ exports.uploadDocument = async (req, res, next) => {
     }
 
     if (application.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
-      fs.unlinkSync(req.file.path);
       return res.status(403).json({
         success: false,
         message: 'Not authorized',
       });
     }
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(req.file.path, {
+    // Upload to Cloudinary from memory buffer (no disk write needed)
+    // Convert buffer to base64 data URI for Cloudinary
+    const b64 = Buffer.from(req.file.buffer).toString('base64');
+    const dataURI = `data:${req.file.mimetype};base64,${b64}`;
+
+    const result = await cloudinary.uploader.upload(dataURI, {
       folder: 'loan-documents',
       resource_type: 'auto',
     });
-
-    // Delete local file
-    fs.unlinkSync(req.file.path);
 
     // Create document record
     const document = await Document.create({
@@ -71,10 +69,6 @@ exports.uploadDocument = async (req, res, next) => {
       data: document,
     });
   } catch (error) {
-    // Clean up file if error occurs
-    if (req.file && fs.existsSync(req.file.path)) {
-      fs.unlinkSync(req.file.path);
-    }
     next(error);
   }
 };

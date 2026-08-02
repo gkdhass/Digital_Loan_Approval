@@ -13,6 +13,7 @@ const Login = () => {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedRole, setSelectedRole] = useState('customer'); // 'customer' or 'admin'
 
   const { login, user } = useAuth();
   const navigate = useNavigate();
@@ -28,6 +29,11 @@ const Login = () => {
     setError('');
   };
 
+  const handleRoleToggle = (role) => {
+    setSelectedRole(role);
+    setError('');
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
@@ -36,6 +42,21 @@ const Login = () => {
     try {
       const response = await login(formData.email, formData.password);
       const userRole = response.data.user.role;
+
+      // Verify the logged-in user's role matches the selected tab
+      if (selectedRole === 'admin' && userRole !== 'admin') {
+        setError('This account is not an admin account. Please use Customer Login instead.');
+        setLoading(false);
+        return;
+      }
+
+      if (selectedRole === 'customer' && userRole === 'admin') {
+        setError('This is an admin account. Please use Admin Login instead.');
+        setLoading(false);
+        return;
+      }
+
+      // Redirect based on actual server role (source of truth)
       const redirectPath = userRole === 'admin' ? '/admin/dashboard' : '/dashboard';
       navigate(redirectPath, { replace: true });
     } catch (err) {
@@ -77,14 +98,42 @@ const Login = () => {
           transition={{ delay: 0.3 }}
           className="card p-8"
         >
+          {/* Role Selector Toggle */}
+          <div className="mb-6">
+            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+              <button
+                type="button"
+                onClick={() => handleRoleToggle('customer')}
+                className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  selectedRole === 'customer'
+                    ? 'bg-gradient-to-r from-accent-600 to-accent-700 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+              >
+                Customer Login
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRoleToggle('admin')}
+                className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
+                  selectedRole === 'admin'
+                    ? 'bg-gradient-to-r from-accent-600 to-accent-700 text-white shadow-md'
+                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                }`}
+              >
+                Admin Login
+              </button>
+            </div>
+          </div>
+
           {error && (
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3"
+              className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3"
             >
-              <AlertCircle className="h-5 w-5 text-red-600 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800">{error}</p>
+              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
             </motion.div>
           )}
 
@@ -153,25 +202,20 @@ const Login = () => {
             </motion.button>
           </form>
 
-          <div className="mt-6 text-center">
-            <p className="text-secondary">
-              Don't have an account?{' '}
-              <Link
-                to="/register"
-                className="text-accent-600 hover:text-accent-700 font-semibold"
-              >
-                Sign up
-              </Link>
-            </p>
-          </div>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-            <p className="text-sm font-semibold text-blue-900 mb-2">Demo Credentials:</p>
-            <p className="text-xs text-blue-800">
-              <strong>Admin:</strong> dhassgkd@gmail.com / dhassgkd
-            </p>
-          </div>
+          {/* Show Sign Up link only for Customer Login */}
+          {selectedRole === 'customer' && (
+            <div className="mt-6 text-center">
+              <p className="text-secondary">
+                Don't have an account?{' '}
+                <Link
+                  to="/register"
+                  className="text-accent-600 hover:text-accent-700 font-semibold"
+                >
+                  Sign up
+                </Link>
+              </p>
+            </div>
+          )}
         </motion.div>
       </div>
     </motion.div>
