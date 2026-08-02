@@ -1,0 +1,119 @@
+import axios from 'axios';
+
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Create axios instance
+const api = axios.create({
+  baseURL: API_URL,
+  headers: {
+    'Content-Type': 'application/json'
+  }
+});
+
+// Request interceptor - attach auth token
+api.interceptors.request.use(
+  (config) => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor - handle errors
+api.interceptors.response.use(
+  (response) => response.data,
+  (error) => {
+    if (error.response?.status === 401) {
+      // Token expired or invalid
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      window.location.href = '/login';
+    }
+    return Promise.reject(error.response?.data || error.message);
+  }
+);
+
+// Auth API
+export const authAPI = {
+  register: (data) => api.post('/auth/register', data),
+  login: (data) => api.post('/auth/login', data),
+  getMe: () => api.get('/auth/me'),
+  updateProfile: (data) => api.put('/auth/profile', data),
+  changePassword: (data) => api.put('/auth/change-password', data)
+};
+
+// Loan Types API
+export const loanTypesAPI = {
+  getAll: () => api.get('/loan-types'),
+  getById: (id) => api.get(`/loan-types/${id}`),
+  checkEligibility: (data) => api.post('/loan-types/check-eligibility', data),
+  calculateEMI: (data) => api.post('/loan-types/calculate-emi', data)
+};
+
+// Applications API
+export const applicationsAPI = {
+  create: (data) => api.post('/applications', data),
+  getUserApplications: () => api.get('/applications'),
+  getById: (id) => api.get(`/applications/${id}`),
+  getAllApplications: (params) => api.get('/applications/admin/all', { params }),
+  updateStatus: (id, data) => api.put(`/applications/${id}/status`, data),
+  delete: (id) => api.delete(`/applications/${id}`)
+};
+
+// Documents API
+export const documentsAPI = {
+  upload: (formData) => api.post('/documents/upload', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' }
+  }),
+  getByApplication: (applicationId) => api.get(`/documents/application/${applicationId}`),
+  verify: (id, data) => api.put(`/documents/${id}/verify`, data),
+  delete: (id) => api.delete(`/documents/${id}`)
+};
+
+// Notifications API
+export const notificationsAPI = {
+  getAll: (params) => api.get('/notifications', { params }),
+  markAsRead: (id) => api.put(`/notifications/${id}/read`),
+  markAllAsRead: () => api.put('/notifications/read-all'),
+  delete: (id) => api.delete(`/notifications/${id}`)
+};
+
+// Dashboard API
+export const dashboardAPI = {
+  getUserDashboard: () => api.get('/dashboard/user'),
+  getAdminDashboard: () => api.get('/dashboard/admin'),
+  getAnalytics: (params) => api.get('/dashboard/analytics', { params })
+};
+
+// Helper to format currency
+export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 0
+  }).format(amount);
+};
+
+// Helper to format date
+export const formatDate = (date) => {
+  return new Intl.DateTimeFormat('en-IN', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  }).format(new Date(date));
+};
+
+// Calculate EMI
+export const calculateEMI = (principal, annualRate, months) => {
+  const monthlyRate = annualRate / 12 / 100;
+  const emi = (principal * monthlyRate * Math.pow(1 + monthlyRate, months)) / 
+               (Math.pow(1 + monthlyRate, months) - 1);
+  return Math.round(emi);
+};
+
+export default api;
