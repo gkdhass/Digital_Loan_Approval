@@ -17,15 +17,18 @@ const allowedOrigins = [
   ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(url => url.trim()) : []),
 ];
 
+console.log('🔒 CORS Allowed Origins:', allowedOrigins);
+
 app.use(cors({
   origin: (origin, callback) => {
     // Allow requests with no origin (mobile apps, Postman, etc.)
     if (!origin) return callback(null, true);
     
     if (allowedOrigins.includes(origin)) {
+      console.log('✅ CORS allowed:', origin);
       callback(null, true);
     } else {
-      // Return false instead of throwing error to avoid 500
+      console.warn('❌ CORS blocked:', origin);
       callback(null, false);
     }
   },
