@@ -18,6 +18,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Digital Loan Approval API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV || 'development',
+  });
+});
+
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/loan-types', require('./routes/loanTypeRoutes'));
 app.use('/api/applications', require('./routes/applicationRoutes'));
