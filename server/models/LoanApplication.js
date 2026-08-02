@@ -63,6 +63,34 @@ const loanApplicationSchema = new mongoose.Schema({
     min: 0,
     max: 100,
   },
+  aiAssessment: {
+    aiConfidenceScore: {
+      type: Number,
+      min: 0,
+      max: 100,
+    },
+    aiRecommendation: {
+      type: String,
+      enum: ['Likely Approved', 'Likely Rejected', 'Needs Review'],
+    },
+    aiReasoning: {
+      type: String,
+    },
+    flaggedInconsistencies: [{
+      type: String,
+    }],
+    processedAt: {
+      type: Date,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'completed', 'failed', 'not_available'],
+      default: 'pending',
+    },
+    errorMessage: {
+      type: String,
+    },
+  },
   adminNotes: {
     type: String,
   },

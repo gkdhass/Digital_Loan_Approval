@@ -5,6 +5,7 @@ const AuditLog = require('../models/AuditLog');
 const User = require('../models/User');
 const cloudinary = require('../config/cloudinary');
 const { sendDocumentVerifiedEmail, sendDocumentRejectedEmail } = require('../utils/emailService');
+const { triggerAIAssessmentAsync, generateAIAssessment } = require('../utils/aiAssessmentService');
 const fs = require('fs');
 
 // @desc    Upload document
@@ -59,6 +60,10 @@ exports.uploadDocument = async (req, res, next) => {
       fileSize: req.file.size,
       mimeType: req.file.mimetype,
     });
+
+    // Trigger AI assessment asynchronously (non-blocking)
+    // This runs in the background without delaying the response
+    triggerAIAssessmentAsync(applicationId);
 
     res.status(201).json({
       success: true,
@@ -237,6 +242,83 @@ exports.deleteDocument = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Document deleted successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Trigger AI assessment for application (Admin)
+// @route   POST /api/documents/ai-assessment/:applicationId
+// @access  Private/Admin
+exports.triggerAIAssessment = async (req, res, next) => {
+  try {
+    const { applicationId } = req.params;
+
+    const application = await LoanApplication.findById(applicationId);
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found',
+      });
+    }
+
+    // Check if already processing
+    if (application.aiAssessment && application.aiAssessment.status === 'pending') {
+      return res.status(400).json({
+        success: false,
+        message: 'AI assessment is already in progress',
+      });
+    }
+
+    // Update status to pending
+    application.aiAssessment = { status: 'pending' };
+    await application.save();
+
+    // Trigger assessment asynchronously
+    triggerAIAssessmentAsync(applicationId);
+
+    res.json({
+      success: true,
+      message: 'AI assessment triggered successfully',
+      data: {
+        status: 'pending',
+        message: 'Assessment is being processed in the background',
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Get AI assessment status for application
+// @route   GET /api/documents/ai-assessment/:applicationId
+// @access  Private
+exports.getAIAssessment = async (req, res, next) => {
+  try {
+    const { applicationId } = req.params;
+
+    const application = await LoanApplication.findById(applicationId);
+    if (!application) {
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found',
+      });
+    }
+
+    // Check authorization
+    if (application.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Not authorized',
+      });
+    }
+
+    const aiAssessment = application.aiAssessment || { status: 'not_available' };
+
+    res.json({
+      success: true,
+      data: aiAssessment,
     });
   } catch (error) {
     next(error);

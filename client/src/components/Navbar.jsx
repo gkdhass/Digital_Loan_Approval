@@ -1,15 +1,17 @@
 import { useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Menu, X, Bell, User, LogOut, LayoutDashboard, FileText, Home, Calculator, Users, BarChart3, FileCheck, History } from 'lucide-react';
+import { Menu, X, Bell, User, LogOut, LayoutDashboard, FileText, Home, Calculator, Users, BarChart3, FileCheck, History, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
-import { buttonVariants } from '../animations/variants';
+import { useTheme } from '../context/ThemeContext';
+import { buttonSpring } from '../animations/springs';
 import Notifications from './Notifications';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileMenuOpen, setProfileMenuOpen] = useState(false);
   const { user, logout, isAuthenticated, isAdmin } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,15 +46,19 @@ const Navbar = () => {
       ];
 
   return (
-    <nav className="bg-white border-b border-gray-200 sticky top-0 z-40 backdrop-blur-lg bg-white/95">
+    <nav className="bg-surface border-b border-border-primary sticky top-0 z-40 backdrop-blur-lg bg-surface/95 transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <div className="h-10 w-10 bg-gradient-to-br from-accent-600 to-accent-700 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-soft">
+            <motion.div 
+              className="h-10 w-10 bg-gradient-to-br from-golden-600 to-golden-500 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-glow-golden"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              whileTap={{ scale: 0.95 }}
+            >
               L
-            </div>
-            <span className="text-xl font-bold text-navy-900">
+            </motion.div>
+            <span className="text-xl font-bold text-heading">
               LoanApproval
             </span>
           </Link>
@@ -67,8 +73,8 @@ const Navbar = () => {
                   to={item.path}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                     isActive(item.path)
-                      ? 'bg-accent-50 text-accent-700'
-                      : 'text-gray-700 hover:bg-gray-50'
+                      ? 'bg-golden-100 text-golden-700 dark:bg-golden-900/30 dark:text-golden-400'
+                      : 'text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -84,24 +90,62 @@ const Navbar = () => {
           <div className="hidden md:flex items-center gap-3">
             {isAuthenticated ? (
               <>
+                {/* Theme Toggle */}
+                <motion.button
+                  {...buttonSpring}
+                  onClick={toggleTheme}
+                  className="p-2 text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+                >
+                  <AnimatePresence mode="wait">
+                    {theme === 'light' ? (
+                      <motion.div
+                        key="moon"
+                        initial={{ rotate: -90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: 90, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Moon className="h-5 w-5" />
+                      </motion.div>
+                    ) : (
+                      <motion.div
+                        key="sun"
+                        initial={{ rotate: 90, opacity: 0 }}
+                        animate={{ rotate: 0, opacity: 1 }}
+                        exit={{ rotate: -90, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Sun className="h-5 w-5" />
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </motion.button>
+
                 {/* Notifications */}
                 <Notifications />
 
                 {/* Profile Menu */}
                 <div className="relative">
                   <motion.button
-                    variants={buttonVariants}
-                    whileHover="hover"
-                    whileTap="tap"
+                    {...buttonSpring}
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
                   >
-                    <div className="h-8 w-8 bg-accent-100 rounded-full flex items-center justify-center">
-                      <span className="text-sm font-semibold text-accent-700">
-                        {user?.fullName?.charAt(0).toUpperCase()}
-                      </span>
+                    <div className="h-8 w-8 bg-golden-100 dark:bg-golden-900/30 rounded-full flex items-center justify-center overflow-hidden">
+                      {user?.profilePicture ? (
+                        <img
+                          src={user.profilePicture}
+                          alt="Profile"
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <span className="text-sm font-semibold text-golden-700 dark:text-golden-400">
+                          {user?.fullName?.charAt(0).toUpperCase()}
+                        </span>
+                      )}
                     </div>
-                    <span className="text-sm font-medium text-gray-700 max-w-[120px] truncate">
+                    <span className="text-sm font-medium text-primary max-w-[120px] truncate">
                       {user?.fullName}
                     </span>
                   </motion.button>
@@ -113,14 +157,26 @@ const Navbar = () => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-48 bg-white rounded-xl shadow-soft-lg border border-gray-200 py-2"
+                        className="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-soft-lg border border-border-primary py-2"
                       >
+                        {isAdmin && (
+                          <button
+                            onClick={() => {
+                              navigate('/admin/dashboard');
+                              setProfileMenuOpen(false);
+                            }}
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                          >
+                            <LayoutDashboard className="h-4 w-4" />
+                            Admin Dashboard
+                          </button>
+                        )}
                         <button
                           onClick={() => {
                             navigate('/profile');
                             setProfileMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
                         >
                           <User className="h-4 w-4" />
                           Profile
@@ -139,15 +195,24 @@ const Navbar = () => {
               </>
             ) : (
               <>
+                {/* Theme Toggle for non-authenticated users */}
+                <motion.button
+                  {...buttonSpring}
+                  onClick={toggleTheme}
+                  className="p-2 text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                >
+                  {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                </motion.button>
+                
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:text-gray-900"
+                  className="px-4 py-2 text-sm font-medium text-primary hover:text-heading"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="px-6 py-2 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-lg font-medium text-sm hover:shadow-md transition-shadow"
+                  className="px-6 py-2 bg-success-300 text-success-900 rounded-lg font-medium text-sm hover:bg-success-400 hover:scale-[1.03] active:scale-[0.97] transition-all"
                 >
                   Get Started
                 </Link>
@@ -172,7 +237,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-gray-200 bg-white"
+            className="md:hidden border-t border-border-primary bg-surface"
           >
             <div className="px-4 py-4 space-y-2">
               {navigation.map((item) => {
@@ -184,8 +249,8 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm ${
                       isActive(item.path)
-                        ? 'bg-accent-50 text-accent-700'
-                        : 'text-gray-700 hover:bg-gray-50'
+                        ? 'bg-golden-100 text-golden-700 dark:bg-golden-900/30 dark:text-golden-400'
+                        : 'text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -197,17 +262,26 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={() => {
+                      toggleTheme();
+                    }}
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                    {theme === 'light' ? 'Dark' : 'Light'} Mode
+                  </button>
+                  <button
+                    onClick={() => {
                       navigate('/profile');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-gray-700 hover:bg-gray-50"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <User className="h-5 w-5" />
                     Profile
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-red-600 hover:bg-red-50"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
                   >
                     <LogOut className="h-5 w-5" />
                     Logout
@@ -215,16 +289,23 @@ const Navbar = () => {
                 </>
               ) : (
                 <>
+                  <button
+                    onClick={toggleTheme}
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
+                    {theme === 'light' ? 'Dark' : 'Light'} Mode
+                  </button>
                   <Link
                     to="/login"
-                    className="block px-4 py-3 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50"
+                    className="block px-4 py-3 rounded-lg text-sm font-medium text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="block px-4 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-lg font-medium text-sm text-center"
+                    className="block px-4 py-3 bg-success-300 text-success-900 rounded-lg font-medium text-sm text-center hover:bg-success-400"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Get Started

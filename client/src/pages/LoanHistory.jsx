@@ -5,11 +5,12 @@ import api from '../services/api';
 import { formatCurrency, formatDate } from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import { pageVariants, cardVariants } from '../animations/variants';
-import { useToast } from '../hooks/useToast';
+import { useToast } from '../hooks/useToast.jsx';
 
 const LoanHistory = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -18,10 +19,17 @@ const LoanHistory = () => {
 
   const fetchApplications = async () => {
     try {
+      setLoading(true);
+      setError(null);
+      // NOTE: The axios interceptor returns response.data (the HTTP body), so
+      // `response` here is already { success, count, data: [...] }.
+      // The actual array lives at response.data, NOT response.data.data.
       const response = await api.get('/applications');
-      setApplications(response.data.data);
-    } catch (error) {
-      console.error('Failed to fetch applications:', error);
+      const list = Array.isArray(response.data) ? response.data : [];
+      setApplications(list);
+    } catch (err) {
+      console.error('Failed to fetch applications:', err);
+      setError(err?.message || 'Failed to load loan history. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -49,7 +57,7 @@ const LoanHistory = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/4" />
@@ -62,17 +70,41 @@ const LoanHistory = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-primary py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md mx-auto text-center py-16">
+            <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-primary mb-2">Failed to load loan history</h2>
+            <p className="text-secondary mb-6">{error}</p>
+            <button
+              onClick={fetchApplications}
+              className="px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-navy-50 py-8"
+      className="min-h-screen bg-primary py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-2">Loan History</h1>
-          <p className="text-navy-600">View all your loan applications and download agreements</p>
+          <h1 className="text-3xl font-bold text-heading mb-2">Loan History</h1>
+          <p className="text-secondary">View all your loan applications and download agreements</p>
         </div>
 
         {applications.length === 0 ? (
@@ -81,9 +113,9 @@ const LoanHistory = () => {
             animate={{ opacity: 1 }}
             className="text-center py-12"
           >
-            <FileText className="mx-auto text-navy-300 mb-4" size={48} />
-            <p className="text-navy-600">No loan applications yet</p>
-            <p className="text-sm text-gray-500 mt-2">Apply for a loan to get started</p>
+            <FileText className="mx-auto text-gray-400 dark:text-gray-600 mb-4" size={48} />
+            <p className="text-secondary">No loan applications yet</p>
+            <p className="text-sm text-secondary mt-2">Apply for a loan to get started</p>
           </motion.div>
         ) : (
           <div className="space-y-6">
@@ -106,10 +138,10 @@ const LoanHistory = () => {
                       <div className="flex-1">
                         <div className="flex items-start justify-between gap-4 mb-2">
                           <div>
-                            <h3 className="text-lg font-bold text-navy-900">
+                            <h3 className="text-lg font-bold text-primary">
                               {app.applicationNumber}
                             </h3>
-                            <p className="text-sm text-navy-600">{app.loanType?.name}</p>
+                            <p className="text-sm text-secondary">{app.loanType?.name}</p>
                           </div>
                           <StatusBadge status={app.status} />
                         </div>
@@ -119,28 +151,28 @@ const LoanHistory = () => {
                     {/* Details Grid */}
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                       <div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                        <div className="flex items-center gap-2 text-sm text-secondary mb-1">
                           <DollarSign size={14} />
                           Loan Amount
                         </div>
-                        <p className="font-semibold text-navy-900">{formatCurrency(app.loanAmount)}</p>
+                        <p className="font-semibold text-primary">{formatCurrency(app.loanAmount)}</p>
                       </div>
                       <div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                        <div className="flex items-center gap-2 text-sm text-secondary mb-1">
                           <Calendar size={14} />
                           Duration
                         </div>
-                        <p className="font-semibold text-navy-900">{app.durationMonths} months</p>
+                        <p className="font-semibold text-primary">{app.durationMonths} months</p>
                       </div>
                       <div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                        <div className="flex items-center gap-2 text-sm text-secondary mb-1">
                           <Clock size={14} />
                           Applied On
                         </div>
-                        <p className="font-semibold text-navy-900">{formatDate(app.createdAt)}</p>
+                        <p className="font-semibold text-primary">{formatDate(app.createdAt)}</p>
                       </div>
                       <div>
-                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                        <div className="flex items-center gap-2 text-sm text-secondary mb-1">
                           <DollarSign size={14} />
                           Monthly EMI
                         </div>
@@ -171,9 +203,9 @@ const LoanHistory = () => {
                     )}
 
                     {app.adminNotes && (
-                      <div className="mt-4 p-4 bg-navy-50 rounded-lg">
-                        <p className="text-sm text-gray-600 mb-1">Admin Notes</p>
-                        <p className="text-navy-900">{app.adminNotes}</p>
+                      <div className="mt-4 p-4 bg-primary rounded-lg">
+                        <p className="text-sm text-secondary mb-1">Admin Notes</p>
+                        <p className="text-primary">{app.adminNotes}</p>
                       </div>
                     )}
                   </div>

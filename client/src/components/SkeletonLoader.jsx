@@ -21,7 +21,7 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
             </div>
           </motion.div>
         );
-      
+
       case 'stat':
         return (
           <motion.div
@@ -34,7 +34,7 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
             <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse" />
           </motion.div>
         );
-      
+
       case 'table':
         return (
           <motion.div
@@ -55,7 +55,7 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
             ))}
           </motion.div>
         );
-      
+
       default:
         return (
           <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
@@ -71,5 +71,14 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
     </div>
   );
 };
+
+// Named exports for specific skeleton types
+export const SkeletonTable = ({ rows = 5 }) => (
+  <SkeletonLoader type="table" count={1} />
+);
+
+export const SkeletonStat = ({ count = 1 }) => (
+  <SkeletonLoader type="stat" count={count} />
+);
 
 export default SkeletonLoader;

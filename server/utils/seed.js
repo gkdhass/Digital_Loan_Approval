@@ -8,21 +8,26 @@ const LoanType = require('../models/LoanType');
 const seedDatabase = async () => {
   try {
     console.log('🌱 Starting database seeding...');
-    
+
     // Connect to MongoDB
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('✓ Connected to MongoDB');
 
+    // Get admin credentials from env or use defaults
+    const adminEmail = process.env.ADMIN_EMAIL || 'dhassgkd@gmail.com';
+    const adminPasswordPlain = process.env.ADMIN_PASSWORD || 'dhassgkd';
+
     // Clear existing data
     await User.deleteMany({ role: 'admin' });
+    await User.deleteMany({ email: adminEmail });
     await LoanType.deleteMany({});
     console.log('✓ Cleared existing seed data');
 
     // Create admin user
-    const adminPassword = await bcrypt.hash('admin123', 10);
+    const adminPassword = await bcrypt.hash(adminPasswordPlain, 10);
     const admin = await User.create({
       fullName: 'System Administrator',
-      email: 'admin@loanapproval.com',
+      email: adminEmail,
       password: adminPassword,
       phone: '+91-9876543210',
       role: 'admin',
@@ -34,7 +39,7 @@ const seedDatabase = async () => {
       },
       isActive: true
     });
-    console.log('✓ Created admin user: admin@loanapproval.com / admin123');
+    console.log(`✓ Created admin user: ${adminEmail} / ${adminPasswordPlain}`);
 
     // Create 8 loan types
     const loanTypes = [

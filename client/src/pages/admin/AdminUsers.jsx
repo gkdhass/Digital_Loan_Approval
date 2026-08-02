@@ -4,11 +4,12 @@ import { Users, Search, Trash2, ChevronLeft, ChevronRight, Mail, Phone, Calendar
 import api from '../../services/api';
 import { pageVariants, cardVariants } from '../../animations/variants';
 import { SkeletonTable } from '../../components/SkeletonLoader';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -22,13 +23,16 @@ const AdminUsers = () => {
   const fetchUsers = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await api.get('/admin/users', {
         params: { page: currentPage, limit: 10, search: searchTerm || undefined },
       });
-      setUsers(response.data.data);
-      setTotalPages(response.data.totalPages || 1);
-    } catch (error) {
-      console.error('Failed to fetch users:', error);
+      // Interceptor unwraps HTTP body → response = {success, data:[...], totalPages}
+      setUsers(Array.isArray(response.data) ? response.data : []);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('Failed to fetch users:', err);
+      setError(err?.message || 'Failed to load users. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -48,7 +52,7 @@ const AdminUsers = () => {
 
   if (loading && currentPage === 1) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SkeletonTable rows={10} />
         </div>
@@ -61,12 +65,12 @@ const AdminUsers = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-navy-50 py-8"
+      className="min-h-screen bg-primary py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-2">User Management</h1>
-          <p className="text-navy-600">Manage customer accounts</p>
+          <h1 className="text-3xl font-bold text-heading mb-2">User Management</h1>
+          <p className="text-secondary">Manage customer accounts</p>
         </div>
 
         {/* Search */}

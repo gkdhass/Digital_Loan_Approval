@@ -24,7 +24,8 @@ import { formatCurrency, formatDate } from '../../services/api';
 import StatusBadge from '../../components/StatusBadge';
 import { pageVariants, cardVariants } from '../../animations/variants';
 import useCountUp from '../../hooks/useCountUp';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '../../hooks/useToast.jsx';
+import { sendDecisionEmail } from '../../utils/emailService';
 
 const AdminApplicationDetail = () => {
   const { id } = useParams();
@@ -70,12 +71,24 @@ const AdminApplicationDetail = () => {
         adminNotes: decisionReason,
         rejectionReason: decisionType === 'rejected' ? decisionReason : undefined
       });
-      
+
       setApplication(response.data.data);
       setShowDecisionModal(false);
       setDecisionReason('');
       setDecisionType('');
       showToast(`Application ${decisionType.replace('_', ' ')} successfully`, 'success');
+
+      // Send decision email using shared utility for approved/rejected
+      if (decisionType === 'approved' || decisionType === 'rejected') {
+        try {
+          await sendDecisionEmail(response.data.data, decisionType, {
+            rejectionReason: decisionType === 'rejected' ? decisionReason : undefined
+          });
+        } catch (emailError) {
+          console.error('Failed to send decision email:', emailError);
+          // Don't block the flow if email fails
+        }
+      }
     } catch (error) {
       console.error('Failed to update status:', error);
       showToast('Failed to update application status', 'error');

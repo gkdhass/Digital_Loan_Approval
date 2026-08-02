@@ -20,20 +20,28 @@ const Notifications = () => {
   const fetchNotifications = async () => {
     try {
       const response = await api.get('/notifications', { params: { limit: 10 } });
-      setNotifications(response.data.data || []);
-      setUnreadCount(response.data.unreadCount || 0);
+      // Safely extract arrays - handle both response structures
+      const data = response.data?.data || response.data || [];
+      setNotifications(Array.isArray(data) ? data : []);
+      setUnreadCount(response.data?.unreadCount || response.unreadCount || 0);
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
+      setNotifications([]);
+      setUnreadCount(0);
     }
   };
 
   const markAsRead = async (id) => {
     try {
       await api.put(`/notifications/${id}/read`);
-      setNotifications(notifications.map(n =>
-        n._id === id ? { ...n, isRead: true, readAt: new Date() } : n
-      ));
-      setUnreadCount(Math.max(0, unreadCount - 1));
+      setNotifications(prevNotifications =>
+        Array.isArray(prevNotifications)
+          ? prevNotifications.map(n =>
+              n._id === id ? { ...n, isRead: true, readAt: new Date() } : n
+            )
+          : []
+      );
+      setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Failed to mark as read:', error);
     }
@@ -42,7 +50,11 @@ const Notifications = () => {
   const markAllAsRead = async () => {
     try {
       await api.put('/notifications/read-all');
-      setNotifications(notifications.map(n => ({ ...n, isRead: true, readAt: new Date() })));
+      setNotifications(prevNotifications =>
+        Array.isArray(prevNotifications)
+          ? prevNotifications.map(n => ({ ...n, isRead: true, readAt: new Date() }))
+          : []
+      );
       setUnreadCount(0);
     } catch (error) {
       console.error('Failed to mark all as read:', error);
@@ -52,9 +64,16 @@ const Notifications = () => {
   const deleteNotification = async (id) => {
     try {
       await api.delete(`/notifications/${id}`);
-      setNotifications(notifications.filter(n => n._id !== id));
-      if (!notifications.find(n => n._id === id)?.isRead) {
-        setUnreadCount(Math.max(0, unreadCount - 1));
+      const deletedNotification = Array.isArray(notifications)
+        ? notifications.find(n => n._id === id)
+        : null;
+      setNotifications(prevNotifications =>
+        Array.isArray(prevNotifications)
+          ? prevNotifications.filter(n => n._id !== id)
+          : []
+      );
+      if (deletedNotification && !deletedNotification.isRead) {
+        setUnreadCount(prev => Math.max(0, prev - 1));
       }
     } catch (error) {
       console.error('Failed to delete notification:', error);

@@ -10,6 +10,7 @@ import { staggerContainer, staggerItem } from '../../animations/variants';
 const AdminApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('createdAt');
@@ -25,6 +26,7 @@ const AdminApplications = () => {
   const fetchApplications = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await api.get('/applications/admin/all', {
         params: { 
           status: filter || undefined, 
@@ -35,10 +37,12 @@ const AdminApplications = () => {
           sortOrder
         },
       });
-      setApplications(response.data.data);
-      setTotalPages(response.data.totalPages || 1);
-    } catch (error) {
-      console.error('Failed to fetch applications:', error);
+      // Interceptor unwraps HTTP body → response = {success, data:[...], totalPages}
+      setApplications(Array.isArray(response.data) ? response.data : []);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('Failed to fetch applications:', err);
+      setError(err?.message || 'Failed to load applications. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -63,7 +67,7 @@ const AdminApplications = () => {
 
   if (loading && currentPage === 1) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SkeletonTable rows={10} />
         </div>
@@ -72,13 +76,13 @@ const AdminApplications = () => {
   }
 
   return (
-    <div className="min-h-screen bg-navy-50 py-8">
+    <div className="min-h-screen bg-primary py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-2">
+          <h1 className="text-3xl font-bold text-heading mb-2">
             All Applications
           </h1>
-          <p className="text-navy-600">Review and manage loan applications</p>
+          <p className="text-secondary">Review and manage loan applications</p>
         </div>
 
         {/* Search and Filters */}

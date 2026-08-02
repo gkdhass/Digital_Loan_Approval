@@ -14,11 +14,11 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = location.state?.from?.pathname || '/dashboard';
+  const from = location.state?.from?.pathname || (user?.role === 'admin' ? '/admin/dashboard' : '/dashboard');
 
   const handleChange = (e) => {
     setFormData({
@@ -34,8 +34,10 @@ const Login = () => {
     setLoading(true);
 
     try {
-      await login(formData.email, formData.password);
-      navigate(from, { replace: true });
+      const response = await login(formData.email, formData.password);
+      const userRole = response.data.user.role;
+      const redirectPath = userRole === 'admin' ? '/admin/dashboard' : '/dashboard';
+      navigate(redirectPath, { replace: true });
     } catch (err) {
       setError(err.message || 'Login failed. Please check your credentials.');
     } finally {
@@ -61,10 +63,10 @@ const Login = () => {
           <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-accent-600 to-accent-700 rounded-2xl mb-4 shadow-soft">
             <LogIn className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-navy-900 mb-2">
+          <h2 className="text-3xl font-bold text-heading mb-2">
             Welcome Back
           </h2>
-          <p className="text-gray-600">
+          <p className="text-secondary">
             Sign in to continue to your account
           </p>
         </motion.div>
@@ -88,7 +90,7 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-primary mb-2">
                 Email Address
               </label>
               <div className="relative">
@@ -106,7 +108,7 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-primary mb-2">
                 Password
               </label>
               <div className="relative">
@@ -129,7 +131,7 @@ const Login = () => {
                   type="checkbox"
                   className="rounded border-gray-300 text-accent-600 focus:ring-accent-500"
                 />
-                <span className="text-gray-700">Remember me</span>
+                <span className="text-primary">Remember me</span>
               </label>
               <Link
                 to="/forgot-password"
@@ -152,7 +154,7 @@ const Login = () => {
           </form>
 
           <div className="mt-6 text-center">
-            <p className="text-gray-600">
+            <p className="text-secondary">
               Don't have an account?{' '}
               <Link
                 to="/register"
@@ -167,7 +169,7 @@ const Login = () => {
           <div className="mt-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
             <p className="text-sm font-semibold text-blue-900 mb-2">Demo Credentials:</p>
             <p className="text-xs text-blue-800">
-              <strong>Admin:</strong> admin@loanapproval.com / admin123
+              <strong>Admin:</strong> dhassgkd@gmail.com / dhassgkd
             </p>
           </div>
         </motion.div>

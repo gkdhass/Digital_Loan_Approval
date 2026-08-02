@@ -23,17 +23,13 @@ const StatCard = ({ icon: Icon, label, value, color, delay }) => {
       animate="visible"
       className="card p-6"
     >
-      <div className="flex items-center justify-between mb-4">
-        <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${color}`}>
-          <Icon className="h-6 w-6" />
-        </div>
+      <div className="flex items-center gap-2 mb-3">
+        <Icon className={`h-5 w-5 ${color}`} />
+        <h4 className="text-sm font-semibold text-secondary">{label}</h4>
       </div>
-      <div className="space-y-1">
-        <p className="text-3xl font-bold text-navy-900">
-          {typeof value === 'number' ? animatedValue : value}
-        </p>
-        <p className="text-sm text-gray-600 font-medium">{label}</p>
-      </div>
+      <p className={`text-2xl font-bold ${color}`}>
+        {typeof value === 'number' ? animatedValue : value}
+      </p>
     </motion.div>
   );
 };
@@ -41,6 +37,7 @@ const StatCard = ({ icon: Icon, label, value, color, delay }) => {
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const { user } = useAuth();
 
   useEffect(() => {
@@ -49,10 +46,14 @@ const Dashboard = () => {
 
   const fetchDashboard = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await dashboardAPI.getUserDashboard();
-      setDashboardData(response.data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard:', error);
+      // Interceptor unwraps HTTP body → response = {success, data:{...}}
+      setDashboardData(response.data || null);
+    } catch (err) {
+      console.error('Failed to fetch dashboard:', err);
+      setError(err?.message || 'Failed to load dashboard. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -70,7 +71,34 @@ const Dashboard = () => {
     );
   }
 
-  const { overview, loanStats, recentApplications } = dashboardData || {};
+  if (error) {
+    return (
+      <div className="container-custom py-8">
+        <div className="max-w-md mx-auto text-center py-16">
+          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-primary mb-2">Failed to load dashboard</h2>
+          <p className="text-secondary mb-6">{error}</p>
+          <button
+            onClick={fetchDashboard}
+            className="px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Safely extract data with proper null checks
+  const overview = dashboardData?.overview || {};
+  const loanStats = dashboardData?.loanStats || {};
+  const recentApplications = Array.isArray(dashboardData?.recentApplications) 
+    ? dashboardData.recentApplications 
+    : [];
 
   return (
     <motion.div
@@ -81,10 +109,10 @@ const Dashboard = () => {
     >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-navy-900 mb-2">
+        <h1 className="text-3xl font-bold text-heading mb-2">
           Welcome back, {user?.fullName}!
         </h1>
-        <p className="text-gray-600">
+        <p className="text-secondary">
           Here's your loan application overview
         </p>
       </div>
@@ -94,29 +122,29 @@ const Dashboard = () => {
         <StatCard
           icon={FileText}
           label="Total Applications"
-          value={overview?.totalApplications || 0}
-          color="bg-blue-50 text-blue-600"
+          value={overview.totalApplications || 0}
+          color="text-blue-600"
           delay={0}
         />
         <StatCard
           icon={Clock}
           label="Pending Applications"
-          value={overview?.pendingApplications || 0}
-          color="bg-amber-50 text-amber-600"
+          value={overview.pendingApplications || 0}
+          color="text-amber-600"
           delay={1}
         />
         <StatCard
           icon={CheckCircle}
           label="Approved Loans"
-          value={overview?.approvedApplications || 0}
-          color="bg-emerald-50 text-emerald-600"
+          value={overview.approvedApplications || 0}
+          color="text-emerald-600"
           delay={2}
         />
         <StatCard
           icon={DollarSign}
           label="Total EMI/Month"
-          value={formatCurrency(loanStats?.totalEMI || 0)}
-          color="bg-purple-50 text-purple-600"
+          value={formatCurrency(loanStats.totalEMI || 0)}
+          color="text-purple-600"
           delay={3}
         />
       </div>
@@ -130,21 +158,21 @@ const Dashboard = () => {
           className="card p-6"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-navy-900">Loan Summary</h3>
+            <h3 className="text-lg font-bold text-heading">Loan Summary</h3>
             <TrendingUp className="h-5 w-5 text-accent-600" />
           </div>
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Requested</p>
-              <p className="text-2xl font-bold text-navy-900">
-                {formatCurrency(loanStats?.totalRequested || 0)}
+              <p className="text-sm text-secondary mb-1">Total Requested</p>
+              <p className="text-2xl font-bold text-primary">
+                {formatCurrency(loanStats.totalRequested || 0)}
               </p>
             </div>
             <div className="h-px bg-gray-200" />
             <div>
-              <p className="text-sm text-gray-600 mb-1">Total Approved</p>
+              <p className="text-sm text-secondary mb-1">Total Approved</p>
               <p className="text-2xl font-bold text-emerald-600">
-                {formatCurrency(loanStats?.totalApproved || 0)}
+                {formatCurrency(loanStats.totalApproved || 0)}
               </p>
             </div>
           </div>
@@ -190,7 +218,7 @@ const Dashboard = () => {
         className="card p-6"
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-navy-900">Recent Applications</h3>
+          <h3 className="text-lg font-bold text-heading">Recent Applications</h3>
           <Link
             to="/applications"
             className="text-sm text-accent-600 hover:text-accent-700 font-semibold flex items-center gap-1"
@@ -200,7 +228,7 @@ const Dashboard = () => {
           </Link>
         </div>
 
-        {recentApplications && recentApplications.length > 0 ? (
+        {recentApplications.length > 0 ? (
           <div className="space-y-4">
             {recentApplications.map((app, index) => (
               <motion.div
@@ -219,10 +247,10 @@ const Dashboard = () => {
                         <FileText className="h-5 w-5 text-accent-600" />
                       </div>
                       <div>
-                        <p className="font-semibold text-navy-900">
+                        <p className="font-semibold text-primary">
                           {app.loanType?.name}
                         </p>
-                        <p className="text-sm text-gray-600">
+                        <p className="text-sm text-secondary">
                           {app.applicationNumber}
                         </p>
                       </div>
@@ -230,13 +258,13 @@ const Dashboard = () => {
                     <StatusBadge status={app.status} />
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-gray-600">
-                      Amount: <span className="font-semibold text-navy-900">
+                    <span className="text-secondary">
+                      Amount: <span className="font-semibold text-primary">
                         {formatCurrency(app.loanAmount)}
                       </span>
                     </span>
-                    <span className="text-gray-600">
-                      EMI: <span className="font-semibold text-navy-900">
+                    <span className="text-secondary">
+                      EMI: <span className="font-semibold text-primary">
                         {formatCurrency(app.emi)}
                       </span>
                     </span>
@@ -251,8 +279,8 @@ const Dashboard = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-12"
           >
-            <FileText className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-600 mb-4">No applications yet</p>
+            <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-secondary mb-4">No applications yet</p>
             <Link
               to="/loan-types"
               className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
@@ -260,7 +288,7 @@ const Dashboard = () => {
               Apply for Your First Loan
               <ArrowRight className="h-4 w-4" />
             </Link>
-          </div>
+          </motion.div>
         )}
       </motion.div>
     </motion.div>

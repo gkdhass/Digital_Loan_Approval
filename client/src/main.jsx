@@ -4,10 +4,12 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './index.css';
 
 import { AuthProvider } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Navbar from './components/Navbar';
 import ToastContainer from './components/ToastContainer';
-import { ToastProvider } from './hooks/useToast';
+import { ToastProvider } from './hooks/useToast.jsx';
+import ErrorBoundary from './components/ErrorBoundary';
 
 // Pages
 import Home from './pages/Home';
@@ -20,6 +22,7 @@ import Applications from './pages/Applications';
 import ApplicationDetail from './pages/ApplicationDetail';
 import EmiCalculator from './pages/EmiCalculator';
 import LoanHistory from './pages/LoanHistory';
+import Profile from './pages/Profile';
 import AdminDashboard from './pages/admin/AdminDashboard';
 import AdminApplications from './pages/admin/AdminApplications';
 import AdminApplicationDetail from './pages/admin/AdminApplicationDetail';
@@ -30,12 +33,14 @@ import AdminLoanTypes from './pages/admin/AdminLoanTypes';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <Router>
-      <ToastProvider>
-        <AuthProvider>
-          <div className="min-h-screen bg-gray-50">
-            <Navbar />
-            <Routes>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <Router>
+          <ToastProvider>
+            <AuthProvider>
+              <div className="min-h-screen bg-primary transition-colors duration-300">
+                <Navbar />
+                <Routes>
             {/* Public Routes */}
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
@@ -81,6 +86,14 @@ ReactDOM.createRoot(document.getElementById('root')).render(
               element={
                 <ProtectedRoute>
                   <LoanHistory />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />
@@ -147,5 +160,7 @@ ReactDOM.createRoot(document.getElementById('root')).render(
       </AuthProvider>
       </ToastProvider>
     </Router>
+    </ThemeProvider>
+    </ErrorBoundary>
   </React.StrictMode>
 );

@@ -4,11 +4,12 @@ import { FileText, Search, Filter, ChevronLeft, ChevronRight, User, Clock } from
 import api from '../../services/api';
 import { pageVariants, cardVariants } from '../../animations/variants';
 import { SkeletonTable } from '../../components/SkeletonLoader';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const AdminAuditLogs = () => {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [actionFilter, setActionFilter] = useState('');
   const [entityFilter, setEntityFilter] = useState('');
@@ -24,6 +25,7 @@ const AdminAuditLogs = () => {
   const fetchLogs = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await api.get('/admin/audit-logs', {
         params: {
           page: currentPage,
@@ -32,10 +34,12 @@ const AdminAuditLogs = () => {
           entityType: entityFilter || undefined,
         },
       });
-      setLogs(response.data.data);
-      setTotalPages(response.data.totalPages || 1);
-    } catch (error) {
-      console.error('Failed to fetch audit logs:', error);
+      // Interceptor unwraps HTTP body → response = {success, data:[...], totalPages}
+      setLogs(Array.isArray(response.data) ? response.data : []);
+      setTotalPages(response.totalPages || 1);
+    } catch (err) {
+      console.error('Failed to fetch audit logs:', err);
+      setError(err?.message || 'Failed to load audit logs. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -71,7 +75,7 @@ const AdminAuditLogs = () => {
 
   if (loading && currentPage === 1) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SkeletonTable rows={20} />
         </div>
@@ -84,12 +88,12 @@ const AdminAuditLogs = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-navy-50 py-8"
+      className="min-h-screen bg-primary py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-2">Audit Logs</h1>
-          <p className="text-navy-600">Track all system activities and changes</p>
+          <h1 className="text-3xl font-bold text-heading mb-2">Audit Logs</h1>
+          <p className="text-secondary">Track all system activities and changes</p>
         </div>
 
         {/* Search and Filters */}

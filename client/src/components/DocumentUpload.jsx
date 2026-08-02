@@ -124,7 +124,6 @@ const DocumentUpload = ({
       vehicle_quotation: 'Vehicle Quotation',
       business_proof: 'Business Proof',
       itr: 'ITR Documents',
-      bank_statement: 'Bank Statement',
       business_plan: 'Business Plan',
       gold_appraisal: 'Gold Appraisal',
       land_documents: 'Land Documents',

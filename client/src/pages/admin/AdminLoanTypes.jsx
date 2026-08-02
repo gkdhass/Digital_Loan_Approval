@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Edit, Trash2, DollarSign, Percent, Clock } from 'lucide-react';
 import api from '../../services/api';
 import { pageVariants, cardVariants } from '../../animations/variants';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const AdminLoanTypes = () => {
   const [loanTypes, setLoanTypes] = useState([]);
@@ -29,10 +29,15 @@ const AdminLoanTypes = () => {
 
   const fetchLoanTypes = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/loan-types');
-      setLoanTypes(response.data.data);
+      // Safely extract array from response - handle both response structures
+      const data = response.data?.data || response.data || [];
+      setLoanTypes(Array.isArray(data) ? data : []);
     } catch (error) {
       console.error('Failed to fetch loan types:', error);
+      showToast('Failed to load loan types', 'error');
+      setLoanTypes([]);
     } finally {
       setLoading(false);
     }
@@ -101,7 +106,7 @@ const AdminLoanTypes = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/4" />
@@ -121,13 +126,13 @@ const AdminLoanTypes = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-navy-50 py-8"
+      className="min-h-screen bg-primary py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-navy-900 mb-2">Loan Types</h1>
-            <p className="text-navy-600">Manage available loan products</p>
+            <h1 className="text-3xl font-bold text-heading mb-2">Loan Types</h1>
+            <p className="text-secondary">Manage available loan products</p>
           </div>
           <motion.button
             whileHover={{ scale: 1.05 }}
@@ -145,8 +150,9 @@ const AdminLoanTypes = () => {
         </div>
 
         {/* Loan Types Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {loanTypes.map((type, index) => (
+        {loanTypes.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {loanTypes.map((type, index) => (
             <motion.div
               key={type._id}
               variants={cardVariants}
@@ -209,8 +215,7 @@ const AdminLoanTypes = () => {
             </motion.div>
           ))}
         </div>
-
-        {loanTypes.length === 0 && (
+        ) : (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}

@@ -29,8 +29,8 @@ const StatCard = ({ icon: Icon, label, value, color, delay = 0 }) => {
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-navy-600 mb-2">{label}</p>
-          <p className="text-3xl font-bold text-navy-900">
+          <p className="text-sm text-secondary mb-2">{label}</p>
+          <p className="text-3xl font-bold text-primary">
             {label.includes('Amount') || label.includes('Disbursed')
               ? `₹${(animatedValue / 100000).toFixed(1)}L`
               : animatedValue}
@@ -47,6 +47,7 @@ const StatCard = ({ icon: Icon, label, value, color, delay = 0 }) => {
 const AdminDashboard = () => {
   const [dashboard, setDashboard] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchDashboard();
@@ -54,10 +55,14 @@ const AdminDashboard = () => {
 
   const fetchDashboard = async () => {
     try {
+      setLoading(true);
+      setError(null);
       const response = await api.get('/dashboard/admin');
-      setDashboard(response.data.data);
-    } catch (error) {
-      console.error('Failed to fetch dashboard:', error);
+      // Interceptor unwraps HTTP body → response = {success, data:{...}}
+      setDashboard(response.data || null);
+    } catch (err) {
+      console.error('Failed to fetch dashboard:', err);
+      setError(err?.message || 'Failed to load admin dashboard. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -65,7 +70,7 @@ const AdminDashboard = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -77,19 +82,47 @@ const AdminDashboard = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-primary py-8">
+        <div className="max-w-md mx-auto text-center py-16">
+          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-primary mb-2">Failed to load admin dashboard</h2>
+          <p className="text-secondary mb-6">{error}</p>
+          <button
+            onClick={fetchDashboard}
+            className="px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   const stats = dashboard?.stats || {};
-  const statusDistribution = dashboard?.statusDistribution || [];
-  const loanTypeDistribution = dashboard?.loanTypeDistribution || [];
-  const recentApplications = dashboard?.recentApplications || [];
+  const statusDistribution = Array.isArray(dashboard?.statusDistribution) 
+    ? dashboard.statusDistribution 
+    : [];
+  const loanTypeDistribution = Array.isArray(dashboard?.loanTypeDistribution) 
+    ? dashboard.loanTypeDistribution 
+    : [];
+  const recentApplications = Array.isArray(dashboard?.recentApplications) 
+    ? dashboard.recentApplications 
+    : [];
 
   const COLORS = ['#059669', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6'];
 
   return (
-    <div className="min-h-screen bg-navy-50 py-8">
+    <div className="min-h-screen bg-primary py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-navy-900 mb-2">Admin Dashboard</h1>
-          <p className="text-navy-600">Overview of loan applications and system metrics</p>
+          <h1 className="text-3xl font-bold text-heading mb-2">Admin Dashboard</h1>
+          <p className="text-secondary">Overview of loan applications and system metrics</p>
         </div>
 
         {/* Stats Grid */}

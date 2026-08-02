@@ -30,13 +30,17 @@ const EmiCalculator = () => {
   const fetchLoanTypes = async () => {
     try {
       const response = await loanTypesAPI.getAll();
-      setLoanTypes(response.data);
-      if (response.data.length > 0) {
-        setSelectedLoanType(response.data[0]);
-        setInterestRate(response.data[0].interestRate);
+      // Safely extract array - handle both response structures
+      const data = response.data?.data || response.data || [];
+      const loanTypesArray = Array.isArray(data) ? data : [];
+      setLoanTypes(loanTypesArray);
+      if (loanTypesArray.length > 0) {
+        setSelectedLoanType(loanTypesArray[0]);
+        setInterestRate(loanTypesArray[0].interestRate);
       }
     } catch (error) {
       console.error('Failed to fetch loan types:', error);
+      setLoanTypes([]);
     } finally {
       setLoading(false);
     }
@@ -58,6 +62,7 @@ const EmiCalculator = () => {
   };
 
   const handleLoanTypeChange = (e) => {
+    if (!Array.isArray(loanTypes) || loanTypes.length === 0) return;
     const loanType = loanTypes.find(lt => lt._id === e.target.value);
     setSelectedLoanType(loanType);
     if (loanType) {
@@ -102,10 +107,10 @@ const EmiCalculator = () => {
         >
           <Calculator className="h-8 w-8 text-white" />
         </motion.div>
-        <h1 className="text-4xl md:text-5xl font-bold text-navy-900 mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-heading mb-4">
           EMI Calculator
         </h1>
-        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+        <p className="text-xl text-secondary max-w-2xl mx-auto">
           Calculate your monthly EMI and plan your loan repayment with our interactive calculator
         </p>
       </div>
@@ -118,7 +123,7 @@ const EmiCalculator = () => {
           animate="visible"
           className="card p-8"
         >
-          <h2 className="text-2xl font-bold text-navy-900 mb-6">Loan Parameters</h2>
+          <h2 className="text-2xl font-bold text-heading mb-6">Loan Parameters</h2>
 
           {/* Loan Type Selection */}
           <div className="mb-8">
@@ -129,14 +134,14 @@ const EmiCalculator = () => {
               className="input-field"
             >
               <option value="">Select loan type</option>
-              {loanTypes.map((lt) => (
+              {Array.isArray(loanTypes) && loanTypes.map((lt) => (
                 <option key={lt._id} value={lt._id}>
                   {lt.name} ({lt.interestRate}% interest)
                 </option>
               ))}
             </select>
             {selectedLoanType && (
-              <p className="text-sm text-gray-600 mt-2">
+              <p className="text-sm text-secondary mt-2">
                 Max Amount: {formatCurrency(selectedLoanType.maxAmount)} | 
                 Max Duration: {selectedLoanType.maxDurationMonths} months
               </p>
@@ -160,7 +165,7 @@ const EmiCalculator = () => {
               onChange={handlePrincipalChange}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent-600"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-secondary mt-1">
               <span>₹10,000</span>
               <span>{formatCurrency(selectedLoanType?.maxAmount || 10000000)}</span>
             </div>
@@ -183,7 +188,7 @@ const EmiCalculator = () => {
               onChange={(e) => setInterestRate(parseFloat(e.target.value))}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent-600"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-secondary mt-1">
               <span>5%</span>
               <span>25%</span>
             </div>
@@ -206,7 +211,7 @@ const EmiCalculator = () => {
               onChange={handleDurationChange}
               className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent-600"
             />
-            <div className="flex justify-between text-xs text-gray-500 mt-1">
+            <div className="flex justify-between text-xs text-secondary mt-1">
               <span>12 months</span>
               <span>{selectedLoanType?.maxDurationMonths || 360} months</span>
             </div>
@@ -251,9 +256,9 @@ const EmiCalculator = () => {
             >
               <div className="flex items-center gap-2 mb-3">
                 <DollarSign className="h-5 w-5 text-accent-600" />
-                <h4 className="text-sm font-semibold text-gray-600">Principal</h4>
+                <h4 className="text-sm font-semibold text-secondary">Principal</h4>
               </div>
-              <p className="text-2xl font-bold text-navy-900">
+              <p className="text-2xl font-bold text-primary">
                 {formatCurrency(animatedPrincipal)}
               </p>
             </motion.div>
@@ -267,7 +272,7 @@ const EmiCalculator = () => {
             >
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="h-5 w-5 text-emerald-600" />
-                <h4 className="text-sm font-semibold text-gray-600">Total Interest</h4>
+                <h4 className="text-sm font-semibold text-secondary">Total Interest</h4>
               </div>
               <p className="text-2xl font-bold text-emerald-600">
                 {formatCurrency(animatedInterest)}
@@ -283,7 +288,7 @@ const EmiCalculator = () => {
             >
               <div className="flex items-center gap-2 mb-3">
                 <PieChart className="h-5 w-5 text-purple-600" />
-                <h4 className="text-sm font-semibold text-gray-600">Total Payable</h4>
+                <h4 className="text-sm font-semibold text-secondary">Total Payable</h4>
               </div>
               <p className="text-2xl font-bold text-purple-600">
                 {formatCurrency(animatedTotal)}
@@ -299,7 +304,7 @@ const EmiCalculator = () => {
             >
               <div className="flex items-center gap-2 mb-3">
                 <Clock className="h-5 w-5 text-amber-600" />
-                <h4 className="text-sm font-semibold text-gray-600">Tenure</h4>
+                <h4 className="text-sm font-semibold text-secondary">Tenure</h4>
               </div>
               <p className="text-2xl font-bold text-amber-600">
                 {duration} months
@@ -315,7 +320,7 @@ const EmiCalculator = () => {
             custom={6}
             className="card p-6"
           >
-            <h4 className="text-sm font-semibold text-gray-600 mb-4">Interest to Principal Ratio</h4>
+            <h4 className="text-sm font-semibold text-secondary mb-4">Interest to Principal Ratio</h4>
             <div className="relative h-4 bg-gray-200 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
@@ -327,8 +332,8 @@ const EmiCalculator = () => {
               />
             </div>
             <div className="flex justify-between mt-2 text-sm">
-              <span className="text-gray-600">Interest: {emiResult ? ((emiResult.interestAmount / emiResult.totalPayable) * 100).toFixed(1) : 0}%</span>
-              <span className="text-gray-600">Principal: {emiResult ? ((emiResult.principal / emiResult.totalPayable) * 100).toFixed(1) : 0}%</span>
+              <span className="text-secondary">Interest: {emiResult ? ((emiResult.interestAmount / emiResult.totalPayable) * 100).toFixed(1) : 0}%</span>
+              <span className="text-secondary">Principal: {emiResult ? ((emiResult.principal / emiResult.totalPayable) * 100).toFixed(1) : 0}%</span>
             </div>
           </motion.div>
 

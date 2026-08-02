@@ -15,6 +15,7 @@ import api from '../services/api';
 import { useCountUp } from '../hooks/useCountUp';
 import DocumentUpload from '../components/DocumentUpload';
 import { documentsAPI } from '../services/api';
+import emailjs from '@emailjs/browser';
 
 const ApplyLoan = () => {
   const navigate = useNavigate();
@@ -68,7 +69,8 @@ const ApplyLoan = () => {
   const fetchLoanTypes = async () => {
     try {
       const response = await api.get('/loan-types');
-      setLoanTypes(response.data.data);
+      // Interceptor unwraps HTTP body → response = {success, count, data:[...]}
+      setLoanTypes(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Failed to fetch loan types:', error);
     }
@@ -84,7 +86,8 @@ const ApplyLoan = () => {
         interestRate: selectedLoanType.interestRate,
         durationMonths: parseInt(formData.durationMonths),
       });
-      setEmiCalculation(response.data.data);
+      // Interceptor unwraps HTTP body → response = {success, data:{emi,...}}
+      setEmiCalculation(response.data);
     } catch (error) {
       console.error('EMI calculation failed:', error);
     }
@@ -101,9 +104,10 @@ const ApplyLoan = () => {
         employmentType: formData.employmentDetails.employmentType,
         workExperienceYears: parseInt(formData.employmentDetails.workExperienceYears),
       });
-      setEligibility(response.data.data);
+      // Interceptor unwraps HTTP body → response = {success, data:{isEligible,...}}
+      setEligibility(response.data);
       setLoading(false);
-      return response.data.data.isEligible;
+      return response.data.isEligible;
     } catch (error) {
       setError('Failed to check eligibility');
       setLoading(false);
@@ -128,8 +132,11 @@ const ApplyLoan = () => {
         },
       });
 
-      setApplicationId(response.data.data._id);
-      return response.data.data._id;
+      // Interceptor unwraps HTTP body → response = {success, data:{_id,...}}
+      const applicationData = response.data;
+      setApplicationId(applicationData._id);
+
+      return applicationData._id;
     } catch (err) {
       setError(err.response?.data?.message || 'Application failed');
       setLoading(false);
@@ -147,6 +154,33 @@ const ApplyLoan = () => {
     } catch (err) {
       setUploadingDoc(false);
       throw err;
+    }
+  };
+
+  const sendSubmissionEmail = async () => {
+    try {
+      // Fetch application data to get application number
+      const response = await api.get(`/applications/${applicationId}`);
+      // Interceptor unwraps HTTP body → response = {success, data:{...}}
+      const applicationData = response.data;
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      await emailjs.send(
+        import.meta.env.VITE_EMAILJS_SERVICE_ID,
+        import.meta.env.VITE_EMAILJS_TEMPLATE_SUBMISSION,
+        {
+          to_email: user.email,
+          customer_name: user.fullName,
+          application_number: applicationData.applicationNumber,
+          loan_amount: applicationData.loanAmount,
+          loan_type: selectedLoanType?.name || 'Loan',
+        },
+        import.meta.env.VITE_EMAILJS_PUBLIC_KEY
+      );
+      console.log('Application submission email sent via EmailJS');
+    } catch (emailError) {
+      console.error('Failed to send submission email:', emailError);
+      // Don't block the flow if email fails
     }
   };
 
@@ -184,13 +218,17 @@ const ApplyLoan = () => {
         await fetchDocuments(appId);
         setCurrentStep(currentStep + 1);
       }
-    } else if (currentStep < steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    } else {
-      await handleSubmit();
+    } else if (currentStep === 3) {
+      // Documents step - send submission email when completing this step
+      // Email is sent after application created AND documents uploaded
+      if (applicationId && documents.length > 0) {
+        await sendSubmissionEmail();
+      }
       navigate(`/applications/${applicationId}`, {
         state: { showSuccess: true },
       });
+    } else {
+      setCurrentStep(currentStep + 1);
     }
   };
 
@@ -238,9 +276,9 @@ const ApplyLoan = () => {
 
   return (
     <div className="min-h-screen bg-navy-50 py-12">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Progress Indicator */}
-        <div className="mb-12">
+        <div className="mb-8">
           <div className="flex items-center justify-between mb-4">
             {steps.map((step, index) => {
               const Icon = step.icon;

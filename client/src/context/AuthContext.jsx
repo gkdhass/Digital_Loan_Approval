@@ -40,6 +40,15 @@ export const AuthProvider = ({ children }) => {
     try {
       setError(null);
       const response = await authAPI.login({ email, password });
+
+      // TEMP LOG: Verify login response
+      console.log('=== FRONTEND LOGIN DEBUG ===');
+      console.log('Response data:', response.data);
+      console.log('User from response:', response.data.user);
+      console.log('User role from response:', response.data.user?.role);
+      console.log('Token:', response.data.token?.substring(0, 20) + '...');
+      console.log('============================');
+
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
       setUser(response.data.user);

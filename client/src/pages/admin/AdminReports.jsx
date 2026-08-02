@@ -4,13 +4,14 @@ import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, PieChart, Pi
 import { TrendingUp, DollarSign, Users, FileText, Calendar, Download } from 'lucide-react';
 import api from '../../services/api';
 import { pageVariants, cardVariants } from '../../animations/variants';
-import { useToast } from '../../hooks/useToast';
+import { useToast } from '../../hooks/useToast.jsx';
 
 const COLORS = ['#059669', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6'];
 
 const AdminReports = () => {
   const [reports, setReports] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [period, setPeriod] = useState('6m');
   const { showToast } = useToast();
 
@@ -21,10 +22,13 @@ const AdminReports = () => {
   const fetchReports = async () => {
     try {
       setLoading(true);
+      setError(null);
       const response = await api.get('/admin/reports', { params: { period } });
-      setReports(response.data.data);
-    } catch (error) {
-      console.error('Failed to fetch reports:', error);
+      // Interceptor unwraps HTTP body → response = {success, data:{...}}
+      setReports(response.data || null);
+    } catch (err) {
+      console.error('Failed to fetch reports:', err);
+      setError(err?.message || 'Failed to load reports. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -32,7 +36,7 @@ const AdminReports = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-primary py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
             <div className="h-8 bg-gray-200 rounded w-1/4" />
@@ -47,6 +51,42 @@ const AdminReports = () => {
     );
   }
 
+  if (error) {
+    return (
+      <div className="min-h-screen bg-primary py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-md mx-auto text-center py-16">
+            <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-xl font-bold text-primary mb-2">Failed to load reports</h2>
+            <p className="text-secondary mb-6">{error}</p>
+            <button
+              onClick={fetchReports}
+              className="px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Safely extract arrays with proper type checking
+  const applicationTrends = Array.isArray(reports?.applicationTrends) 
+    ? reports.applicationTrends 
+    : [];
+  const loanTypePerformance = Array.isArray(reports?.loanTypePerformance) 
+    ? reports.loanTypePerformance 
+    : [];
+  const topUsers = Array.isArray(reports?.topUsers) 
+    ? reports.topUsers 
+    : [];
+  const processingTimes = reports?.processingTimes || {};
+
   const periodLabels = {
     '1m': 'Last Month',
     '3m': 'Last 3 Months',
@@ -59,13 +99,13 @@ const AdminReports = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-navy-50 py-8"
+      className="min-h-screen bg-primary py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-navy-900 mb-2">Reports & Analytics</h1>
-            <p className="text-navy-600">Comprehensive insights into loan operations</p>
+            <h1 className="text-3xl font-bold text-heading mb-2">Reports & Analytics</h1>
+            <p className="text-secondary">Comprehensive insights into loan operations</p>
           </div>
           <div className="flex items-center gap-3">
             <select
@@ -101,7 +141,7 @@ const AdminReports = () => {
               <div>
                 <p className="text-sm text-navy-600 mb-2">Total Applications</p>
                 <p className="text-3xl font-bold text-navy-900">
-                  {reports?.applicationTrends?.reduce((sum, t) => sum + t.totalApplications, 0) || 0}
+                  {applicationTrends.reduce((sum, t) => sum + (t.totalApplications || 0), 0)}
                 </p>
               </div>
               <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
@@ -121,7 +161,7 @@ const AdminReports = () => {
               <div>
                 <p className="text-sm text-navy-600 mb-2">Approved Amount</p>
                 <p className="text-3xl font-bold text-emerald-600">
-                  ₹{((reports?.applicationTrends?.reduce((sum, t) => sum + t.approvedAmount, 0) || 0) / 100000).toFixed(1)}L
+                  ₹{(applicationTrends.reduce((sum, t) => sum + (t.approvedAmount || 0), 0) / 100000).toFixed(1)}L
                 </p>
               </div>
               <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
@@ -141,7 +181,7 @@ const AdminReports = () => {
               <div>
                 <p className="text-sm text-navy-600 mb-2">Avg Processing Time</p>
                 <p className="text-3xl font-bold text-navy-900">
-                  {reports?.processingTimes?.avgProcessingDays?.toFixed(1) || 0}d
+                  {processingTimes.avgProcessingDays?.toFixed(1) || 0}d
                 </p>
               </div>
               <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
@@ -161,7 +201,7 @@ const AdminReports = () => {
               <div>
                 <p className="text-sm text-navy-600 mb-2">Active Users</p>
                 <p className="text-3xl font-bold text-navy-900">
-                  {reports?.topUsers?.length || 0}
+                  {topUsers.length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -182,9 +222,9 @@ const AdminReports = () => {
             className="card"
           >
             <h3 className="text-lg font-bold text-navy-900 mb-6">Application Trends</h3>
-            {reports?.applicationTrends?.length > 0 ? (
+            {applicationTrends.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={reports.applicationTrends}>
+                <BarChart data={applicationTrends}>
                   <XAxis 
                     dataKey="_id" 
                     tickFormatter={(value) => `${value.month}/${value.year}`}
@@ -213,11 +253,11 @@ const AdminReports = () => {
             className="card"
           >
             <h3 className="text-lg font-bold text-navy-900 mb-6">Loan Type Performance</h3>
-            {reports?.loanTypePerformance?.length > 0 ? (
+            {loanTypePerformance.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={reports.loanTypePerformance}
+                    data={loanTypePerformance}
                     dataKey="totalApplications"
                     nameKey="_id"
                     cx="50%"
@@ -225,7 +265,7 @@ const AdminReports = () => {
                     outerRadius={100}
                     label={(entry) => `${entry._id}: ${entry.totalApplications}`}
                   >
-                    {reports.loanTypePerformance.map((entry, index) => (
+                    {loanTypePerformance.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                     ))}
                   </Pie>
@@ -247,7 +287,7 @@ const AdminReports = () => {
           className="card"
         >
           <h3 className="text-lg font-bold text-navy-900 mb-6">Loan Type Breakdown</h3>
-          {reports?.loanTypePerformance?.length > 0 ? (
+          {loanTypePerformance.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
@@ -261,7 +301,7 @@ const AdminReports = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {reports.loanTypePerformance.map((type, index) => (
+                  {loanTypePerformance.map((type, index) => (
                     <motion.tr
                       key={type._id}
                       initial={{ opacity: 0, y: 20 }}
@@ -298,9 +338,9 @@ const AdminReports = () => {
           className="card mt-6"
         >
           <h3 className="text-lg font-bold text-navy-900 mb-6">Top Users by Applications</h3>
-          {reports?.topUsers?.length > 0 ? (
+          {topUsers.length > 0 ? (
             <div className="space-y-4">
-              {reports.topUsers.map((user, index) => (
+              {topUsers.map((user, index) => (
                 <motion.div
                   key={user.email}
                   initial={{ opacity: 0, x: -20 }}

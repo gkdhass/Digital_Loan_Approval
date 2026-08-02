@@ -82,6 +82,14 @@ exports.login = async (req, res, next) => {
 
     const token = generateToken(user._id);
 
+    // TEMP LOG: Verify admin user
+    console.log('=== LOGIN DEBUG ===');
+    console.log('Email:', email);
+    console.log('User found:', !!user);
+    console.log('User role:', user.role);
+    console.log('User ID:', user._id);
+    console.log('==================');
+
     // Remove password from response
     user.password = undefined;
 
@@ -176,6 +184,53 @@ exports.changePassword = async (req, res, next) => {
     res.json({
       success: true,
       message: 'Password changed successfully',
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Upload profile picture
+// @route   POST /api/auth/profile-picture
+// @access  Private
+exports.uploadProfilePicture = async (req, res, next) => {
+  try {
+    const cloudinary = require('../config/cloudinary');
+    
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file uploaded',
+      });
+    }
+
+    // Upload to Cloudinary
+    const result = await cloudinary.uploader.upload(req.file.path, {
+      folder: 'profile-pictures',
+      transformation: [
+        { width: 200, height: 200, crop: 'fill' },
+        { quality: 'auto' },
+      ],
+    });
+
+    // Update user profile
+    const user = await User.findByIdAndUpdate(
+      req.user._id,
+      { profilePicture: result.secure_url },
+      { new: true, runValidators: true }
+    );
+
+    // Delete local file
+    const fs = require('fs');
+    fs.unlinkSync(req.file.path);
+
+    res.json({
+      success: true,
+      message: 'Profile picture uploaded successfully',
+      data: {
+        profilePicture: result.secure_url,
+        user,
+      },
     });
   } catch (error) {
     next(error);

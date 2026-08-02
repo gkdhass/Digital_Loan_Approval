@@ -5,9 +5,6 @@ const AuditLog = require('../models/AuditLog');
 const User = require('../models/User');
 const { generateLoanAgreement } = require('../utils/pdfGenerator');
 const {
-  sendApplicationSubmittedEmail,
-  sendApplicationApprovedEmail,
-  sendApplicationRejectedEmail,
   sendDocumentsRequestedEmail,
 } = require('../utils/emailService');
 
@@ -59,12 +56,8 @@ exports.createApplication = async (req, res, next) => {
       type: 'success',
     });
 
-    // Send email
-    try {
-      await sendApplicationSubmittedEmail(req.user, application, loanTypeData);
-    } catch (emailError) {
-      console.error('Failed to send submission email:', emailError);
-    }
+    // Note: Application submission email is handled by EmailJS Auto-Reply on the frontend
+    // Admin-triggered emails (approved/rejected) are handled by backend Nodemailer
 
     // Audit log
     await AuditLog.create({
@@ -238,18 +231,13 @@ exports.updateApplicationStatus = async (req, res, next) => {
       type: status === 'approved' || status === 'disbursed' ? 'success' : status === 'rejected' ? 'error' : 'info',
     });
 
-    // Send email based on status
-    if (user) {
+    // Send email based on status (only documents_requested uses backend Nodemailer)
+    // Approved/Rejected emails are handled by EmailJS on the frontend admin panel
+    if (user && status === 'documents_requested') {
       try {
-        if (status === 'approved') {
-          await sendApplicationApprovedEmail(user, application);
-        } else if (status === 'rejected') {
-          await sendApplicationRejectedEmail(user, application, rejectionReason);
-        } else if (status === 'documents_requested') {
-          await sendDocumentsRequestedEmail(user, application, adminNotes);
-        }
+        await sendDocumentsRequestedEmail(user, application, adminNotes);
       } catch (emailError) {
-        console.error('Failed to send status email:', emailError);
+        console.error('Failed to send documents requested email:', emailError);
       }
     }
 

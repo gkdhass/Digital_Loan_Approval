@@ -74,10 +74,10 @@ const Register = () => {
           <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-accent-600 to-accent-700 rounded-2xl mb-4 shadow-soft">
             <UserPlus className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-navy-900 mb-2">
+          <h2 className="text-3xl font-bold text-heading mb-2">
             Create Account
           </h2>
-          <p className="text-gray-600">
+          <p className="text-secondary">
             Start your loan application journey today
           </p>
         </motion.div>
