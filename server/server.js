@@ -6,10 +6,38 @@ const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
 
-// Connect to MongoDB
-connectDB();
+// Global error handlers for uncaught errors (CRITICAL for serverless stability)
+process.on('uncaughtException', (error) => {
+  console.error('💥 UNCAUGHT EXCEPTION:', error);
+  console.error('Stack:', error.stack);
+  // In serverless, log but don't exit - the function will terminate naturally
+});
 
-// CORS Configuration - Allow multiple origins
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 UNHANDLED REJECTION at:', promise);
+  console.error('Reason:', reason);
+  // In serverless, log but don't exit
+});
+
+// Connect to MongoDB (async, non-blocking, with error handling)
+let dbConnectionAttempted = false;
+
+const initializeDB = async () => {
+  if (dbConnectionAttempted) return;
+  dbConnectionAttempted = true;
+
+  try {
+    await connectDB();
+  } catch (error) {
+    console.error('⚠️ Database connection failed at startup:', error.message);
+    // Don't crash - let requests come in and try to reconnect on first DB operation
+  }
+};
+
+// Initialize DB connection
+initializeDB();
+
+// CORS Configuration - Allow multiple origins + Vercel preview URLs
 const allowedOrigins = [
   'http://localhost:5173',
   'http://localhost:5174',
@@ -17,20 +45,32 @@ const allowedOrigins = [
   ...(process.env.CLIENT_URL ? process.env.CLIENT_URL.split(',').map(url => url.trim()) : []),
 ];
 
+// Vercel preview URL pattern (optional - allows all *.vercel.app preview URLs)
+const isVercelPreviewURL = (origin) => {
+  return origin && origin.match(/^https:\/\/.*\.vercel\.app$/);
+};
+
 console.log('🔒 CORS Allowed Origins:', allowedOrigins);
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, Postman, etc.)
+    // Allow requests with no origin (mobile apps, Postman, curl)
     if (!origin) return callback(null, true);
     
+    // Check explicit allowed origins
     if (allowedOrigins.includes(origin)) {
-      console.log('✅ CORS allowed:', origin);
-      callback(null, true);
-    } else {
-      console.warn('❌ CORS blocked:', origin);
-      callback(null, false);
+      console.log('✅ CORS allowed (explicit):', origin);
+      return callback(null, true);
     }
+    
+    // Allow Vercel preview URLs if enabled (set ALLOW_VERCEL_PREVIEWS=true in env)
+    if (process.env.ALLOW_VERCEL_PREVIEWS === 'true' && isVercelPreviewURL(origin)) {
+      console.log('✅ CORS allowed (Vercel preview):', origin);
+      return callback(null, true);
+    }
+    
+    console.warn('❌ CORS blocked:', origin);
+    callback(null, false);
   },
   credentials: true,
 }));
@@ -39,13 +79,31 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Routes
-app.get('/', (req, res) => {
-  res.json({
-    success: true,
-    message: 'Digital Loan Approval API is running',
-    timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development',
-  });
+app.get('/', async (req, res) => {
+  try {
+    const dbStatus = require('mongoose').connection.readyState;
+    const dbStatusText = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting',
+    }[dbStatus] || 'unknown';
+
+    res.json({
+      success: true,
+      message: 'Digital Loan Approval API is running',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV || 'development',
+      database: dbStatusText,
+    });
+  } catch (error) {
+    console.error('❌ Health check error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Health check failed',
+      error: error.message,
+    });
+  }
 });
 
 app.use('/api/auth', require('./routes/authRoutes'));
