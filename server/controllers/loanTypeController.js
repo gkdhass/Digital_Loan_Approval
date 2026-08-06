@@ -7,7 +7,19 @@ const { checkEligibility } = require('../utils/eligibilityEngine');
 // @access  Public
 exports.getAllLoanTypes = async (req, res, next) => {
   try {
+    console.log('📋 Fetching loan types...');
+    
     const loanTypes = await LoanType.find({ isActive: true }).sort('name');
+    
+    console.log(`✅ Found ${loanTypes.length} active loan types`);
+    
+    if (loanTypes.length === 0) {
+      console.warn('⚠️  WARNING: No loan types found in database!');
+      console.warn('   This may indicate:');
+      console.warn('   1. Database is empty (run: npm run seed:loantypes)');
+      console.warn('   2. All loan types are marked as inactive');
+      console.warn('   3. Database connection issue');
+    }
 
     res.json({
       success: true,
@@ -15,6 +27,8 @@ exports.getAllLoanTypes = async (req, res, next) => {
       data: loanTypes,
     });
   } catch (error) {
+    console.error('❌ Error fetching loan types:', error.message);
+    console.error('   Stack:', error.stack);
     next(error);
   }
 };

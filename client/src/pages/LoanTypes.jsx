@@ -32,14 +32,35 @@ const LoanTypes = () => {
     try {
       setLoading(true);
       setError(null);
+      
+      console.log('🔄 Fetching loan types from API...');
+      
       // NOTE: The axios interceptor returns response.data (the HTTP body), so
       // `response` here is already { success, count, data: [...] }.
       // The actual array lives at response.data, NOT response.data.data.
       const response = await loanTypesAPI.getAll();
+      
+      console.log('📦 API Response:', response);
+      console.log('   Success:', response.success);
+      console.log('   Count:', response.count);
+      console.log('   Data type:', Array.isArray(response.data) ? 'Array' : typeof response.data);
+      console.log('   Data length:', response.data?.length);
+      
       const list = Array.isArray(response.data) ? response.data : [];
+      
+      if (list.length === 0) {
+        console.warn('⚠️  No loan types returned from API');
+        console.warn('   Check backend logs for database issues');
+      } else {
+        console.log(`✅ Loaded ${list.length} loan types`);
+      }
+      
       setLoanTypes(list);
     } catch (err) {
-      console.error('Failed to fetch loan types:', err);
+      console.error('❌ Failed to fetch loan types:');
+      console.error('   Error:', err);
+      console.error('   Message:', err?.message);
+      console.error('   Response:', err?.response?.data);
       setError(err?.message || 'Failed to load loan types. Please try again.');
     } finally {
       setLoading(false);
