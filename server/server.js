@@ -19,23 +19,8 @@ process.on('unhandledRejection', (reason, promise) => {
   // In serverless, log but don't exit
 });
 
-// Connect to MongoDB (async, non-blocking, with error handling)
-let dbConnectionAttempted = false;
-
-const initializeDB = async () => {
-  if (dbConnectionAttempted) return;
-  dbConnectionAttempted = true;
-
-  try {
-    await connectDB();
-  } catch (error) {
-    console.error('⚠️ Database connection failed at startup:', error.message);
-    // Don't crash - let requests come in and try to reconnect on first DB operation
-  }
-};
-
-// Initialize DB connection
-initializeDB();
+// Connect to MongoDB (MUST be awaited in serverless before routes execute)
+// This is wrapped in an async IIFE or handled via middleware
 
 // CORS Configuration - Allow multiple origins + Vercel preview URLs
 const allowedOrigins = [
@@ -82,7 +67,23 @@ app.use(cors({
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Routes
+// Database connection middleware - CRITICAL for serverless
+// Ensures DB is connected before any route handler executes
+app.use(async (req, res, next) => {
+  try {
+    await connectDB();
+    next();
+  } catch (error) {
+    console.error('❌ Database connection middleware error:', error);
+    res.status(503).json({
+      success: false,
+      message: 'Database connection failed',
+      error: error.message,
+    });
+  }
+});
+
+// Routes (DB connection guaranteed by middleware above)
 app.get('/', async (req, res) => {
   try {
     const dbStatus = require('mongoose').connection.readyState;
