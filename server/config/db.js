@@ -10,16 +10,18 @@ const connectDB = async () => {
   }
 
   try {
-    // Serverless-friendly options
+    // Serverless-friendly options with longer timeout for cold starts
     const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of default 30s
+      serverSelectionTimeoutMS: 30000, // 30s for Vercel cold starts
       socketTimeoutMS: 45000,
+      family: 4, // Force IPv4 (Vercel sometimes has IPv6 issues)
     });
     
     isConnected = true;
     console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
   } catch (error) {
     console.error(`❌ MongoDB Connection Error: ${error.message}`);
+    console.error(`❌ Connection String Host: ${process.env.MONGODB_URI?.split('@')[1]?.split('/')[0] || 'unknown'}`);
     isConnected = false;
     
     // In serverless, DO NOT call process.exit(1) - it crashes the entire function
