@@ -160,7 +160,7 @@ const Home = () => {
                     boxShadow: '0 0 25px rgba(79, 70, 229, 0.5)'
                   }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 bg-white text-primary rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all hover:shadow-xl"
+                  className="px-8 py-4 bg-white text-[#0F172A] rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all hover:shadow-xl"
                 >
                   Explore Loans
                   <ArrowRight className="h-5 w-5" />
