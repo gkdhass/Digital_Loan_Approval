@@ -10,10 +10,14 @@ import {
   User,
   Briefcase,
   Upload,
+  AlertCircle,
 } from 'lucide-react';
 import api from '../services/api';
 import { useCountUp } from '../hooks/useCountUp';
 import DocumentUpload from '../components/DocumentUpload';
+import DocumentChecklist from '../components/DocumentChecklist';
+import PremiumLoader from '../components/PremiumLoader';
+import EligibilityScore from '../components/EligibilityScore';
 import { documentsAPI } from '../services/api';
 import emailjs from '@emailjs/browser';
 
@@ -120,7 +124,7 @@ const ApplyLoan = () => {
       setLoading(true);
       setError('');
 
-      const response = await api.post('/applications', {
+      const payload = {
         loanType: formData.loanType,
         loanAmount: parseFloat(formData.loanAmount),
         durationMonths: parseInt(formData.durationMonths),
@@ -130,15 +134,23 @@ const ApplyLoan = () => {
           workExperienceYears: parseInt(formData.employmentDetails.workExperienceYears),
           monthlyIncome: parseFloat(formData.employmentDetails.monthlyIncome),
         },
-      });
+      };
+      console.log('[ApplyLoan] POST /api/applications payload:', payload);
+
+      const response = await api.post('/applications', payload);
 
       // Interceptor unwraps HTTP body → response = {success, data:{_id,...}}
       const applicationData = response.data;
       setApplicationId(applicationData._id);
-
+      setLoading(false);
       return applicationData._id;
     } catch (err) {
-      setError(err.response?.data?.message || 'Application failed');
+      // err is the full axios error; err.response.data is the backend JSON body
+      const errData = err.response?.data;
+      const fieldErrors = errData?.errors?.map(e => `${e.field}: ${e.message}`).join('; ');
+      const message = fieldErrors || errData?.message || err.message || 'Application submission failed';
+      console.error('[ApplyLoan] POST /api/applications failed — status:', err.response?.status, '| body:', errData);
+      setError(message);
       setLoading(false);
       return null;
     }
@@ -204,23 +216,22 @@ const ApplyLoan = () => {
 
   const nextStep = async () => {
     if (currentStep === 1) {
-      const isEligible = await checkEligibility();
-      if (isEligible) {
-        setCurrentStep(currentStep + 1);
-      } else {
-        setCurrentStep(currentStep + 1);
-      }
+      // Run eligibility check; advance to step 2 regardless of result (step 2 shows the outcome)
+      await checkEligibility();
+      setCurrentStep(currentStep + 1);
     } else if (currentStep === 2) {
-      // After eligibility check, create application and move to documents
+      // Eligibility shown — now create the application and move to documents
+      setError('');
       const appId = await handleSubmit();
-      if (appId) {
-        setApplicationId(appId);
-        await fetchDocuments(appId);
-        setCurrentStep(currentStep + 1);
+      if (!appId) {
+        // handleSubmit already called setError(); stay on this step so user sees the reason
+        return;
       }
+      setApplicationId(appId);
+      await fetchDocuments(appId);
+      setCurrentStep(currentStep + 1);
     } else if (currentStep === 3) {
-      // Documents step - send submission email when completing this step
-      // Email is sent after application created AND documents uploaded
+      // Documents step — send submission email then navigate to success
       if (applicationId && documents.length > 0) {
         await sendSubmissionEmail();
       }
@@ -269,13 +280,39 @@ const ApplyLoan = () => {
       return eligibility !== null;
     }
     if (currentStep === 3) {
-      return applicationId !== null;
+      // Validate all required documents are uploaded
+      if (!applicationId || !selectedLoanType) return false;
+      
+      const requiredDocs = selectedLoanType.requiredDocuments || [];
+      const uploadedDocTypes = new Set(
+        documents.map(doc => doc.documentType?.toLowerCase().trim().replace(/\s+/g, ' '))
+      );
+      
+      const allDocsUploaded = requiredDocs.every(docType => 
+        uploadedDocTypes.has(docType?.toLowerCase().trim().replace(/\s+/g, ' '))
+      );
+      
+      return allDocsUploaded;
     }
     return true;
   };
 
+  // Get missing documents for step 3
+  const getMissingDocuments = () => {
+    if (currentStep !== 3 || !selectedLoanType) return [];
+    
+    const requiredDocs = selectedLoanType.requiredDocuments || [];
+    const uploadedDocTypes = new Set(
+      documents.map(doc => doc.documentType?.toLowerCase().trim().replace(/\s+/g, ' '))
+    );
+    
+    return requiredDocs.filter(docType => 
+      !uploadedDocTypes.has(docType?.toLowerCase().trim().replace(/\s+/g, ' '))
+    );
+  };
+
   return (
-    <div className="min-h-screen bg-navy-50 py-12">
+    <div className="min-h-screen bg-surface dark:bg-backgroundDark py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Progress Indicator */}
         <div className="mb-8">
@@ -296,7 +333,7 @@ const ApplyLoan = () => {
                     >
                       <Icon
                         size={20}
-                        className={index <= currentStep ? 'text-white' : 'text-navy-400'}
+                        className={index <= currentStep ? 'text-white' : 'text-foregroundSecondary'}
                       />
                     </motion.div>
                     {index < steps.length - 1 && (
@@ -309,7 +346,7 @@ const ApplyLoan = () => {
                       />
                     )}
                   </div>
-                  <p className="text-xs text-navy-600 mt-2 text-center">
+                  <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-2 text-center">
                     {step.title}
                   </p>
                 </div>
@@ -329,7 +366,7 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-navy-900 mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
                   Loan Details
                 </h2>
 
@@ -364,7 +401,7 @@ const ApplyLoan = () => {
                       required
                     />
                     {selectedLoanType && (
-                      <p className="text-xs text-navy-600 mt-1">
+                      <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-1">
                         Max: ₹{selectedLoanType.maxAmount.toLocaleString()}
                       </p>
                     )}
@@ -382,7 +419,7 @@ const ApplyLoan = () => {
                       required
                     />
                     {selectedLoanType && (
-                      <p className="text-xs text-navy-600 mt-1">
+                      <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-1">
                         Max: {selectedLoanType.maxDurationMonths} months
                       </p>
                     )}
@@ -405,28 +442,28 @@ const ApplyLoan = () => {
                     <motion.div
                       initial={{ opacity: 0, scale: 0.95 }}
                       animate={{ opacity: 1, scale: 1 }}
-                      className="bg-accent-50 border border-accent-200 rounded-xl p-6"
+                      className="bg-secondary dark:bg-secondaryDark/10 border border-secondary dark:border-primary rounded-xl p-6"
                     >
                       <div className="flex items-center gap-2 mb-4">
-                        <Calculator className="text-accent-600" size={20} />
-                        <h3 className="font-bold text-navy-900">EMI Calculation</h3>
+                        <Calculator className="text-foreground dark:text-secondaryDark" size={20} />
+                        <h3 className="font-bold text-foreground dark:text-surfaceDark">EMI Calculation</h3>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
-                          <p className="text-sm text-navy-600">Monthly EMI</p>
-                          <p className="text-2xl font-bold text-accent-600">
+                          <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">Monthly EMI</p>
+                          <p className="text-2xl font-bold text-foreground dark:text-secondaryDark">
                             ₹{emiCalculation.emi.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-navy-600">Total Payable</p>
-                          <p className="text-xl font-bold text-navy-900">
+                          <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">Total Payable</p>
+                          <p className="text-xl font-bold text-foreground dark:text-surfaceDark">
                             ₹{emiCalculation.totalPayable.toLocaleString()}
                           </p>
                         </div>
                         <div>
-                          <p className="text-sm text-navy-600">Interest Amount</p>
-                          <p className="text-lg font-semibold text-navy-700">
+                          <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">Interest Amount</p>
+                          <p className="text-lg font-semibold text-foreground dark:text-border">
                             ₹{emiCalculation.interestAmount.toLocaleString()}
                           </p>
                         </div>
@@ -445,7 +482,7 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-navy-900 mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
                   Employment Details
                 </h2>
 
@@ -515,7 +552,7 @@ const ApplyLoan = () => {
                       required
                     />
                     {selectedLoanType && (
-                      <p className="text-xs text-navy-600 mt-1">
+                      <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-1">
                         Minimum required: ₹{selectedLoanType.minIncome.toLocaleString()}
                       </p>
                     )}
@@ -532,67 +569,93 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-navy-900 mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
                   Eligibility Check
                 </h2>
 
                 {loading ? (
                   <div className="text-center py-12">
-                    <div className="inline-block w-12 h-12 border-4 border-accent-200 border-t-accent-600 rounded-full animate-spin"></div>
-                    <p className="text-navy-600 mt-4">Checking eligibility...</p>
+                    <PremiumLoader message="Checking eligibility..." size="lg" />
                   </div>
                 ) : eligibility ? (
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    className={`text-center py-12 rounded-2xl ${
-                      eligibility.isEligible
-                        ? 'bg-emerald-50 border-2 border-emerald-200'
-                        : 'bg-red-50 border-2 border-red-200'
-                    }`}
-                  >
-                    <motion.div
-                      initial={{ scale: 0, rotate: -180 }}
-                      animate={{ scale: 1, rotate: 0 }}
-                      transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                      className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
-                        eligibility.isEligible ? 'bg-emerald-600' : 'bg-red-600'
-                      }`}
-                    >
-                      {eligibility.isEligible ? (
-                        <CheckCircle className="text-white" size={40} />
-                      ) : (
-                        <motion.div className="text-white text-4xl font-bold">✕</motion.div>
-                      )}
-                    </motion.div>
+                  <div className="space-y-6">
+                    {/* Submission error from POST /api/applications */}
+                    {error && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="flex items-start gap-3 p-4 bg-danger-50 dark:bg-danger-900/10 border border-danger-200 dark:border-danger-800 rounded-xl"
+                      >
+                        <AlertCircle className="h-5 w-5 text-danger-600 dark:text-danger-400 flex-shrink-0 mt-0.5" />
+                        <div>
+                          <p className="font-semibold text-danger-800 dark:text-danger-300 text-sm">Failed to create application</p>
+                          <p className="text-danger-700 dark:text-danger-400 text-sm mt-0.5">{error}</p>
+                        </div>
+                      </motion.div>
+                    )}
 
-                    <h3 className={`text-2xl font-bold mb-2 ${
-                      eligibility.isEligible ? 'text-emerald-900' : 'text-red-900'
-                    }`}>
-                      {eligibility.isEligible ? 'Eligible!' : 'Not Eligible'}
-                    </h3>
-                    <p className={`mb-4 ${
-                      eligibility.isEligible ? 'text-emerald-700' : 'text-red-700'
-                    }`}>
-                      Eligibility Score: {eligibility.score}/100
-                    </p>
+                    {/* Enhanced Eligibility Score Display with Factors */}
+                    {eligibility.eligibilityScore && (
+                      <EligibilityScore eligibilityScore={eligibility.eligibilityScore} />
+                    )}
 
-                    <div className={`max-w-md mx-auto text-left p-4 rounded-xl ${
-                      eligibility.isEligible ? 'bg-white' : 'bg-red-100'
-                    }`}>
-                      <p className="font-semibold mb-2 text-navy-900">
-                        {eligibility.isEligible ? 'Next Steps:' : 'Reasons:'}
-                      </p>
-                      <ul className="space-y-1 text-sm text-navy-700">
-                        {eligibility.reasons.map((reason, index) => (
-                          <li key={index} className="flex items-start gap-2">
-                            <span className="text-accent-600 mt-1">•</span>
-                            <span>{reason}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </motion.div>
+                    {/* Legacy Eligibility Display (fallback) */}
+                    {!eligibility.eligibilityScore && (
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className={`text-center py-12 rounded-2xl ${
+                          eligibility.isEligible
+                            ? 'bg-success-50 dark:bg-success-900/10 border-2 border-success-200 dark:border-success-800'
+                            : 'bg-danger-50 dark:bg-danger-900/10 border-2 border-danger-200 dark:border-danger-800'
+                        }`}
+                      >
+                        <motion.div
+                          initial={{ scale: 0, rotate: -180 }}
+                          animate={{ scale: 1, rotate: 0 }}
+                          transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                          className={`inline-flex items-center justify-center w-20 h-20 rounded-full mb-4 ${
+                            eligibility.isEligible ? 'bg-success-600' : 'bg-danger-600'
+                          }`}
+                        >
+                          {eligibility.isEligible ? (
+                            <CheckCircle className="text-white" size={40} />
+                          ) : (
+                            <motion.div className="text-white text-4xl font-bold">✕</motion.div>
+                          )}
+                        </motion.div>
+
+                        <h3 className={`text-2xl font-bold mb-2 ${
+                          eligibility.isEligible ? 'text-success-900 dark:text-success-200' : 'text-danger-900 dark:text-danger-200'
+                        }`}>
+                          {eligibility.isEligible ? 'Eligible!' : 'Not Eligible'}
+                        </h3>
+                        <p className={`mb-4 ${
+                          eligibility.isEligible ? 'text-success-700 dark:text-success-300' : 'text-danger-700 dark:text-danger-300'
+                        }`}>
+                          Eligibility Score: {eligibility.score}/100
+                        </p>
+
+                        <div className={`max-w-md mx-auto text-left p-4 rounded-xl ${
+                          eligibility.isEligible 
+                            ? 'bg-white dark:bg-surfaceDark' 
+                            : 'bg-danger-100 dark:bg-danger-900/20'
+                        }`}>
+                          <p className="font-semibold mb-2 text-foreground dark:text-surfaceDark">
+                            {eligibility.isEligible ? 'Next Steps:' : 'Reasons:'}
+                          </p>
+                          <ul className="space-y-1 text-sm text-foreground dark:text-foregroundSecondary">
+                            {eligibility.reasons.map((reason, index) => (
+                              <li key={index} className="flex items-start gap-2">
+                                <span className="text-foreground dark:text-secondaryDark mt-1">•</span>
+                                <span>{reason}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      </motion.div>
+                    )}
+                  </div>
                 ) : null}
               </motion.div>
             )}
@@ -604,27 +667,37 @@ const ApplyLoan = () => {
                 animate={{ opacity: 1, x: 0 }}
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
+                className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-navy-900 mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
                   Upload Documents
                 </h2>
 
-                <div className="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                  <p className="text-sm text-blue-900">
+                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-xl">
+                  <p className="text-sm text-blue-900 dark:text-blue-200">
                     <strong>Required Documents:</strong> Please upload the following documents for your {selectedLoanType?.name} application.
                   </p>
                 </div>
 
                 {applicationId ? (
-                  <DocumentUpload
-                    onUpload={handleDocumentUpload}
-                    documentTypes={selectedLoanType?.requiredDocuments || []}
-                    applicationId={applicationId}
-                    existingDocuments={documents}
-                    onDeleteDocument={handleDeleteDocument}
-                  />
+                  <>
+                    {/* Document Checklist - Real-time feedback */}
+                    <DocumentChecklist
+                      requiredDocuments={selectedLoanType?.requiredDocuments || []}
+                      uploadedDocuments={documents}
+                    />
+
+                    {/* Document Upload Component */}
+                    <DocumentUpload
+                      onUpload={handleDocumentUpload}
+                      documentTypes={selectedLoanType?.requiredDocuments || []}
+                      applicationId={applicationId}
+                      existingDocuments={documents}
+                      onDeleteDocument={handleDeleteDocument}
+                    />
+                  </>
                 ) : (
-                  <div className="text-center py-12 text-gray-500">
+                  <div className="text-center py-12 text-surface0 dark:text-surface0Dark">
                     <p>Complete the previous steps to upload documents</p>
                   </div>
                 )}
@@ -639,72 +712,72 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-navy-900 mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
                   Review & Submit
                 </h2>
 
                 <div className="space-y-6">
-                  <div className="bg-navy-50 rounded-xl p-6">
-                    <h3 className="font-bold text-navy-900 mb-4">Loan Details</h3>
+                  <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
+                    <h3 className="font-bold text-foreground dark:text-surfaceDark mb-4">Loan Details</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Loan Type:</span>
-                        <span className="font-semibold">{selectedLoanType?.name}</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Loan Type:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">{selectedLoanType?.name}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Amount:</span>
-                        <span className="font-semibold">₹{parseFloat(formData.loanAmount).toLocaleString()}</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Amount:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">₹{parseFloat(formData.loanAmount).toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Duration:</span>
-                        <span className="font-semibold">{formData.durationMonths} months</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Duration:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.durationMonths} months</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Monthly EMI:</span>
-                        <span className="font-bold text-accent-600">₹{emiCalculation?.emi.toLocaleString()}</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Monthly EMI:</span>
+                        <span className="font-bold text-foreground dark:text-secondaryDark">₹{emiCalculation?.emi.toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-navy-50 rounded-xl p-6">
-                    <h3 className="font-bold text-navy-900 mb-4">Employment Details</h3>
+                  <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
+                    <h3 className="font-bold text-foreground dark:text-surfaceDark mb-4">Employment Details</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Employment Type:</span>
-                        <span className="font-semibold capitalize">
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Employment Type:</span>
+                        <span className="font-semibold capitalize text-foreground dark:text-surfaceDark">
                           {formData.employmentDetails.employmentType}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Company:</span>
-                        <span className="font-semibold">{formData.employmentDetails.companyName}</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Company:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.employmentDetails.companyName}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Designation:</span>
-                        <span className="font-semibold">{formData.employmentDetails.designation}</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Designation:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.employmentDetails.designation}</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Experience:</span>
-                        <span className="font-semibold">{formData.employmentDetails.workExperienceYears} years</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Experience:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.employmentDetails.workExperienceYears} years</span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-navy-600">Monthly Income:</span>
-                        <span className="font-semibold">₹{parseFloat(formData.employmentDetails.monthlyIncome).toLocaleString()}</span>
+                        <span className="text-foregroundSecondary dark:text-foregroundSecondary">Monthly Income:</span>
+                        <span className="font-semibold text-foreground dark:text-surfaceDark">₹{parseFloat(formData.employmentDetails.monthlyIncome).toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="bg-navy-50 rounded-xl p-6">
-                    <h3 className="font-bold text-navy-900 mb-4">Uploaded Documents</h3>
+                  <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
+                    <h3 className="font-bold text-foreground dark:text-surfaceDark mb-4">Uploaded Documents</h3>
                     {documents.length > 0 ? (
                       <div className="space-y-2 text-sm">
                         {documents.map((doc) => (
-                          <div key={doc._id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-0">
-                            <span className="text-navy-700">{doc.fileName}</span>
+                          <div key={doc._id} className="flex justify-between items-center py-2 border-b border-border dark:border-borderDark dark:border-foregroundDark last:border-0">
+                            <span className="text-foreground dark:text-foregroundSecondary">{doc.fileName}</span>
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              doc.verificationStatus === 'verified' ? 'bg-emerald-100 text-emerald-800' :
-                              doc.verificationStatus === 'rejected' ? 'bg-red-100 text-red-800' :
-                              'bg-gray-100 text-gray-800'
+                              doc.verificationStatus === 'verified' ? 'bg-success-100 dark:bg-success-900/20 text-success-800 dark:text-success-300' :
+                              doc.verificationStatus === 'rejected' ? 'bg-danger-100 dark:bg-danger-900/20 text-danger-800 dark:text-danger-300' :
+                              'bg-gray-100 dark:bg-cardDark text-gray-800 dark:text-gray-300'
                             }`}>
                               {doc.verificationStatus || 'Pending'}
                             </span>
@@ -712,12 +785,12 @@ const ApplyLoan = () => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-500">No documents uploaded yet</p>
+                      <p className="text-sm text-surface0 dark:text-surface0Dark">No documents uploaded yet</p>
                     )}
                   </div>
 
                   {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-800 text-sm">
+                    <div className="bg-danger-50 dark:bg-danger-900/10 border border-danger-200 dark:border-danger-800 rounded-xl p-4 text-danger-800 dark:text-danger-300 text-sm">
                       {error}
                     </div>
                   )}
@@ -727,32 +800,59 @@ const ApplyLoan = () => {
           </AnimatePresence>
 
           {/* Navigation Buttons */}
-          <div className="flex justify-between mt-8 pt-6 border-t border-navy-200">
-            <button
-              onClick={prevStep}
-              disabled={currentStep === 0}
-              className="btn-secondary flex items-center gap-2"
-            >
-              <ArrowLeft size={16} />
-              Previous
-            </button>
+          <div className="mt-8 pt-6 border-t border-border dark:border-borderDark dark:border-foregroundDark">
+            {/* Missing Documents Warning for Step 3 */}
+            {currentStep === 3 && !isStepValid() && getMissingDocuments().length > 0 && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl"
+              >
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <div className="flex-1">
+                    <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                      Please upload the following required documents:
+                    </p>
+                    <ul className="space-y-1">
+                      {getMissingDocuments().map((doc) => (
+                        <li key={doc} className="text-sm text-amber-800 dark:text-amber-300">
+                          • {doc}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            )}
 
-            <button
-              onClick={nextStep}
-              disabled={!isStepValid() || loading || uploadingDoc}
-              className="btn-primary flex items-center gap-2"
-            >
-              {currentStep === steps.length - 1 ? (
-                loading ? 'Submitting...' : 'Submit Application'
-              ) : currentStep === 3 ? (
-                uploadingDoc ? 'Uploading...' : 'Review & Submit'
-              ) : (
-                <>
-                  Next
-                  <ArrowRight size={16} />
-                </>
-              )}
-            </button>
+            <div className="flex justify-between">
+              <button
+                onClick={prevStep}
+                disabled={currentStep === 0}
+                className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <ArrowLeft size={16} />
+                Previous
+              </button>
+
+              <button
+                onClick={nextStep}
+                disabled={!isStepValid() || loading || uploadingDoc}
+                className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {currentStep === steps.length - 1 ? (
+                  loading ? 'Submitting...' : 'Submit Application'
+                ) : currentStep === 3 ? (
+                  uploadingDoc ? 'Uploading...' : 'Review & Submit'
+                ) : (
+                  <>
+                    Next
+                    <ArrowRight size={16} />
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>

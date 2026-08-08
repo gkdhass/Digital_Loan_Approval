@@ -29,13 +29,9 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      localStorage.removeItem('token');
-      localStorage.removeItem('user');
-      window.location.href = '/login';
-    }
-    return Promise.reject(error.response?.data || error.message);
+    // Don't auto-redirect on 401 - let components handle auth errors
+    // The ProtectedRoute already handles authentication state
+    return Promise.reject(error);
   }
 );
 
@@ -105,11 +101,29 @@ export const formatCurrency = (amount) => {
 
 // Helper to format date
 export const formatDate = (date) => {
-  return new Intl.DateTimeFormat('en-IN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  }).format(new Date(date));
+  // Handle null, undefined, empty string, or invalid dates
+  if (!date) {
+    return 'N/A';
+  }
+  
+  try {
+    const dateObj = new Date(date);
+    
+    // Check if the date is valid
+    if (isNaN(dateObj.getTime())) {
+      console.warn('[formatDate] Invalid date value:', date);
+      return 'N/A';
+    }
+    
+    return new Intl.DateTimeFormat('en-IN', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }).format(dateObj);
+  } catch (error) {
+    console.error('[formatDate] Error formatting date:', { date, error });
+    return 'N/A';
+  }
 };
 
 // Calculate EMI

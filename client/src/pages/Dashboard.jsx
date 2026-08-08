@@ -5,11 +5,11 @@ import {
   TrendingUp, DollarSign, FileText, Clock, 
   ArrowRight, CheckCircle 
 } from 'lucide-react';
-import { pageVariants, cardVariants, staggerContainer } from '../animations/variants';
+import { pageVariants, cardVariants, kpiCardVariants } from '../animations/variants';
 import { dashboardAPI, formatCurrency } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import useCountUp from '../hooks/useCountUp';
-import SkeletonLoader from '../components/SkeletonLoader';
+import { SkeletonKPI, SkeletonList } from '../components/ui/Skeleton';
 import StatusBadge from '../components/StatusBadge';
 
 const StatCard = ({ icon: Icon, label, value, color, delay }) => {
@@ -17,19 +17,25 @@ const StatCard = ({ icon: Icon, label, value, color, delay }) => {
 
   return (
     <motion.div
-      variants={cardVariants}
+      variants={kpiCardVariants}
       custom={delay}
       initial="hidden"
       animate="visible"
-      className="card p-6"
+      whileHover="hover"
+      className="card"
     >
       <div className="flex items-center gap-2 mb-3">
         <Icon className={`h-5 w-5 ${color}`} />
-        <h4 className="text-sm font-semibold text-secondary">{label}</h4>
+        <h4 className="text-sm font-semibold text-foregroundSecondary">{label}</h4>
       </div>
-      <p className={`text-2xl font-bold ${color}`}>
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: delay * 0.1 + 0.3 }}
+        className={`text-2xl font-bold ${color}`}
+      >
         {typeof value === 'number' ? animatedValue : value}
-      </p>
+      </motion.p>
     </motion.div>
   );
 };
@@ -63,10 +69,25 @@ const Dashboard = () => {
     return (
       <div className="container-custom py-8">
         <div className="mb-8">
-          <div className="h-8 bg-gray-200 rounded w-1/3 mb-2 animate-pulse" />
-          <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
+          <div className="h-8 bg-surface dark:bg-surfaceDark rounded w-1/3 mb-2 animate-pulse" />
+          <div className="h-4 bg-surface dark:bg-surfaceDark rounded w-1/4 animate-pulse" />
         </div>
-        <SkeletonLoader type="stat" count={4} />
+        
+        {/* Skeleton KPI Cards */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <SkeletonKPI key={i} />
+          ))}
+        </div>
+
+        {/* Skeleton Summary Cards */}
+        <div className="grid md:grid-cols-2 gap-6 mb-8">
+          <SkeletonKPI className="h-48" />
+          <SkeletonKPI className="h-48" />
+        </div>
+
+        {/* Skeleton Applications List */}
+        <SkeletonList items={3} />
       </div>
     );
   }
@@ -80,11 +101,11 @@ const Dashboard = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-primary mb-2">Failed to load dashboard</h2>
-          <p className="text-secondary mb-6">{error}</p>
+          <h2 className="text-xl font-bold text-foreground mb-2">Failed to load dashboard</h2>
+          <p className="text-foregroundSecondary mb-6">{error}</p>
           <button
             onClick={fetchDashboard}
-            className="px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -109,10 +130,10 @@ const Dashboard = () => {
     >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-heading mb-2">
+        <h1 className="text-3xl font-bold text-foreground dark:text-surfaceDark mb-2">
           Welcome back, {user?.fullName}!
         </h1>
-        <p className="text-secondary">
+        <p className="text-foregroundSecondary dark:text-foregroundSecondary">
           Here's your loan application overview
         </p>
       </div>
@@ -155,23 +176,23 @@ const Dashboard = () => {
           variants={cardVariants}
           initial="hidden"
           animate="visible"
-          className="card p-6"
+          className="card"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-heading">Loan Summary</h3>
-            <TrendingUp className="h-5 w-5 text-accent-600" />
+            <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark">Loan Summary</h3>
+            <TrendingUp className="h-5 w-5 text-foreground dark:text-foregroundSecondaryDark" />
           </div>
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-secondary mb-1">Total Requested</p>
-              <p className="text-2xl font-bold text-primary">
+              <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary mb-1">Total Requested</p>
+              <p className="text-2xl font-bold text-foreground dark:text-surfaceDark">
                 {formatCurrency(loanStats.totalRequested || 0)}
               </p>
             </div>
-            <div className="h-px bg-gray-200" />
+            <div className="h-px bg-border dark:bg-foregroundDark" />
             <div>
-              <p className="text-sm text-secondary mb-1">Total Approved</p>
-              <p className="text-2xl font-bold text-emerald-600">
+              <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary mb-1">Total Approved</p>
+              <p className="text-2xl font-bold text-success-600 dark:text-success-400">
                 {formatCurrency(loanStats.totalApproved || 0)}
               </p>
             </div>
@@ -183,7 +204,7 @@ const Dashboard = () => {
           initial="hidden"
           animate="visible"
           custom={1}
-          className="card p-6 bg-gradient-to-br from-accent-600 to-accent-700 text-white"
+          className="bg-gradient-to-br from-secondary to-primary rounded-2xl p-6 text-white shadow-lg"
         >
           <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
           <div className="space-y-3">
@@ -215,13 +236,13 @@ const Dashboard = () => {
         initial="hidden"
         animate="visible"
         custom={2}
-        className="card p-6"
+        className="card"
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-heading">Recent Applications</h3>
+          <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark">Recent Applications</h3>
           <Link
             to="/applications"
-            className="text-sm text-accent-600 hover:text-accent-700 font-semibold flex items-center gap-1"
+            className="text-sm text-foreground dark:text-foregroundSecondaryDark hover:text-foreground dark:hover:text-foregroundSecondary font-semibold flex items-center gap-1"
           >
             View All
             <ArrowRight className="h-4 w-4" />
@@ -239,18 +260,18 @@ const Dashboard = () => {
               >
                 <Link
                   to={`/applications/${app._id}`}
-                  className="block p-4 border border-gray-200 rounded-xl hover:border-accent-300 hover:bg-accent-50/50 transition-all"
+                  className="block p-4 border border-border dark:border-borderDark dark:border-foregroundDark rounded-xl hover:border-secondary dark:hover:border-secondary hover:bg-secondary/50 dark:hover:bg-secondaryDark/10 transition-all"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-accent-50 rounded-lg flex items-center justify-center">
-                        <FileText className="h-5 w-5 text-accent-600" />
+                      <div className="h-10 w-10 bg-secondary dark:bg-secondaryDark/20 rounded-lg flex items-center justify-center">
+                        <FileText className="h-5 w-5 text-foreground dark:text-foregroundSecondaryDark" />
                       </div>
                       <div>
-                        <p className="font-semibold text-primary">
+                        <p className="font-semibold text-foreground dark:text-surfaceDark">
                           {app.loanType?.name}
                         </p>
-                        <p className="text-sm text-secondary">
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">
                           {app.applicationNumber}
                         </p>
                       </div>
@@ -258,13 +279,13 @@ const Dashboard = () => {
                     <StatusBadge status={app.status} />
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-secondary">
-                      Amount: <span className="font-semibold text-primary">
+                    <span className="text-foregroundSecondary dark:text-foregroundSecondary">
+                      Amount: <span className="font-semibold text-foreground dark:text-surfaceDark">
                         {formatCurrency(app.loanAmount)}
                       </span>
                     </span>
-                    <span className="text-secondary">
-                      EMI: <span className="font-semibold text-primary">
+                    <span className="text-foregroundSecondary dark:text-foregroundSecondary">
+                      EMI: <span className="font-semibold text-foreground dark:text-surfaceDark">
                         {formatCurrency(app.emi)}
                       </span>
                     </span>
@@ -279,11 +300,11 @@ const Dashboard = () => {
             animate={{ opacity: 1, scale: 1 }}
             className="text-center py-12"
           >
-            <FileText className="h-12 w-12 text-gray-400 dark:text-gray-600 mx-auto mb-3" />
-            <p className="text-secondary mb-4">No applications yet</p>
+            <FileText className="h-12 w-12 text-foregroundSecondary dark:text-foregroundSecondary mx-auto mb-3" />
+            <p className="text-foregroundSecondary dark:text-foregroundSecondary mb-4">No applications yet</p>
             <Link
               to="/loan-types"
-              className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+              className="inline-flex items-center gap-2 px-6 py-3 bg-secondary hover:bg-background text-white rounded-xl font-semibold hover:shadow-lg transition-all"
             >
               Apply for Your First Loan
               <ArrowRight className="h-4 w-4" />

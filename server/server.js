@@ -35,6 +35,11 @@ const isVercelPreviewURL = (origin) => {
   return origin && origin.match(/^https:\/\/.*\.vercel\.app$/);
 };
 
+// Allow localhost/127.0.0.1 on any port (for development and browser preview)
+const isLocalhost = (origin) => {
+  return origin && (origin.match(/^http:\/\/localhost(:\d+)?$/) || origin.match(/^http:\/\/127\.0\.0\.1(:\d+)?$/));
+};
+
 // Auto-allow Vercel preview URLs if running on Vercel
 const isRunningOnVercel = process.env.VERCEL === '1';
 
@@ -49,6 +54,12 @@ app.use(cors({
     // Check explicit allowed origins
     if (allowedOrigins.includes(origin)) {
       console.log('✅ CORS allowed (explicit):', origin);
+      return callback(null, true);
+    }
+    
+    // Allow localhost/127.0.0.1 on any port (for development)
+    if (isLocalhost(origin)) {
+      console.log('✅ CORS allowed (localhost):', origin);
       return callback(null, true);
     }
     

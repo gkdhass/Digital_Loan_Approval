@@ -57,16 +57,31 @@ exports.login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
+    console.log('[login] Attempt:', { email });
+
     const user = await User.findOne({ email }).select('+password');
+    
     if (!user) {
+      console.log('[login] FAILED: User not found for email:', email);
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password',
       });
     }
 
+    console.log('[login] User found:', {
+      id: user._id,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+    });
+
     const isMatch = await user.comparePassword(password);
+    
+    console.log('[login] Password comparison result:', isMatch ? 'MATCH' : 'NO MATCH');
+    
     if (!isMatch) {
+      console.log('[login] FAILED: Password mismatch');
       return res.status(401).json({
         success: false,
         message: 'Invalid email or password',
@@ -74,6 +89,7 @@ exports.login = async (req, res, next) => {
     }
 
     if (!user.isActive) {
+      console.log('[login] FAILED: Account inactive');
       return res.status(403).json({
         success: false,
         message: 'Account is inactive. Please contact support.',
@@ -82,13 +98,10 @@ exports.login = async (req, res, next) => {
 
     const token = generateToken(user._id);
 
-    // TEMP LOG: Verify admin user
-    console.log('=== LOGIN DEBUG ===');
-    console.log('Email:', email);
-    console.log('User found:', !!user);
-    console.log('User role:', user.role);
-    console.log('User ID:', user._id);
-    console.log('==================');
+    console.log('[login] SUCCESS:', {
+      userId: user._id,
+      role: user.role,
+    });
 
     // Remove password from response
     user.password = undefined;
@@ -102,6 +115,7 @@ exports.login = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error('[login] ERROR:', error.message);
     next(error);
   }
 };

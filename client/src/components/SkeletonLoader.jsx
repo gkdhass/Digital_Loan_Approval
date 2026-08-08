@@ -8,16 +8,16 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl border border-gray-200 p-6 space-y-4"
+            className="bg-white rounded-2xl border border-border p-6 space-y-4"
           >
-            <div className="h-6 bg-gray-200 rounded-lg w-2/3 animate-pulse" />
+            <div className="h-6 bg-gray-200 dark:bg-cardDark rounded-lg w-2/3 animate-pulse" />
             <div className="space-y-2">
-              <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
-              <div className="h-4 bg-gray-200 rounded w-5/6 animate-pulse" />
+              <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-full animate-pulse" />
+              <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-5/6 animate-pulse" />
             </div>
             <div className="flex gap-2">
-              <div className="h-8 bg-gray-200 rounded-full w-24 animate-pulse" />
-              <div className="h-8 bg-gray-200 rounded-full w-24 animate-pulse" />
+              <div className="h-8 bg-gray-200 dark:bg-cardDark rounded-full w-24 animate-pulse" />
+              <div className="h-8 bg-gray-200 dark:bg-cardDark rounded-full w-24 animate-pulse" />
             </div>
           </motion.div>
         );
@@ -27,11 +27,11 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl border border-gray-200 p-6 space-y-3"
+            className="bg-white rounded-2xl border border-border p-6 space-y-3"
           >
-            <div className="h-10 w-10 bg-gray-200 rounded-lg animate-pulse" />
-            <div className="h-8 bg-gray-200 rounded w-1/2 animate-pulse" />
-            <div className="h-4 bg-gray-200 rounded w-2/3 animate-pulse" />
+            <div className="h-10 w-10 bg-gray-200 dark:bg-cardDark rounded-lg animate-pulse" />
+            <div className="h-8 bg-gray-200 dark:bg-cardDark rounded w-1/2 animate-pulse" />
+            <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-2/3 animate-pulse" />
           </motion.div>
         );
 
@@ -40,17 +40,17 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="bg-white rounded-2xl border border-gray-200 overflow-hidden"
+            className="bg-white rounded-2xl border border-border overflow-hidden"
           >
-            <div className="p-4 border-b border-gray-200">
-              <div className="h-6 bg-gray-200 rounded w-1/4 animate-pulse" />
+            <div className="p-4 border-b border-border">
+              <div className="h-6 bg-gray-200 dark:bg-cardDark rounded w-1/4 animate-pulse" />
             </div>
             {[...Array(5)].map((_, i) => (
-              <div key={i} className="p-4 border-b border-gray-100 flex gap-4">
-                <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded w-1/3 animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded w-1/4 animate-pulse" />
-                <div className="h-4 bg-gray-200 rounded w-1/6 animate-pulse" />
+              <div key={i} className="p-4 border-b border-border100 flex gap-4">
+                <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-1/4 animate-pulse" />
+                <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-1/3 animate-pulse" />
+                <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-1/4 animate-pulse" />
+                <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-1/6 animate-pulse" />
               </div>
             ))}
           </motion.div>
@@ -58,7 +58,7 @@ const SkeletonLoader = ({ type = 'card', count = 1 }) => {
 
       default:
         return (
-          <div className="h-4 bg-gray-200 rounded w-full animate-pulse" />
+          <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-full animate-pulse" />
         );
     }
   };

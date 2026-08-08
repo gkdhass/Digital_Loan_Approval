@@ -62,8 +62,51 @@ const Home = () => {
       className="min-h-screen"
     >
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800 text-white overflow-hidden">
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsMjU1LDI1NSwwLjAzKSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-30" />
+      <section className="relative bg-gradient-to-br from-backgroundDark via-surfaceDark to-backgroundDark text-white overflow-hidden">
+        {/* Animated Grid Background */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyMTIsIDE3NSwgNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+        
+        {/* Floating Background Shapes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            animate={{
+              y: [0, -30, 0],
+              x: [0, 20, 0],
+              rotate: [0, 10, 0],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute top-20 right-20 w-64 h-64 bg-secondary/5 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              y: [0, 40, 0],
+              x: [0, -30, 0],
+              rotate: [0, -15, 0],
+            }}
+            transition={{
+              duration: 10,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute bottom-20 left-20 w-96 h-96 bg-secondary/5 rounded-full blur-3xl"
+          />
+          <motion.div
+            animate={{
+              y: [0, -20, 0],
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: 6,
+              repeat: Infinity,
+              ease: 'easeInOut',
+            }}
+            className="absolute top-1/2 left-1/2 w-72 h-72 bg-secondary/3 rounded-full blur-3xl"
+          />
+        </div>
         
         <div className="container-custom relative py-20 md:py-32">
           <div className="max-w-3xl">
@@ -71,28 +114,33 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-accent-500/10 border border-accent-500/20 rounded-full text-accent-400 text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 border border-secondary/30 rounded-full text-foregroundSecondary text-sm font-medium mb-6"
             >
               <Award className="h-4 w-4" />
               <span>Trusted by 10,000+ customers</span>
             </motion.div>
 
             <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
+              transition={{ delay: 0.3, duration: 0.6 }}
               className="text-5xl md:text-6xl font-bold mb-6 leading-tight"
             >
               Your Financial Goals,
-              <span className="block gradient-text bg-gradient-to-r from-accent-400 to-emerald-400 bg-clip-text text-transparent">
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.5, duration: 0.6 }}
+                className="block bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent"
+              >
                 Our Priority
-              </span>
+              </motion.span>
             </motion.h1>
 
             <motion.p
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              transition={{ delay: 0.6 }}
               className="text-xl text-gray-300 mb-8 leading-relaxed"
             >
               Experience hassle-free loan approvals with our digital platform. 
@@ -102,15 +150,17 @@ const Home = () => {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.5 }}
+              transition={{ delay: 0.7 }}
               className="flex flex-wrap gap-4"
             >
               <Link to="/loan-types">
                 <motion.button
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
-                  className="px-8 py-4 bg-gradient-to-r from-accent-600 to-accent-700 rounded-xl font-semibold flex items-center gap-2 shadow-lg hover:shadow-xl transition-shadow"
+                  whileHover={{ 
+                    scale: 1.02,
+                    boxShadow: '0 0 25px rgba(212, 175, 55, 0.5)'
+                  }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-8 py-4 bg-secondary hover:bg-background text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all"
                 >
                   Explore Loans
                   <ArrowRight className="h-5 w-5" />
@@ -118,9 +168,8 @@ const Home = () => {
               </Link>
               <Link to="/register">
                 <motion.button
-                  variants={buttonVariants}
-                  whileHover="hover"
-                  whileTap="tap"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
                   className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl font-semibold hover:bg-white/20 transition-colors"
                 >
                   Get Started
@@ -133,13 +182,13 @@ const Home = () => {
         {/* Wave Divider */}
         <div className="absolute bottom-0 left-0 right-0">
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 120" className="w-full h-auto">
-            <path fill="#F9FAFB" fillOpacity="1" d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,48C840,43,960,53,1080,58.7C1200,64,1320,64,1380,64L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
+            <path fill="#FFFFFF" fillOpacity="1" d="M0,64L60,69.3C120,75,240,85,360,80C480,75,600,53,720,48C840,43,960,53,1080,58.7C1200,64,1320,64,1380,64L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
           </svg>
         </div>
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white dark:bg-backgroundDark">
         <div className="container-custom">
           <motion.div
             variants={staggerContainer}
@@ -148,10 +197,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-navy-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground dark:text-surfaceDark mb-4">
               Why Choose Us?
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondary max-w-2xl mx-auto">
               We make loan approvals fast, secure, and hassle-free
             </p>
           </motion.div>
@@ -171,15 +220,15 @@ const Home = () => {
                   variants={cardVariants}
                   custom={index}
                   whileHover="hover"
-                  className="card p-6"
+                  className="card"
                 >
-                  <div className="h-12 w-12 bg-accent-50 rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="h-6 w-6 text-accent-600" />
+                  <div className="h-12 w-12 bg-secondary/10 dark:bg-secondary/20 rounded-xl flex items-center justify-center mb-4">
+                    <Icon className="h-6 w-6 text-foreground dark:text-foreground" />
                   </div>
-                  <h3 className="text-xl font-bold text-navy-900 mb-2">
+                  <h3 className="text-xl font-bold text-foreground dark:text-surfaceDark mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-foregroundSecondary dark:text-foregroundSecondary">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -190,7 +239,7 @@ const Home = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-white">
+      <section className="py-20 bg-surface dark:bg-backgroundDark">
         <div className="container-custom">
           <motion.div
             variants={staggerContainer}
@@ -199,10 +248,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-navy-900 mb-4">
+            <h2 className="text-4xl font-bold text-foreground dark:text-surfaceDark mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
+            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondary max-w-2xl mx-auto">
               Four simple steps to get your loan approved
             </p>
           </motion.div>
@@ -219,18 +268,18 @@ const Home = () => {
                 className="relative"
               >
                 <div className="text-center">
-                  <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-accent-600 to-accent-700 text-white rounded-2xl font-bold text-2xl mb-4 shadow-soft">
+                  <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-secondary to-primary text-white rounded-2xl font-bold text-2xl mb-4 shadow-soft">
                     {step.number}
                   </div>
-                  <h3 className="text-xl font-bold text-navy-900 mb-2">
+                  <h3 className="text-xl font-bold text-foreground dark:text-surfaceDark mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-gray-600">
+                  <p className="text-foregroundSecondary dark:text-foregroundSecondary">
                     {step.description}
                   </p>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-accent-300 to-transparent -ml-4" />
+                  <div className="hidden lg:block absolute top-8 left-full w-full h-0.5 bg-gradient-to-r from-secondary to-transparent -ml-4" />
                 )}
               </motion.div>
             ))}
@@ -239,7 +288,7 @@ const Home = () => {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-br from-navy-900 to-navy-800 text-white">
+      <section className="py-20 bg-gradient-to-br from-backgroundDark to-surfaceDark text-white">
         <div className="container-custom">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -258,7 +307,7 @@ const Home = () => {
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="tap"
-                className="px-8 py-4 bg-gradient-to-r from-accent-600 to-accent-700 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-shadow"
+                className="px-8 py-4 bg-secondary hover:bg-background rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
               >
                 Apply Now
               </motion.button>

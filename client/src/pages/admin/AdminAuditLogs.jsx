@@ -57,7 +57,7 @@ const AdminAuditLogs = () => {
     if (action.includes('create')) return 'text-emerald-600 bg-emerald-50';
     if (action.includes('update')) return 'text-blue-600 bg-blue-50';
     if (action.includes('verify')) return 'text-purple-600 bg-purple-50';
-    return 'text-gray-600 bg-gray-50';
+    return 'text-gray-600 bg-gray-50 dark:bg-cardSecondaryDark';
   };
 
   const getEntityIcon = (entityType) => {
@@ -75,7 +75,7 @@ const AdminAuditLogs = () => {
 
   if (loading && currentPage === 1) {
     return (
-      <div className="min-h-screen bg-primary py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SkeletonTable rows={20} />
         </div>
@@ -88,12 +88,12 @@ const AdminAuditLogs = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-primary py-8"
+      className="min-h-screen bg-background py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-heading mb-2">Audit Logs</h1>
-          <p className="text-secondary">Track all system activities and changes</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">Audit Logs</h1>
+          <p className="text-foregroundSecondary">Track all system activities and changes</p>
         </div>
 
         {/* Search and Filters */}
@@ -111,7 +111,7 @@ const AdminAuditLogs = () => {
                 placeholder="Search by action..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+                className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
               />
             </div>
 
@@ -119,12 +119,12 @@ const AdminAuditLogs = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-navy-100 text-navy-700 rounded-lg hover:bg-navy-200 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-surface text-foreground rounded-lg hover:bg-border transition-colors"
             >
               <Filter size={16} />
               Filters
               {(actionFilter || entityFilter) && (
-                <span className="h-2 w-2 bg-accent-600 rounded-full" />
+                <span className="h-2 w-2 bg-primary-600 rounded-full" />
               )}
             </motion.button>
 
@@ -144,13 +144,13 @@ const AdminAuditLogs = () => {
             <motion.div
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 'auto', opacity: 1 }}
-              className="mt-4 pt-4 border-t border-gray-200"
+              className="mt-4 pt-4 border-t border-border"
             >
               <div className="flex flex-wrap gap-3">
                 <select
                   value={actionFilter}
                   onChange={(e) => setActionFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">All Actions</option>
                   <option value="create">Create</option>
@@ -162,7 +162,7 @@ const AdminAuditLogs = () => {
                 <select
                   value={entityFilter}
                   onChange={(e) => setEntityFilter(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
+                  className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
                 >
                   <option value="">All Entities</option>
                   <option value="user">User</option>
@@ -185,19 +185,19 @@ const AdminAuditLogs = () => {
         >
           {logs.length === 0 ? (
             <div className="text-center py-12">
-              <FileText className="mx-auto text-navy-300 mb-4" size={48} />
-              <p className="text-navy-600">No audit logs found</p>
+              <FileText className="mx-auto text-foregroundSecondary mb-4" size={48} />
+              <p className="text-foregroundSecondary">No audit logs found</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">User</th>
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">Action</th>
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">Entity</th>
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">Timestamp</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">User</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">Action</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">Entity</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">Timestamp</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -207,12 +207,12 @@ const AdminAuditLogs = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.02 }}
-                        className="border-b border-gray-100 hover:bg-gray-50"
+                        className="border-b border-border100 hover:bg-gray-50 dark:hover:bg-cardSecondaryDark"
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <User size={16} className="text-gray-400" />
-                            <span className="font-medium text-navy-900">
+                            <span className="font-medium text-foreground">
                               {log.user?.fullName || 'System'}
                             </span>
                           </div>
@@ -242,7 +242,7 @@ const AdminAuditLogs = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-border">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
@@ -251,7 +251,7 @@ const AdminAuditLogs = () => {
                     <ChevronLeft size={16} />
                     Previous
                   </button>
-                  <span className="text-navy-600">
+                  <span className="text-foregroundSecondary">
                     Page {currentPage} of {totalPages}
                   </span>
                   <button

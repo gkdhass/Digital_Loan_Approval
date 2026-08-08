@@ -6,13 +6,24 @@ const User = require('../models/User');
 const cloudinary = require('../config/cloudinary');
 const { sendDocumentVerifiedEmail, sendDocumentRejectedEmail } = require('../utils/emailService');
 const { triggerAIAssessmentAsync, generateAIAssessment } = require('../utils/aiAssessmentService');
+const { verifyDocumentOCR, requiresOCR } = require('../services/ocrService');
 
 // @desc    Upload document
 // @route   POST /api/documents/upload
 // @access  Private
 exports.uploadDocument = async (req, res, next) => {
   try {
+    console.log('[uploadDocument] Request received');
+    console.log('[uploadDocument] req.file:', req.file ? {
+      fieldname: req.file.fieldname,
+      originalname: req.file.originalname,
+      mimetype: req.file.mimetype,
+      size: req.file.size,
+    } : 'MISSING');
+    console.log('[uploadDocument] req.body:', req.body);
+
     if (!req.file) {
+      console.error('[uploadDocument] ERROR: No file uploaded');
       return res.status(400).json({
         success: false,
         message: 'No file uploaded',
@@ -21,9 +32,28 @@ exports.uploadDocument = async (req, res, next) => {
 
     const { applicationId, documentType } = req.body;
 
+    if (!applicationId) {
+      console.error('[uploadDocument] ERROR: Missing applicationId');
+      return res.status(400).json({
+        success: false,
+        message: 'Application ID is required',
+      });
+    }
+
+    if (!documentType) {
+      console.error('[uploadDocument] ERROR: Missing documentType');
+      return res.status(400).json({
+        success: false,
+        message: 'Document type is required',
+      });
+    }
+
+    console.log('[uploadDocument] Verifying application:', applicationId);
+
     // Verify application exists and belongs to user
     const application = await LoanApplication.findById(applicationId);
     if (!application) {
+      console.error('[uploadDocument] ERROR: Application not found:', applicationId);
       return res.status(404).json({
         success: false,
         message: 'Application not found',
@@ -31,11 +61,14 @@ exports.uploadDocument = async (req, res, next) => {
     }
 
     if (application.user.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      console.error('[uploadDocument] ERROR: Authorization failed');
       return res.status(403).json({
         success: false,
         message: 'Not authorized',
       });
     }
+
+    console.log('[uploadDocument] Uploading to Cloudinary...');
 
     // Upload to Cloudinary from memory buffer (no disk write needed)
     // Convert buffer to base64 data URI for Cloudinary
@@ -47,8 +80,10 @@ exports.uploadDocument = async (req, res, next) => {
       resource_type: 'auto',
     });
 
-    // Create document record
-    const document = await Document.create({
+    console.log('[uploadDocument] Cloudinary upload successful:', result.public_id);
+
+    // Create document record with OCR status pending if applicable
+    const documentData = {
       application: applicationId,
       user: req.user._id,
       documentType,
@@ -57,7 +92,28 @@ exports.uploadDocument = async (req, res, next) => {
       cloudinaryId: result.public_id,
       fileSize: req.file.size,
       mimeType: req.file.mimetype,
-    });
+    };
+
+    // Initialize OCR verification if document is PAN or Aadhaar
+    if (requiresOCR(documentType)) {
+      documentData.ocrVerification = {
+        ocrStatus: 'pending',
+      };
+    }
+
+    const document = await Document.create(documentData);
+
+    console.log('[uploadDocument] Document created successfully:', document._id);
+
+    // Trigger OCR verification asynchronously for PAN/Aadhaar documents
+    if (requiresOCR(documentType)) {
+      // Get user's full name for OCR comparison
+      const user = await User.findById(req.user._id).select('fullName');
+      const registeredName = user?.fullName || '';
+
+      // Run OCR in background (non-blocking)
+      processDocumentOCR(document._id, req.file.buffer, req.file.originalname, documentType, registeredName);
+    }
 
     // Trigger AI assessment asynchronously (non-blocking)
     // This runs in the background without delaying the response
@@ -69,9 +125,65 @@ exports.uploadDocument = async (req, res, next) => {
       data: document,
     });
   } catch (error) {
+    console.error('[uploadDocument] ERROR:', error.name, error.message);
+    console.error('[uploadDocument] Stack:', error.stack);
     next(error);
   }
 };
+
+/**
+ * Process document OCR in background (async, non-blocking)
+ * @param {string} documentId - Document ID
+ * @param {Buffer} fileBuffer - File buffer
+ * @param {string} fileName - File name
+ * @param {string} documentType - Document type
+ * @param {string} registeredName - User's registered name
+ */
+async function processDocumentOCR(documentId, fileBuffer, fileName, documentType, registeredName) {
+  try {
+    console.log(`🔍 Starting OCR verification for document ${documentId}`);
+
+    // Call OCR service
+    const ocrResult = await verifyDocumentOCR(fileBuffer, fileName, documentType, registeredName);
+
+    // Update document with OCR results
+    const document = await Document.findById(documentId);
+    if (!document) {
+      console.error('Document not found for OCR update:', documentId);
+      return;
+    }
+
+    if (ocrResult.skip) {
+      // Document doesn't require OCR - remove pending status
+      document.ocrVerification = undefined;
+    } else if (ocrResult.success || ocrResult.fallback) {
+      // Update with OCR results
+      document.ocrVerification = {
+        ...document.ocrVerification,
+        ...ocrResult.data,
+      };
+    }
+
+    await document.save();
+
+    console.log(`✅ OCR verification completed for document ${documentId}`);
+    console.log(`   Status: ${document.ocrVerification?.ocrStatus || 'N/A'}`);
+  } catch (error) {
+    console.error('❌ Error processing OCR:', error.message);
+    
+    // Update document with failed status
+    try {
+      await Document.findByIdAndUpdate(documentId, {
+        $set: {
+          'ocrVerification.ocrStatus': 'failed',
+          'ocrVerification.processedAt': new Date(),
+        },
+      });
+    } catch (updateError) {
+      console.error('Failed to update document with OCR error status:', updateError.message);
+    }
+  }
+}
 
 // @desc    Get documents for application
 // @route   GET /api/documents/application/:applicationId
@@ -98,6 +210,32 @@ exports.getApplicationDocuments = async (req, res, next) => {
 
     const documents = await Document.find({ application: applicationId })
       .sort('-uploadedAt');
+
+    // Auto-fail OCR for documents stuck in 'pending' for more than 60 seconds
+    const OCR_TIMEOUT_MS = 60 * 1000; // 60 seconds
+    const now = new Date();
+    
+    for (const doc of documents) {
+      if (doc.ocrVerification && doc.ocrVerification.ocrStatus === 'pending') {
+        const uploadedAt = new Date(doc.uploadedAt);
+        const timeSinceUpload = now - uploadedAt;
+        
+        if (timeSinceUpload > OCR_TIMEOUT_MS) {
+          console.log(`⏱️  Auto-failing OCR for document ${doc._id} (stuck for ${Math.floor(timeSinceUpload / 1000)}s)`);
+          
+          await Document.findByIdAndUpdate(doc._id, {
+            $set: {
+              'ocrVerification.ocrStatus': 'failed',
+              'ocrVerification.processedAt': new Date(),
+            },
+          });
+          
+          // Update local document object
+          doc.ocrVerification.ocrStatus = 'failed';
+          doc.ocrVerification.processedAt = new Date();
+        }
+      }
+    }
 
     res.json({
       success: true,

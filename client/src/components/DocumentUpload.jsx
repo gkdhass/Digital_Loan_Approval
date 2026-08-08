@@ -156,8 +156,8 @@ const DocumentUpload = ({
       <div
         className={`relative border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
           dragActive
-            ? 'border-accent-600 bg-accent-50'
-            : 'border-gray-300 hover:border-accent-400 hover:bg-gray-50'
+            ? 'border-primary-600 bg-primary-50'
+            : 'border-border300 hover:border-primary-400 hover:bg-gray-50 dark:hover:bg-cardSecondaryDark'
         }`}
         onDragEnter={handleDrag}
         onDragLeave={handleDrag}
@@ -182,16 +182,16 @@ const DocumentUpload = ({
               exit={{ opacity: 0 }}
               className="space-y-4"
             >
-              <Loader2 className="h-12 w-12 text-accent-600 mx-auto animate-spin" />
+              <Loader2 className="h-12 w-12 text-primary-600 mx-auto animate-spin" />
               <div>
                 <p className="font-semibold text-gray-900">Uploading...</p>
                 <p className="text-sm text-gray-600">{uploadProgress}%</p>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2">
+              <div className="w-full bg-gray-200 dark:bg-cardDark rounded-full h-2">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${uploadProgress}%` }}
-                  className="bg-accent-600 h-2 rounded-full transition-all"
+                  className="bg-primary-600 h-2 rounded-full transition-all"
                 />
               </div>
             </motion.div>
@@ -203,7 +203,7 @@ const DocumentUpload = ({
               exit={{ opacity: 0 }}
               className="space-y-4"
             >
-              <div className="mx-auto h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center">
+              <div className="mx-auto h-16 w-16 bg-gray-100 dark:bg-cardDark rounded-full flex items-center justify-center">
                 <Upload className="h-8 w-8 text-gray-400" />
               </div>
               <div>
@@ -219,7 +219,7 @@ const DocumentUpload = ({
                 whileTap={{ scale: 0.95 }}
                 onClick={onButtonClick}
                 disabled={!selectedDocType}
-                className="px-6 py-2 bg-accent-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Choose File
               </motion.button>
@@ -258,10 +258,10 @@ const DocumentUpload = ({
                 key={doc._id}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="flex items-center justify-between p-4 bg-gray-50 rounded-lg border border-gray-200"
+                className="flex items-center justify-between p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg border border-border"
               >
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
+                  <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border border-border">
                     <FileText className="h-5 w-5 text-gray-600" />
                   </div>
                   <div>

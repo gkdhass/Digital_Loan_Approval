@@ -8,30 +8,51 @@ import emailjs from '@emailjs/browser';
  */
 export const sendDecisionEmail = async (application, decision, extra = {}) => {
   try {
+    console.log('[EmailService] Sending decision email:', {
+      decision,
+      applicationId: application._id,
+      applicationNumber: application.applicationNumber,
+      hasUserData: !!application.user,
+      userData: application.user
+    });
+
     const { decision_status, decision_message } = buildDecisionContent(application, decision, extra);
+
+    // Handle both populated user object and user ID
+    const userEmail = application.user?.email || application.userEmail;
+    const userName = application.user?.fullName || application.userName || application.user?.name || 'Customer';
+
+    if (!userEmail) {
+      console.error('[EmailService] No email found in application data');
+      throw new Error('Recipient email not found');
+    }
+
+    const templateParams = {
+      to_email: userEmail,
+      customer_name: userName,
+      application_number: application.applicationNumber,
+      loan_amount: application.loanAmount,
+      loan_type: application.loanType?.name || 'Loan',
+      decision_status,
+      decision_message,
+      emi: application.emi,
+      tenure: application.durationMonths,
+      interest_rate: application.loanType?.interestRate,
+    };
+
+    console.log('[EmailService] Template params:', templateParams);
 
     await emailjs.send(
       import.meta.env.VITE_EMAILJS_SERVICE_ID,
       import.meta.env.VITE_EMAILJS_TEMPLATE_DECISION,
-      {
-        to_email: application.user.email,
-        customer_name: application.user.fullName,
-        application_number: application.applicationNumber,
-        loan_amount: application.loanAmount,
-        loan_type: application.loanType?.name || 'Loan',
-        decision_status,
-        decision_message,
-        emi: application.emi,
-        tenure: application.durationMonths,
-        interest_rate: application.loanType?.interestRate,
-      },
+      templateParams,
       import.meta.env.VITE_EMAILJS_PUBLIC_KEY
     );
 
-    console.log(`Decision email sent via EmailJS: ${decision}`);
+    console.log(`[EmailService] Decision email sent successfully: ${decision}`);
     return true;
   } catch (error) {
-    console.error('Failed to send decision email:', error);
+    console.error('[EmailService] Failed to send decision email:', error);
     throw error;
   }
 };

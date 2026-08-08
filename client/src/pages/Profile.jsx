@@ -109,31 +109,31 @@ const Profile = () => {
   };
 
   return (
-    <div className="min-h-screen bg-primary py-8 transition-colors">
+    <div className="min-h-screen bg-background py-8 transition-colors">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-heading mb-2">My Profile</h1>
-          <p className="text-secondary">Manage your personal information</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">My Profile</h1>
+          <p className="text-foregroundSecondary">Manage your personal information</p>
         </div>
 
         <div className="card p-8">
           {/* Header with Avatar */}
-          <div className="flex items-center gap-6 mb-8 pb-6 border-b border-gray-200 dark:border-gray-700">
+          <div className="flex items-center gap-6 mb-8 pb-6 border-b border-border dark:border-borderDark">
             <div className="relative">
               {previewUrl ? (
                 <img
                   src={previewUrl}
                   alt="Profile"
-                  className="h-24 w-24 rounded-full object-cover border-4 border-golden-200 dark:border-golden-800"
+                  className="h-24 w-24 rounded-full object-cover border-4 border-secondary dark:border-secondaryDark"
                 />
               ) : (
-                <div className="h-24 w-24 bg-golden-100 dark:bg-golden-900/30 rounded-full flex items-center justify-center border-4 border-golden-200 dark:border-golden-800">
-                  <span className="text-4xl font-bold text-golden-700 dark:text-golden-400">
+                <div className="h-24 w-24 bg-secondary dark:bg-secondaryDark/30 rounded-full flex items-center justify-center border-4 border-secondary dark:border-secondaryDark">
+                  <span className="text-4xl font-bold text-foreground dark:text-foregroundSecondaryDark">
                     {user?.fullName?.charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
-              <label className="absolute bottom-0 right-0 h-8 w-8 bg-accent-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-accent-700 transition-colors shadow-lg">
+              <label className="absolute bottom-0 right-0 h-8 w-8 bg-primary-600 rounded-full flex items-center justify-center cursor-pointer hover:bg-primary-700 transition-colors shadow-lg">
                 <Camera className="h-4 w-4 text-white" />
                 <input
                   type="file"
@@ -150,12 +150,12 @@ const Profile = () => {
               )}
             </div>
             <div className="flex-1">
-              <h2 className="text-2xl font-bold text-primary mb-1">{user?.fullName}</h2>
-              <p className="text-secondary flex items-center gap-2">
+              <h2 className="text-2xl font-bold text-foreground mb-1">{user?.fullName}</h2>
+              <p className="text-foregroundSecondary flex items-center gap-2">
                 <Mail className="h-4 w-4" />
                 {user?.email}
               </p>
-              <p className="text-sm text-golden-600 dark:text-golden-400 mt-1">
+              <p className="text-sm text-foreground dark:text-foregroundSecondaryDark mt-1">
                 {user?.role === 'admin' ? 'Administrator' : 'Customer'}
               </p>
             </div>
@@ -177,7 +177,7 @@ const Profile = () => {
               <div>
                 <label className="label">Full Name</label>
                 <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary" />
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundSecondary" />
                   <input
                     type="text"
                     name="fullName"
@@ -194,7 +194,7 @@ const Profile = () => {
               <div>
                 <label className="label">Phone Number</label>
                 <div className="relative">
-                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-secondary" />
+                  <Phone className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundSecondary" />
                   <input
                     type="tel"
                     name="phone"
@@ -211,7 +211,7 @@ const Profile = () => {
               <div>
                 <label className="label">Street Address</label>
                 <div className="relative">
-                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-secondary" />
+                  <MapPin className="absolute left-3 top-3 h-5 w-5 text-foregroundSecondary" />
                   <input
                     type="text"
                     name="address.street"
@@ -261,16 +261,16 @@ const Profile = () => {
               </div>
 
               {/* Account Info (Read-only) */}
-              <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+              <div className="pt-4 border-t border-border dark:border-borderDark">
                 <label className="label mb-3">Account Information</label>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                    <p className="text-xs text-secondary mb-1">Email</p>
-                    <p className="text-sm font-medium text-primary">{user?.email}</p>
+                  <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
+                    <p className="text-xs text-foregroundSecondary mb-1">Email</p>
+                    <p className="text-sm font-medium text-foreground">{user?.email}</p>
                   </div>
-                  <div className="p-4 bg-gray-50 dark:bg-gray-900 rounded-lg">
-                    <p className="text-xs text-secondary mb-1">Member Since</p>
-                    <p className="text-sm font-medium text-primary">
+                  <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
+                    <p className="text-xs text-foregroundSecondary mb-1">Member Since</p>
+                    <p className="text-sm font-medium text-foreground">
                       {new Date(user?.createdAt).toLocaleDateString()}
                     </p>
                   </div>

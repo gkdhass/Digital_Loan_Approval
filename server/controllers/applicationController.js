@@ -3,10 +3,13 @@ const LoanType = require('../models/LoanType');
 const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const User = require('../models/User');
+const Document = require('../models/Document');
 const { generateLoanAgreement } = require('../utils/pdfGenerator');
 const {
   sendDocumentsRequestedEmail,
 } = require('../utils/emailService');
+const { predictLoanRisk } = require('../services/aiService');
+const { calculateEligibilityScore } = require('../utils/eligibilityScore');
 
 // @desc    Create loan application
 // @route   POST /api/applications
@@ -14,6 +17,12 @@ const {
 exports.createApplication = async (req, res, next) => {
   try {
     const { loanType, loanAmount, durationMonths, purpose, employmentDetails } = req.body;
+
+    console.log('[createApplication] Incoming payload:', JSON.stringify({
+      loanType, loanAmount, durationMonths, purpose,
+      employmentType: employmentDetails?.employmentType,
+      monthlyIncome: employmentDetails?.monthlyIncome,
+    }));
 
     const loanTypeData = await LoanType.findById(loanType);
     if (!loanTypeData) {
@@ -34,7 +43,24 @@ exports.createApplication = async (req, res, next) => {
     const interestAmount = totalPayable - loanAmount;
     const processingFee = Math.round((loanAmount * loanTypeData.processingFeePercent) / 100);
 
-    const application = await LoanApplication.create({
+    // Calculate eligibility score
+    const eligibilityScoreData = calculateEligibilityScore({
+      monthlyIncome: employmentDetails.monthlyIncome,
+      requestedAmount: loanAmount,
+      employmentType: employmentDetails.employmentType || 'other',
+      existingEMI: 0, // Can be extended to track existing EMIs
+      loanDuration: durationMonths,
+    });
+
+    // Generate applicationNumber here explicitly — belt-and-suspenders alongside the
+    // pre-save hook, ensuring the field is set before Mongoose validation runs.
+    const timestamp = Date.now().toString().slice(-8);
+    const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
+    const applicationNumber = `LA${timestamp}${random}`;
+    console.log('[createApplication] Generated applicationNumber:', applicationNumber);
+
+    const application = new LoanApplication({
+      applicationNumber,
       user: req.user._id,
       loanType,
       loanAmount,
@@ -45,7 +71,41 @@ exports.createApplication = async (req, res, next) => {
       totalPayable,
       interestAmount,
       processingFee,
+      eligibilityScore: eligibilityScoreData,
     });
+    await application.save();
+
+    // Call AI service for risk prediction (non-blocking)
+    // If AI service fails, application still succeeds
+    const aiResult = await predictLoanRisk({
+      monthlyIncome: employmentDetails.monthlyIncome,
+      employmentType: employmentDetails.employmentType,
+      existingEMI: 0, // Can be extended to track existing EMIs
+      requestedAmount: loanAmount,
+      loanDuration: durationMonths,
+      age: req.user.age || 30, // Get from user profile if available
+    });
+
+    // Update application with risk assessment
+    if (aiResult.success && aiResult.data) {
+      application.riskAssessment = {
+        approvalProbability: aiResult.data.approvalProbability,
+        riskLevel: aiResult.data.riskLevel,
+        recommendation: aiResult.data.recommendation,
+        factors: aiResult.data.factors,
+        assessedAt: new Date(),
+        modelVersion: aiResult.data.metadata?.modelVersion || 'unknown',
+        status: 'completed',
+      };
+    } else {
+      // AI service failed - mark as pending
+      application.riskAssessment = {
+        status: 'pending',
+      };
+      console.warn('⚠️  AI risk assessment not available, application will proceed with manual review');
+    }
+
+    await application.save();
 
     // Create notification
     await Notification.create({
@@ -73,6 +133,10 @@ exports.createApplication = async (req, res, next) => {
       data: application,
     });
   } catch (error) {
+    console.error('[createApplication] Error:', error.name, error.message);
+    if (error.errors) {
+      console.error('[createApplication] Validation fields failed:', Object.keys(error.errors));
+    }
     next(error);
   }
 };
@@ -101,31 +165,53 @@ exports.getUserApplications = async (req, res, next) => {
 // @access  Private
 exports.getApplicationById = async (req, res, next) => {
   try {
+    console.log('[getApplicationById] Request for ID:', req.params.id);
+    console.log('[getApplicationById] Requested by user:', {
+      userId: req.user._id,
+      role: req.user.role,
+    });
+
     const application = await LoanApplication.findById(req.params.id)
       .populate('loanType')
-      .populate('user', 'fullName email phone')
+      .populate('user', 'fullName email phone address')
       .populate('reviewedBy', 'fullName email');
 
     if (!application) {
+      console.log('[getApplicationById] NOT FOUND - No application with ID:', req.params.id);
       return res.status(404).json({
         success: false,
         message: 'Application not found',
       });
     }
 
+    console.log('[getApplicationById] Found application:', {
+      id: application._id,
+      applicationNumber: application.applicationNumber,
+      userId: application.user._id,
+      status: application.status,
+    });
+
     // Check authorization
     if (application.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      console.log('[getApplicationById] UNAUTHORIZED - User does not own this application');
       return res.status(403).json({
         success: false,
         message: 'Not authorized to view this application',
       });
     }
 
+    console.log('[getApplicationById] SUCCESS - Returning application');
+
     res.json({
       success: true,
       data: application,
     });
   } catch (error) {
+    console.error('[getApplicationById] ERROR:', {
+      id: req.params.id,
+      error: error.message,
+      name: error.name,
+    });
     next(error);
   }
 };
@@ -187,15 +273,33 @@ exports.getAllApplications = async (req, res, next) => {
 // @access  Private/Admin
 exports.updateApplicationStatus = async (req, res, next) => {
   try {
+    console.log('[updateApplicationStatus] Request:', {
+      applicationId: req.params.id,
+      newStatus: req.body.status,
+      hasAdminNotes: !!req.body.adminNotes,
+      hasRejectionReason: !!req.body.rejectionReason,
+      adminId: req.user._id,
+    });
+
     const { status, adminNotes, rejectionReason } = req.body;
 
-    const application = await LoanApplication.findById(req.params.id);
+    const application = await LoanApplication.findById(req.params.id)
+      .populate('loanType')
+      .populate('user', 'fullName email phone address')
+      .populate('reviewedBy', 'fullName email');
+    
     if (!application) {
+      console.log('[updateApplicationStatus] NOT FOUND:', req.params.id);
       return res.status(404).json({
         success: false,
         message: 'Application not found',
       });
     }
+
+    console.log('[updateApplicationStatus] Found application:', {
+      id: application._id,
+      currentStatus: application.status,
+    });
 
     const previousStatus = application.status;
     application.status = status;
@@ -209,6 +313,11 @@ exports.updateApplicationStatus = async (req, res, next) => {
     if (status === 'disbursed') application.disbursedAt = Date.now();
 
     await application.save();
+
+    console.log('[updateApplicationStatus] Saved successfully:', {
+      previousStatus,
+      newStatus: status,
+    });
 
     // Get user for email
     const user = await User.findById(application.user);
@@ -343,6 +452,70 @@ exports.generateAgreement = async (req, res, next) => {
     res.setHeader('Content-Disposition', `attachment; filename=loan-agreement-${application.applicationNumber}.pdf`);
     res.send(pdfBuffer);
   } catch (error) {
+    next(error);
+  }
+};
+
+// @desc    Delete application (Admin)
+// @route   DELETE /api/applications/admin/:id
+// @access  Private/Admin
+exports.deleteApplicationAdmin = async (req, res, next) => {
+  try {
+    console.log('[deleteApplicationAdmin] Request:', {
+      applicationId: req.params.id,
+      adminId: req.user._id,
+      adminRole: req.user.role,
+    });
+
+    const application = await LoanApplication.findById(req.params.id);
+
+    if (!application) {
+      console.log('[deleteApplicationAdmin] Application not found:', req.params.id);
+      return res.status(404).json({
+        success: false,
+        message: 'Application not found',
+      });
+    }
+
+    console.log('[deleteApplicationAdmin] Found application:', {
+      id: application._id,
+      applicationNumber: application.applicationNumber,
+      userId: application.user,
+      status: application.status,
+    });
+
+    // Delete associated documents
+    const deletedDocuments = await Document.deleteMany({ application: application._id });
+    console.log('[deleteApplicationAdmin] Deleted documents:', deletedDocuments.deletedCount);
+
+    // Delete the application
+    await application.deleteOne();
+    console.log('[deleteApplicationAdmin] Application deleted');
+
+    // Audit log
+    await AuditLog.create({
+      user: req.user._id,
+      action: 'delete_application',
+      entityType: 'application',
+      entityId: application._id,
+      changes: {
+        deletedApplicationNumber: application.applicationNumber,
+        deletedUserId: application.user,
+        deletedStatus: application.status,
+        documentsDeleted: deletedDocuments.deletedCount,
+      },
+    });
+    console.log('[deleteApplicationAdmin] Audit log created');
+
+    res.json({
+      success: true,
+      message: 'Application deleted successfully',
+    });
+  } catch (error) {
+    console.error('[deleteApplicationAdmin] ERROR:', {
+      error: error.message,
+      name: error.name,
+    });
     next(error);
   }
 };

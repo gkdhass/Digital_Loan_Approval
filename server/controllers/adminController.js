@@ -246,6 +246,12 @@ exports.getReports = async (req, res, next) => {
   try {
     const { period = '6m' } = req.query;
 
+    console.log('[getReports] Request received:', {
+      period,
+      userId: req.user._id,
+      role: req.user.role,
+    });
+
     let startDate = new Date();
     switch (period) {
       case '1m':
@@ -403,6 +409,14 @@ exports.getReports = async (req, res, next) => {
       { $limit: 10 },
     ]);
 
+    console.log('[getReports] Aggregation results:', {
+      applicationTrendsCount: applicationTrends.length,
+      loanTypePerformanceCount: loanTypePerformance.length,
+      documentStatsCount: documentStats.length,
+      processingTimesCount: processingTimes.length,
+      topUsersCount: topUsers.length,
+    });
+
     res.json({
       success: true,
       data: {
@@ -422,6 +436,86 @@ exports.getReports = async (req, res, next) => {
       },
     });
   } catch (error) {
+    console.error('[getReports] ERROR:', {
+      error: error.message,
+      name: error.name,
+      stack: error.stack,
+    });
+    next(error);
+  }
+};
+
+// @desc    Export reports as CSV (Admin)
+// @route   GET /api/admin/reports/export
+// @access  Private/Admin
+exports.exportReports = async (req, res, next) => {
+  try {
+    const { period = '6m' } = req.query;
+
+    console.log('[exportReports] Request received:', {
+      period,
+      userId: req.user._id,
+      role: req.user.role,
+    });
+
+    let startDate = new Date();
+    switch (period) {
+      case '1m':
+        startDate.setMonth(startDate.getMonth() - 1);
+        break;
+      case '3m':
+        startDate.setMonth(startDate.getMonth() - 3);
+        break;
+      case '6m':
+        startDate.setMonth(startDate.getMonth() - 6);
+        break;
+      case '1y':
+        startDate.setFullYear(startDate.getFullYear() - 1);
+        break;
+      default:
+        startDate.setMonth(startDate.getMonth() - 6);
+    }
+
+    console.log('[exportReports] Querying applications from:', startDate);
+
+    const applications = await LoanApplication.find({
+      createdAt: { $gte: startDate },
+    })
+      .populate('loanType', 'name interestRate')
+      .populate('user', 'fullName email phone')
+      .sort('-createdAt');
+
+    console.log('[exportReports] Found', applications.length, 'applications');
+
+    // Generate CSV
+    const csvHeader = 'Application Number,Applicant Name,Email,Phone,Loan Type,Loan Amount,Status,Submitted Date,Approved Date\n';
+    const csvRows = applications.map((app) => {
+      return [
+        app.applicationNumber,
+        app.user?.fullName || '',
+        app.user?.email || '',
+        app.user?.phone || '',
+        app.loanType?.name || '',
+        app.loanAmount,
+        app.status,
+        app.createdAt ? new Date(app.createdAt).toISOString().split('T')[0] : '',
+        app.approvedAt ? new Date(app.approvedAt).toISOString().split('T')[0] : '',
+      ].join(',');
+    });
+
+    const csvContent = csvHeader + csvRows.join('\n');
+
+    console.log('[exportReports] CSV generated successfully, size:', csvContent.length);
+
+    res.setHeader('Content-Type', 'text/csv');
+    res.setHeader('Content-Disposition', `attachment; filename=loan-reports-${period}-${new Date().toISOString().split('T')[0]}.csv`);
+    res.send(csvContent);
+  } catch (error) {
+    console.error('[exportReports] ERROR:', {
+      error: error.message,
+      name: error.name,
+      stack: error.stack,
+    });
     next(error);
   }
 };

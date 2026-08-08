@@ -12,6 +12,8 @@ import {
 import api from '../services/api';
 import StatusBadge from '../components/StatusBadge';
 import LoadingSpinner from '../components/LoadingSpinner';
+import RiskAssessment from '../components/RiskAssessment';
+import EligibilityScore from '../components/EligibilityScore';
 import { checkmarkVariants } from '../animations/variants';
 
 const ApplicationDetail = () => {
@@ -33,8 +35,8 @@ const ApplicationDetail = () => {
   const fetchApplication = async () => {
     try {
       const response = await api.get(`/applications/${id}`);
-      // Interceptor unwraps HTTP body → response = {success, data:{...}}
-      setApplication(response.data || null);
+      // API interceptor unwraps response.data, so response is { success: true, data: application }
+      setApplication(response.data);
     } catch (err) {
       console.error('Failed to fetch application:', err);
       setError(err?.message || 'Failed to load application details.');
@@ -46,14 +48,14 @@ const ApplicationDetail = () => {
   const fetchDocuments = async () => {
     try {
       const response = await api.get(`/documents/application/${id}`);
-      // Interceptor unwraps HTTP body → response = {success, data:[...]}
+      // API interceptor unwraps response.data, so response is { success: true, data: documents }
       setDocuments(Array.isArray(response.data) ? response.data : []);
     } catch (err) {
       console.error('Failed to fetch documents:', err);
     }
   };
 
-  const handleFileUpload = async (e, documentType) => {
+  const handleFileUpload = async (e, documentType, existingDocId = null) => {
     const file = e.target.files[0];
     if (!file) return;
 
@@ -64,6 +66,10 @@ const ApplicationDetail = () => {
 
     setUploading(true);
     try {
+      if (existingDocId) {
+        // Re-upload: delete existing document first, then upload new one
+        await api.delete(`/documents/${existingDocId}`);
+      }
       await api.post('/documents/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' },
       });
@@ -82,18 +88,18 @@ const ApplicationDetail = () => {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-navy-50 py-12">
+      <div className="min-h-screen bg-surface py-12">
         <div className="max-w-md mx-auto text-center">
           <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-navy-900 mb-2">Failed to load application</h2>
+          <h2 className="text-xl font-bold text-foreground mb-2">Failed to load application</h2>
           <p className="text-gray-600 mb-6">{error}</p>
           <button
             onClick={() => { fetchApplication(); fetchDocuments(); }}
-            className="px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -104,18 +110,18 @@ const ApplicationDetail = () => {
 
   if (!application) {
     return (
-      <div className="min-h-screen bg-navy-50 py-12 text-center">
-        <p className="text-navy-600">Application not found</p>
+      <div className="min-h-screen bg-surface py-12 text-center">
+        <p className="text-foregroundSecondary">Application not found</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-navy-50 py-8">
+    <div className="min-h-screen bg-surface py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <button
           onClick={() => navigate('/applications')}
-          className="flex items-center gap-2 text-navy-600 hover:text-accent-600 mb-6"
+          className="flex items-center gap-2 text-foregroundSecondary hover:text-primary-600 mb-6"
         >
           <ArrowLeft size={20} />
           Back to Applications
@@ -158,10 +164,10 @@ const ApplicationDetail = () => {
         <div className="card mb-6">
           <div className="flex items-start justify-between mb-6">
             <div>
-              <h1 className="text-2xl font-bold text-navy-900 mb-2">
+              <h1 className="text-2xl font-bold text-foreground mb-2">
                 {application.loanType?.name}
               </h1>
-              <p className="text-navy-600">{application.applicationNumber}</p>
+              <p className="text-foregroundSecondary">{application.applicationNumber}</p>
             </div>
             <StatusBadge status={application.status} />
           </div>
@@ -169,20 +175,20 @@ const ApplicationDetail = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-navy-600 mb-1">Loan Amount</p>
-                <p className="text-2xl font-bold text-navy-900">
+                <p className="text-sm text-foregroundSecondary mb-1">Loan Amount</p>
+                <p className="text-2xl font-bold text-foreground">
                   ₹{application.loanAmount.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-navy-600 mb-1">Monthly EMI</p>
-                <p className="text-xl font-bold text-accent-600">
+                <p className="text-sm text-foregroundSecondary mb-1">Monthly EMI</p>
+                <p className="text-xl font-bold text-primary-600">
                   ₹{application.emi.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-navy-600 mb-1">Duration</p>
-                <p className="text-lg font-semibold text-navy-900">
+                <p className="text-sm text-foregroundSecondary mb-1">Duration</p>
+                <p className="text-lg font-semibold text-foreground">
                   {application.durationMonths} months
                 </p>
               </div>
@@ -190,20 +196,20 @@ const ApplicationDetail = () => {
 
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-navy-600 mb-1">Interest Rate</p>
-                <p className="text-lg font-semibold text-navy-900">
+                <p className="text-sm text-foregroundSecondary mb-1">Interest Rate</p>
+                <p className="text-lg font-semibold text-foreground">
                   {application.loanType?.interestRate}%
                 </p>
               </div>
               <div>
-                <p className="text-sm text-navy-600 mb-1">Total Payable</p>
-                <p className="text-lg font-semibold text-navy-900">
+                <p className="text-sm text-foregroundSecondary mb-1">Total Payable</p>
+                <p className="text-lg font-semibold text-foreground">
                   ₹{application.totalPayable.toLocaleString()}
                 </p>
               </div>
               <div>
-                <p className="text-sm text-navy-600 mb-1">Applied On</p>
-                <p className="text-lg font-semibold text-navy-900">
+                <p className="text-sm text-foregroundSecondary mb-1">Applied On</p>
+                <p className="text-lg font-semibold text-foreground">
                   {new Date(application.createdAt).toLocaleDateString()}
                 </p>
               </div>
@@ -211,14 +217,14 @@ const ApplicationDetail = () => {
           </div>
 
           {application.purpose && (
-            <div className="mt-6 pt-6 border-t border-navy-200">
-              <p className="text-sm text-navy-600 mb-1">Purpose</p>
-              <p className="text-navy-900">{application.purpose}</p>
+            <div className="mt-6 pt-6 border-t border-border dark:border-borderDark">
+              <p className="text-sm text-foregroundSecondary mb-1">Purpose</p>
+              <p className="text-foreground">{application.purpose}</p>
             </div>
           )}
 
           {application.rejectionReason && (
-            <div className="mt-6 pt-6 border-t border-navy-200">
+            <div className="mt-6 pt-6 border-t border-border dark:border-borderDark">
               <div className="bg-red-50 border border-red-200 rounded-xl p-4">
                 <div className="flex items-start gap-3">
                   <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
@@ -232,16 +238,30 @@ const ApplicationDetail = () => {
           )}
 
           {application.adminNotes && (
-            <div className="mt-6 pt-6 border-t border-navy-200">
-              <p className="text-sm text-navy-600 mb-1">Admin Notes</p>
-              <p className="text-navy-900">{application.adminNotes}</p>
+            <div className="mt-6 pt-6 border-t border-border dark:border-borderDark">
+              <p className="text-sm text-foregroundSecondary mb-1">Admin Notes</p>
+              <p className="text-foreground">{application.adminNotes}</p>
             </div>
           )}
         </div>
 
+        {/* Eligibility Score */}
+        {application.eligibilityScore && (
+          <div className="mb-6">
+            <EligibilityScore eligibilityScore={application.eligibilityScore} />
+          </div>
+        )}
+
+        {/* AI Risk Assessment */}
+        {application.riskAssessment && (
+          <div className="mb-6">
+            <RiskAssessment riskAssessment={application.riskAssessment} />
+          </div>
+        )}
+
         {/* Documents Section */}
         <div className="card">
-          <h2 className="text-xl font-bold text-navy-900 mb-6">Documents</h2>
+          <h2 className="text-xl font-bold text-foreground mb-6">Documents</h2>
 
           {application.loanType?.requiredDocuments && (
             <div className="space-y-4">
@@ -250,22 +270,27 @@ const ApplicationDetail = () => {
                 return (
                   <div
                     key={docType}
-                    className="flex items-center justify-between p-4 bg-navy-50 rounded-xl"
+                    className="flex items-center justify-between p-4 bg-surface rounded-xl"
                   >
                     <div className="flex items-center gap-3">
-                      <FileText className="text-navy-600" size={20} />
+                      <FileText className="text-foregroundSecondary" size={20} />
                       <div>
-                        <p className="font-medium text-navy-900 capitalize">
+                        <p className="font-medium text-foreground capitalize">
                           {docType.replace(/_/g, ' ')}
                         </p>
                         {uploadedDoc && (
-                          <p className="text-xs text-navy-600">
+                          <p className="text-xs text-foregroundSecondary">
                             Uploaded {new Date(uploadedDoc.uploadedAt).toLocaleDateString()}
                             {uploadedDoc.verificationStatus === 'verified' && (
                               <span className="ml-2 text-emerald-600">✓ Verified</span>
                             )}
                             {uploadedDoc.verificationStatus === 'rejected' && (
-                              <span className="ml-2 text-red-600">✗ Rejected</span>
+                              <>
+                                <span className="ml-2 text-red-600">✗ Rejected</span>
+                                {uploadedDoc.rejectionReason && (
+                                  <span className="ml-2 text-red-500 italic">({uploadedDoc.rejectionReason})</span>
+                                )}
+                              </>
                             )}
                           </p>
                         )}
@@ -273,15 +298,30 @@ const ApplicationDetail = () => {
                     </div>
 
                     {uploadedDoc ? (
-                      <a
-                        href={uploadedDoc.fileUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-secondary flex items-center gap-2"
-                      >
-                        <Download size={16} />
-                        View
-                      </a>
+                      <div className="flex gap-2">
+                        <a
+                          href={uploadedDoc.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="btn-secondary flex items-center gap-2"
+                        >
+                          <Download size={16} />
+                          View
+                        </a>
+                        {uploadedDoc.verificationStatus === 'rejected' && (
+                          <label className="btn-primary flex items-center gap-2 cursor-pointer">
+                            <Upload size={16} />
+                            {uploading ? 'Uploading...' : 'Re-upload'}
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              onChange={(e) => handleFileUpload(e, docType, uploadedDoc._id)}
+                              disabled={uploading}
+                            />
+                          </label>
+                        )}
+                      </div>
                     ) : (
                       <label className="btn-primary flex items-center gap-2 cursor-pointer">
                         <Upload size={16} />

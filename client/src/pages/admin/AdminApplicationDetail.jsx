@@ -22,6 +22,9 @@ import {
 import api from '../../services/api';
 import { formatCurrency, formatDate } from '../../services/api';
 import StatusBadge from '../../components/StatusBadge';
+import EligibilityScore from '../../components/EligibilityScore';
+import DocumentChecklist from '../../components/DocumentChecklist';
+import OCRStatusBadge from '../../components/OCRStatusBadge';
 import { pageVariants, cardVariants } from '../../animations/variants';
 import useCountUp from '../../hooks/useCountUp';
 import { useToast } from '../../hooks/useToast.jsx';
@@ -37,6 +40,7 @@ const AdminApplicationDetail = () => {
   const [decisionType, setDecisionType] = useState('');
   const [decisionReason, setDecisionReason] = useState('');
   const [activeTab, setActiveTab] = useState('overview');
+  const [refreshingDocs, setRefreshingDocs] = useState(false);
   const { showToast } = useToast();
 
   useEffect(() => {
@@ -44,12 +48,36 @@ const AdminApplicationDetail = () => {
     fetchDocuments();
   }, [id]);
 
+  // Poll for pending OCR status updates
+  useEffect(() => {
+    if (activeTab !== 'documents') return;
+
+    const hasPendingOCR = documents.some(
+      doc => doc.ocrVerification?.ocrStatus === 'pending'
+    );
+
+    if (!hasPendingOCR) return;
+
+    // Poll every 5 seconds while there are pending OCR verifications
+    const interval = setInterval(() => {
+      fetchDocuments();
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [activeTab, documents, id]);
+
   const fetchApplication = async () => {
     try {
       const response = await api.get(`/applications/${id}`);
-      setApplication(response.data.data);
+      // API interceptor unwraps response.data, so response is { success: true, data: application }
+      setApplication(response.data);
     } catch (error) {
-      console.error('Failed to fetch application:', error);
+      console.error('[AdminApplicationDetail] FAILED to fetch application:', {
+        id,
+        error: error.message,
+        status: error.response?.status,
+        responseData: error.response?.data,
+      });
     } finally {
       setLoading(false);
     }
@@ -58,7 +86,8 @@ const AdminApplicationDetail = () => {
   const fetchDocuments = async () => {
     try {
       const response = await api.get(`/documents/application/${id}`);
-      setDocuments(response.data.data || []);
+      // API interceptor unwraps response.data, so response is { success: true, data: documents }
+      setDocuments(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Failed to fetch documents:', error);
     }
@@ -66,13 +95,33 @@ const AdminApplicationDetail = () => {
 
   const handleDecision = async () => {
     try {
-      const response = await api.put(`/applications/${id}/status`, {
+      console.log('[AdminApplicationDetail] Making decision:', {
+        applicationId: id,
+        decisionType,
+        hasReason: !!decisionReason,
+      });
+
+      const payload = {
         status: decisionType,
         adminNotes: decisionReason,
         rejectionReason: decisionType === 'rejected' ? decisionReason : undefined
+      };
+
+      console.log('[AdminApplicationDetail] Sending payload:', payload);
+
+      const response = await api.put(`/applications/${id}/status`, payload);
+
+      console.log('[AdminApplicationDetail] Decision SUCCESS:', response);
+      console.log('[AdminApplicationDetail] Response structure:', {
+        responseType: typeof response,
+        hasSuccess: !!response.success,
+        hasData: !!response.data,
+        status: response?.status,
+        applicationNumber: response?.applicationNumber
       });
 
-      setApplication(response.data.data);
+      // API interceptor unwraps response.data, so response is { success, data: application }
+      setApplication(response.data);
       setShowDecisionModal(false);
       setDecisionReason('');
       setDecisionType('');
@@ -81,16 +130,22 @@ const AdminApplicationDetail = () => {
       // Send decision email using shared utility for approved/rejected
       if (decisionType === 'approved' || decisionType === 'rejected') {
         try {
-          await sendDecisionEmail(response.data.data, decisionType, {
+          await sendDecisionEmail(response.data, decisionType, {
             rejectionReason: decisionType === 'rejected' ? decisionReason : undefined
           });
+          showToast('Email sent to customer', 'success');
         } catch (emailError) {
           console.error('Failed to send decision email:', emailError);
+          showToast('Failed to send email notification', 'error');
           // Don't block the flow if email fails
         }
       }
     } catch (error) {
-      console.error('Failed to update status:', error);
+      console.error('[AdminApplicationDetail] FAILED to update status:', {
+        error: error.message,
+        status: error.response?.status,
+        responseData: error.response?.data,
+      });
       showToast('Failed to update application status', 'error');
     }
   };
@@ -142,11 +197,11 @@ const AdminApplicationDetail = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-surface py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/4" />
-            <div className="h-64 bg-gray-200 rounded-xl" />
+            <div className="h-8 bg-gray-200 dark:bg-cardDark rounded w-1/4" />
+            <div className="h-64 bg-gray-200 dark:bg-cardDark rounded-xl" />
           </div>
         </div>
       </div>
@@ -155,14 +210,14 @@ const AdminApplicationDetail = () => {
 
   if (!application) {
     return (
-      <div className="min-h-screen bg-navy-50 py-8">
+      <div className="min-h-screen bg-surface py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
             <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <p className="text-gray-600">Application not found</p>
             <Link
               to="/admin/applications"
-              className="inline-flex items-center gap-2 mt-4 text-accent-600 hover:text-accent-700"
+              className="inline-flex items-center gap-2 mt-4 text-primary-600 hover:text-primary-700"
             >
               <ArrowLeft size={16} />
               Back to Applications
@@ -178,7 +233,7 @@ const AdminApplicationDetail = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-navy-50 py-8"
+      className="min-h-screen bg-surface py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
@@ -192,14 +247,16 @@ const AdminApplicationDetail = () => {
           </Link>
           <div className="flex items-start justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-navy-900 mb-2">
+              <h1 className="text-3xl font-bold text-foreground mb-2">
                 {application.applicationNumber}
               </h1>
               <div className="flex items-center gap-3">
                 <StatusBadge status={application.status} />
-                <span className="text-sm text-gray-600">
-                  Applied on {formatDate(application.createdAt)}
-                </span>
+                {application.createdAt && (
+                  <span className="text-sm text-gray-600">
+                    Applied on {formatDate(application.createdAt)}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex gap-3">
@@ -208,7 +265,7 @@ const AdminApplicationDetail = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   onClick={generatePDF}
-                  className="flex items-center gap-2 px-4 py-2 bg-navy-100 text-navy-700 rounded-lg hover:bg-navy-200 transition-colors"
+                  className="flex items-center gap-2 px-4 py-2 bg-surface text-foreground rounded-lg hover:bg-border transition-colors"
                 >
                   <Download size={16} />
                   Download Agreement
@@ -218,7 +275,10 @@ const AdminApplicationDetail = () => {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => setShowDecisionModal(true)}
-                className="flex items-center gap-2 px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 transition-colors"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all duration-300"
+                style={{ backgroundColor: '#E53935', color: 'white' }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#C62828'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#E53935'}
               >
                 <Edit size={16} />
                 Update Status
@@ -234,21 +294,22 @@ const AdminApplicationDetail = () => {
           animate="visible"
           className="card p-6 mb-6"
         >
-          <h3 className="text-lg font-bold text-navy-900 mb-6">Application Timeline</h3>
+          <h3 className="text-lg font-bold text-foreground mb-6">Application Timeline</h3>
           <div className="relative">
-            <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200">
+            <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 dark:bg-cardDark">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(getCurrentStatusIndex() / (statusTimeline.length - 1)) * 100}%` }}
                 transition={{ duration: 1 }}
-                className="h-full bg-accent-600"
+                className="h-full bg-primary"
               />
             </div>
             <div className="relative flex justify-between">
               {statusTimeline.map((step, index) => {
                 const Icon = step.icon;
-                const isActive = index <= getCurrentStatusIndex();
-                const isCurrent = index === getCurrentStatusIndex();
+                const currentIndex = getCurrentStatusIndex();
+                const isActive = index <= currentIndex;
+                const isCurrent = index === currentIndex;
                 
                 return (
                   <div key={step.status} className="flex flex-col items-center gap-2">
@@ -257,13 +318,13 @@ const AdminApplicationDetail = () => {
                       animate={{ scale: 1 }}
                       transition={{ delay: index * 0.1 }}
                       className={`w-8 h-8 rounded-full flex items-center justify-center relative z-10 ${
-                        isActive ? 'bg-accent-600 text-white' : 'bg-gray-200 text-gray-400'
-                      } ${isCurrent ? 'ring-4 ring-accent-200' : ''}`}
+                        isActive ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-cardDark text-gray-400'
+                      } ${isCurrent ? 'ring-4 ring-primary/20' : ''}`}
                     >
                       <Icon size={16} />
                     </motion.div>
                     <span className={`text-xs font-medium ${
-                      isActive ? 'text-accent-700' : 'text-gray-400'
+                      isActive ? 'text-primary' : 'text-gray-400'
                     }`}>
                       {step.label}
                     </span>
@@ -275,14 +336,14 @@ const AdminApplicationDetail = () => {
         </motion.div>
 
         {/* Tabs */}
-        <div className="flex gap-4 mb-6 border-b border-gray-200">
+        <div className="flex gap-4 mb-6 border-b border-border">
           {['overview', 'documents', 'eligibility', 'history'].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={`px-4 py-3 font-medium transition-colors ${
                 activeTab === tab
-                  ? 'text-accent-600 border-b-2 border-accent-600'
+                  ? 'text-primary border-b-2 border-primary'
                   : 'text-gray-600 hover:text-gray-900'
               }`}
             >
@@ -309,27 +370,27 @@ const AdminApplicationDetail = () => {
                 className="card p-6"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 bg-accent-100 rounded-xl flex items-center justify-center">
-                    <User className="h-6 w-6 text-accent-600" />
+                  <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <User className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold text-navy-900">Customer Details</h3>
+                  <h3 className="text-lg font-bold text-foreground">Customer Details</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-gray-600">Full Name</p>
-                    <p className="font-semibold text-navy-900">{application.user?.fullName}</p>
+                    <p className="font-semibold text-foreground">{application.user?.fullName}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Email</p>
-                    <p className="font-semibold text-navy-900">{application.user?.email}</p>
+                    <p className="font-semibold text-foreground">{application.user?.email}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Phone</p>
-                    <p className="font-semibold text-navy-900">{application.user?.phone}</p>
+                    <p className="font-semibold text-foreground">{application.user?.phone}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Address</p>
-                    <p className="font-semibold text-navy-900">
+                    <p className="font-semibold text-foreground">
                       {application.user?.address?.street}, {application.user?.address?.city}
                     </p>
                   </div>
@@ -345,35 +406,35 @@ const AdminApplicationDetail = () => {
                 className="card p-6"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 bg-accent-100 rounded-xl flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-accent-600" />
+                  <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold text-navy-900">Loan Details</h3>
+                  <h3 className="text-lg font-bold text-foreground">Loan Details</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-gray-600">Loan Type</p>
-                    <p className="font-semibold text-navy-900">{application.loanType?.name}</p>
+                    <p className="font-semibold text-foreground">{application.loanType?.name}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Loan Amount</p>
-                    <p className="font-semibold text-navy-900">{formatCurrency(application.loanAmount)}</p>
+                    <p className="font-semibold text-foreground">{formatCurrency(application.loanAmount)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Duration</p>
-                    <p className="font-semibold text-navy-900">{application.durationMonths} months</p>
+                    <p className="font-semibold text-foreground">{application.durationMonths} months</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Interest Rate</p>
-                    <p className="font-semibold text-navy-900">{application.loanType?.interestRate}% p.a.</p>
+                    <p className="font-semibold text-foreground">{application.loanType?.interestRate}% p.a.</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Monthly EMI</p>
-                    <p className="font-bold text-accent-600">{formatCurrency(application.emi)}</p>
+                    <p className="font-bold text-primary">{formatCurrency(application.emi)}</p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Total Payable</p>
-                    <p className="font-semibold text-navy-900">{formatCurrency(application.totalPayable)}</p>
+                    <p className="font-semibold text-foreground">{formatCurrency(application.totalPayable)}</p>
                   </div>
                 </div>
               </motion.div>
@@ -387,39 +448,39 @@ const AdminApplicationDetail = () => {
                 className="card p-6"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 bg-accent-100 rounded-xl flex items-center justify-center">
-                    <Briefcase className="h-6 w-6 text-accent-600" />
+                  <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <Briefcase className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold text-navy-900">Employment Details</h3>
+                  <h3 className="text-lg font-bold text-foreground">Employment Details</h3>
                 </div>
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-gray-600">Employment Type</p>
-                    <p className="font-semibold text-navy-900 capitalize">
+                    <p className="font-semibold text-foreground capitalize">
                       {application.employmentDetails?.employmentType}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Company</p>
-                    <p className="font-semibold text-navy-900">
+                    <p className="font-semibold text-foreground">
                       {application.employmentDetails?.companyName}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Designation</p>
-                    <p className="font-semibold text-navy-900">
+                    <p className="font-semibold text-foreground">
                       {application.employmentDetails?.designation}
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Experience</p>
-                    <p className="font-semibold text-navy-900">
+                    <p className="font-semibold text-foreground">
                       {application.employmentDetails?.workExperienceYears} years
                     </p>
                   </div>
                   <div>
                     <p className="text-sm text-gray-600">Monthly Income</p>
-                    <p className="font-semibold text-navy-900">
+                    <p className="font-semibold text-foreground">
                       {formatCurrency(application.employmentDetails?.monthlyIncome)}
                     </p>
                   </div>
@@ -435,17 +496,17 @@ const AdminApplicationDetail = () => {
                 className="card p-6"
               >
                 <div className="flex items-center gap-3 mb-6">
-                  <div className="h-12 w-12 bg-accent-100 rounded-xl flex items-center justify-center">
-                    <FileText className="h-6 w-6 text-accent-600" />
+                  <div className="h-12 w-12 bg-primary/10 rounded-xl flex items-center justify-center">
+                    <FileText className="h-6 w-6 text-primary" />
                   </div>
-                  <h3 className="text-lg font-bold text-navy-900">Loan Purpose</h3>
+                  <h3 className="text-lg font-bold text-foreground">Loan Purpose</h3>
                 </div>
                 <p className="text-gray-700">{application.purpose}</p>
                 
                 {application.adminNotes && (
-                  <div className="mt-6 p-4 bg-navy-50 rounded-lg">
+                  <div className="mt-6 p-4 bg-surface rounded-lg">
                     <p className="text-sm text-gray-600 mb-2">Admin Notes</p>
-                    <p className="text-navy-900">{application.adminNotes}</p>
+                    <p className="text-foreground">{application.adminNotes}</p>
                   </div>
                 )}
               </motion.div>
@@ -458,14 +519,45 @@ const AdminApplicationDetail = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
+              className="space-y-6"
             >
+              {/* Document Checklist - Admin View */}
+              <DocumentChecklist
+                requiredDocuments={application.loanType?.requiredDocuments || []}
+                uploadedDocuments={documents}
+                compact={true}
+              />
+
+              {/* Uploaded Documents List */}
               <motion.div
                 variants={cardVariants}
                 initial="hidden"
                 animate="visible"
                 className="card p-6"
               >
-                <h3 className="text-lg font-bold text-navy-900 mb-6">Uploaded Documents</h3>
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-lg font-bold text-foreground">Uploaded Documents</h3>
+                  {documents.some(doc => doc.ocrVerification?.ocrStatus === 'pending') && (
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => {
+                        setRefreshingDocs(true);
+                        fetchDocuments().finally(() => setRefreshingDocs(false));
+                      }}
+                      disabled={refreshingDocs}
+                      className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 disabled:opacity-50"
+                    >
+                      <motion.div
+                        animate={{ rotate: refreshingDocs ? 360 : 0 }}
+                        transition={{ duration: 1, repeat: refreshingDocs ? Infinity : 0, ease: 'linear' }}
+                      >
+                        <FileText className="h-4 w-4" />
+                      </motion.div>
+                      {refreshingDocs ? 'Refreshing...' : 'Refresh OCR Status'}
+                    </motion.button>
+                  )}
+                </div>
                 
                 {documents.length === 0 ? (
                   <div className="text-center py-12">
@@ -480,59 +572,87 @@ const AdminApplicationDetail = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="flex items-center justify-between p-4 bg-gray-50 rounded-xl border border-gray-200"
+                        className="bg-gray-50 dark:bg-cardSecondaryDark rounded-xl border border-border overflow-hidden"
                       >
-                        <div className="flex items-center gap-4">
-                          <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border border-gray-200">
-                            <FileText className="h-5 w-5 text-gray-600" />
+                        {/* Document Header */}
+                        <div className="flex items-center justify-between p-4">
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border border-border">
+                              <FileText className="h-5 w-5 text-gray-600" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="font-medium text-foreground">{doc.fileName}</p>
+                              <p className="text-sm text-gray-600 capitalize">
+                                {doc.documentType?.replace(/_/g, ' ')}
+                              </p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="font-medium text-navy-900">{doc.fileName}</p>
-                            <p className="text-sm text-gray-600 capitalize">
-                              {doc.documentType?.replace(/_/g, ' ')}
-                            </p>
+                          <div className="flex items-center gap-3">
+                            <a
+                              href={doc.fileUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 flex items-center gap-1"
+                            >
+                              <Download size={14} />
+                              View
+                            </a>
+                            {doc.verificationStatus === 'verified' && (
+                              <div className="flex items-center gap-1 px-3 py-1 bg-success/10 text-success rounded-lg text-sm font-medium">
+                                <FileCheck size={16} />
+                                <span>Verified</span>
+                              </div>
+                            )}
+                            {doc.verificationStatus === 'rejected' && (
+                              <div className="flex items-center gap-1 px-3 py-1 bg-error/10 text-error rounded-lg text-sm font-medium">
+                                <FileX size={16} />
+                                <span>Rejected</span>
+                              </div>
+                            )}
+                            {doc.verificationStatus === 'pending' && (
+                              <div className="flex items-center gap-1 px-3 py-1 bg-warning/10 text-warning rounded-lg text-sm font-medium">
+                                <Clock size={16} />
+                                <span>Pending</span>
+                              </div>
+                            )}
+                            {doc.verificationStatus === 'pending' && (
+                              <div className="flex gap-2">
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => {
+                                    const remarks = prompt('Enter verification remarks (optional):');
+                                    handleVerifyDocument(doc._id, 'verified', remarks);
+                                  }}
+                                  className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200"
+                                >
+                                  Verify
+                                </motion.button>
+                                <motion.button
+                                  whileHover={{ scale: 1.05 }}
+                                  whileTap={{ scale: 0.95 }}
+                                  onClick={() => {
+                                    const remarks = prompt('Enter rejection reason:');
+                                    if (remarks) handleVerifyDocument(doc._id, 'rejected', remarks);
+                                  }}
+                                  className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
+                                >
+                                  Reject
+                                </motion.button>
+                              </div>
+                            )}
                           </div>
                         </div>
-                        <div className="flex items-center gap-3">
-                          {doc.verificationStatus === 'verified' && (
-                            <div className="flex items-center gap-1 text-emerald-600">
-                              <FileCheck size={16} />
-                              <span className="text-sm font-medium">Verified</span>
-                            </div>
-                          )}
-                          {doc.verificationStatus === 'rejected' && (
-                            <div className="flex items-center gap-1 text-red-600">
-                              <FileX size={16} />
-                              <span className="text-sm font-medium">Rejected</span>
-                            </div>
-                          )}
-                          {!doc.verificationStatus && (
-                            <div className="flex gap-2">
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => {
-                                  const remarks = prompt('Enter verification remarks (optional):');
-                                  handleVerifyDocument(doc._id, 'verified', remarks);
-                                }}
-                                className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200"
-                              >
-                                Verify
-                              </motion.button>
-                              <motion.button
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
-                                onClick={() => {
-                                  const remarks = prompt('Enter rejection reason:');
-                                  if (remarks) handleVerifyDocument(doc._id, 'rejected', remarks);
-                                }}
-                                className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
-                              >
-                                Reject
-                              </motion.button>
-                            </div>
-                          )}
-                        </div>
+
+                        {/* OCR Status Badge (for PAN/Aadhaar only) */}
+                        {doc.ocrVerification && (
+                          <div className="px-4 pb-4">
+                            <OCRStatusBadge
+                              ocrVerification={doc.ocrVerification}
+                              registeredName={application.user?.fullName}
+                            />
+                          </div>
+                        )}
                       </motion.div>
                     ))}
                   </div>
@@ -548,47 +668,52 @@ const AdminApplicationDetail = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
             >
-              <motion.div
-                variants={cardVariants}
-                initial="hidden"
-                animate="visible"
-                className="card p-6"
-              >
-                <h3 className="text-lg font-bold text-navy-900 mb-6">Eligibility Snapshot</h3>
-                
-                <div className="space-y-6">
-                  <div className="flex items-center justify-between p-4 bg-accent-50 rounded-xl">
-                    <div>
-                      <p className="text-sm text-gray-600">Eligibility Score</p>
-                      <p className="text-3xl font-bold text-accent-600">
-                        {application.eligibilityScore || 'N/A'}
-                      </p>
+              {/* Enhanced Eligibility Score Display */}
+              {application.eligibilityScore ? (
+                <EligibilityScore eligibilityScore={application.eligibilityScore} />
+              ) : (
+                <motion.div
+                  variants={cardVariants}
+                  initial="hidden"
+                  animate="visible"
+                  className="card p-6"
+                >
+                  <h3 className="text-lg font-bold text-foreground mb-6">Eligibility Snapshot</h3>
+                  
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between p-4 bg-primary/10 rounded-xl">
+                      <div>
+                        <p className="text-sm text-gray-600">Eligibility Score</p>
+                        <p className="text-3xl font-bold text-primary">
+                          {application.eligibilityScore || 'N/A'}
+                        </p>
+                      </div>
+                      <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
+                        {application.eligibilityScore >= 70 ? (
+                          <CheckCircle className="h-8 w-8 text-emerald-600" />
+                        ) : (
+                          <XCircle className="h-8 w-8 text-red-600" />
+                        )}
+                      </div>
                     </div>
-                    <div className="h-16 w-16 bg-accent-100 rounded-full flex items-center justify-center">
-                      {application.eligibilityScore >= 70 ? (
-                        <CheckCircle className="h-8 w-8 text-emerald-600" />
-                      ) : (
-                        <XCircle className="h-8 w-8 text-red-600" />
-                      )}
-                    </div>
-                  </div>
 
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">EMI Ratio</p>
-                      <p className="text-lg font-bold text-navy-900">
-                        {((application.emi / application.employmentDetails?.monthlyIncome) * 100).toFixed(1)}%
-                      </p>
-                    </div>
-                    <div className="p-4 bg-gray-50 rounded-lg">
-                      <p className="text-sm text-gray-600">Debt-to-Income</p>
-                      <p className="text-lg font-bold text-navy-900">
-                        {((application.loanAmount / (application.employmentDetails?.monthlyIncome * 12)) * 100).toFixed(1)}%
-                      </p>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
+                        <p className="text-sm text-gray-600">EMI Ratio</p>
+                        <p className="text-lg font-bold text-foreground">
+                          {((application.emi / application.employmentDetails?.monthlyIncome) * 100).toFixed(1)}%
+                        </p>
+                      </div>
+                      <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
+                        <p className="text-sm text-gray-600">Debt-to-Income</p>
+                        <p className="text-lg font-bold text-foreground">
+                          {((application.loanAmount / (application.employmentDetails?.monthlyIncome * 12)) * 100).toFixed(1)}%
+                        </p>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </motion.div>
+                </motion.div>
+              )}
             </motion.div>
           )}
 
@@ -605,33 +730,33 @@ const AdminApplicationDetail = () => {
                 animate="visible"
                 className="card p-6"
               >
-                <h3 className="text-lg font-bold text-navy-900 mb-6">Application History</h3>
+                <h3 className="text-lg font-bold text-foreground mb-6">Application History</h3>
                 
                 <div className="space-y-4">
                   <div className="flex gap-4">
                     <div className="flex flex-col items-center">
-                      <div className="h-8 w-8 bg-accent-600 rounded-full flex items-center justify-center">
+                      <div className="h-8 w-8 bg-primary-600 rounded-full flex items-center justify-center">
                         <FileText size={16} className="text-white" />
                       </div>
-                      <div className="w-0.5 h-full bg-gray-200 mt-2" />
+                      <div className="w-0.5 h-full bg-gray-200 dark:bg-cardDark mt-2" />
                     </div>
                     <div className="flex-1 pb-8">
-                      <p className="font-medium text-navy-900">Application Submitted</p>
-                      <p className="text-sm text-gray-600">{formatDate(application.createdAt)}</p>
+                      <p className="font-medium text-foreground">Application Submitted</p>
+                      <p className="text-sm text-gray-600">{application.createdAt ? formatDate(application.createdAt) : 'N/A'}</p>
                     </div>
                   </div>
 
                   {application.reviewedAt && (
                     <div className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className="h-8 w-8 bg-navy-600 rounded-full flex items-center justify-center">
+                        <div className="h-8 w-8 bg-foregroundSecondary rounded-full flex items-center justify-center">
                           <Clock size={16} className="text-white" />
                         </div>
-                        <div className="w-0.5 h-full bg-gray-200 mt-2" />
+                        <div className="w-0.5 h-full bg-gray-200 dark:bg-cardDark mt-2" />
                       </div>
                       <div className="flex-1 pb-8">
-                        <p className="font-medium text-navy-900">Application Reviewed</p>
-                        <p className="text-sm text-gray-600">{formatDate(application.reviewedAt)}</p>
+                        <p className="font-medium text-foreground">Application Reviewed</p>
+                        <p className="text-sm text-gray-600">{application.reviewedAt ? formatDate(application.reviewedAt) : 'N/A'}</p>
                         {application.reviewedBy && (
                           <p className="text-sm text-gray-500">
                             Reviewed by: {application.reviewedBy?.fullName}
@@ -649,8 +774,8 @@ const AdminApplicationDetail = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-navy-900">Application Approved</p>
-                        <p className="text-sm text-gray-600">{formatDate(application.approvedAt)}</p>
+                        <p className="font-medium text-foreground">Application Approved</p>
+                        <p className="text-sm text-gray-600">{application.approvedAt ? formatDate(application.approvedAt) : 'N/A'}</p>
                       </div>
                     </div>
                   )}
@@ -663,8 +788,8 @@ const AdminApplicationDetail = () => {
                         </div>
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-navy-900">Loan Disbursed</p>
-                        <p className="text-sm text-gray-600">{formatDate(application.disbursedAt)}</p>
+                        <p className="font-medium text-foreground">Loan Disbursed</p>
+                        <p className="text-sm text-gray-600">{application.disbursedAt ? formatDate(application.disbursedAt) : 'N/A'}</p>
                       </div>
                     </div>
                   )}
@@ -692,7 +817,7 @@ const AdminApplicationDetail = () => {
               className="bg-white rounded-2xl p-6 max-w-md w-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-xl font-bold text-navy-900 mb-4">Update Application Status</h3>
+              <h3 className="text-xl font-bold text-foreground mb-4">Update Application Status</h3>
               
               <div className="space-y-4 mb-6">
                 <div>
@@ -726,14 +851,14 @@ const AdminApplicationDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDecisionModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-cardDark transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDecision}
                   disabled={!decisionType}
-                  className="flex-1 px-4 py-2 bg-accent-600 text-white rounded-lg hover:bg-accent-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Update Status
                 </button>

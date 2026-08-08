@@ -38,19 +38,19 @@ export const ThemeProvider = ({ children }) => {
 
     // Set CSS custom properties for dynamic theming
     if (theme === 'dark') {
-      root.style.setProperty('--color-bg-primary', '#1A1A1A');
-      root.style.setProperty('--color-bg-surface', '#0A0A0A');
-      root.style.setProperty('--color-text-primary', '#E5E7EB');
-      root.style.setProperty('--color-text-secondary', '#9CA3AF');
-      root.style.setProperty('--color-text-heading', '#E8C547');
-      root.style.setProperty('--color-border-primary', '#374151');
+      root.style.setProperty('--color-bg-background', '#111111');
+      root.style.setProperty('--color-bg-surface', '#1A1A1A');
+      root.style.setProperty('--color-text-foreground', '#FFFFFF');
+      root.style.setProperty('--color-text-foregroundSecondary', '#CCCCCC');
+      root.style.setProperty('--color-text-foreground', '#FFD54F');
+      root.style.setProperty('--color-border-primary', '#FF4D4F');
     } else {
-      root.style.setProperty('--color-bg-primary', '#F3F4F6');
-      root.style.setProperty('--color-bg-surface', '#FFFFFF');
-      root.style.setProperty('--color-text-primary', '#1F2937');
-      root.style.setProperty('--color-text-secondary', '#6B7280');
-      root.style.setProperty('--color-text-heading', '#D4AF37');
-      root.style.setProperty('--color-border-primary', '#E5E7EB');
+      root.style.setProperty('--color-bg-background', '#FFFFFF');
+      root.style.setProperty('--color-bg-surface', '#F8F9FA');
+      root.style.setProperty('--color-text-foreground', '#111111');
+      root.style.setProperty('--color-text-foregroundSecondary', '#555555');
+      root.style.setProperty('--color-text-foreground', '#FFC107');
+      root.style.setProperty('--color-border-primary', '#E53935');
     }
   }, [theme]);
 

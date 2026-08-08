@@ -1,6 +1,7 @@
 const LoanType = require('../models/LoanType');
 const User = require('../models/User');
 const { checkEligibility } = require('../utils/eligibilityEngine');
+const { calculateEligibilityScore } = require('../utils/eligibilityScore');
 
 // @desc    Get all loan types
 // @route   GET /api/loan-types
@@ -135,11 +136,21 @@ exports.checkEligibility = async (req, res, next) => {
     // Use the comprehensive eligibility engine
     const eligibilityResult = checkEligibility(loanType, user, applicationData);
 
+    // Calculate detailed eligibility score with star ratings
+    const eligibilityScore = calculateEligibilityScore({
+      monthlyIncome: parseFloat(monthlyIncome),
+      requestedAmount: parseFloat(loanAmount),
+      employmentType: employmentType || user?.employmentType || 'other',
+      existingEMI: 0, // Can be extended to track existing EMIs from user profile
+      loanDuration: parseInt(durationMonths),
+    });
+
     res.json({
       success: true,
       data: {
         ...eligibilityResult,
         loanType: loanType.name,
+        eligibilityScore, // Include detailed score with factors and star ratings
       },
     });
   } catch (error) {

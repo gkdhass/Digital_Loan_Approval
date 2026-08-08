@@ -11,7 +11,7 @@ const LoadingSpinner = ({ size = 'md', text = '' }) => {
   return (
     <div className="flex flex-col items-center justify-center gap-3">
       <motion.div
-        className={`${sizes[size]} border-accent-600 border-t-transparent rounded-full`}
+        className={`${sizes[size]} border-primary-600 border-t-transparent rounded-full`}
         animate={{ rotate: 360 }}
         transition={{
           duration: 0.8,

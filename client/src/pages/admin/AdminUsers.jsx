@@ -52,7 +52,7 @@ const AdminUsers = () => {
 
   if (loading && currentPage === 1) {
     return (
-      <div className="min-h-screen bg-primary py-8">
+      <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <SkeletonTable rows={10} />
         </div>
@@ -65,12 +65,12 @@ const AdminUsers = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-primary py-8"
+      className="min-h-screen bg-background py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-heading mb-2">User Management</h1>
-          <p className="text-secondary">Manage customer accounts</p>
+          <h1 className="text-3xl font-bold text-foreground mb-2">User Management</h1>
+          <p className="text-foregroundSecondary">Manage customer accounts</p>
         </div>
 
         {/* Search */}
@@ -87,7 +87,7 @@ const AdminUsers = () => {
               placeholder="Search by name, email, or phone..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent-500"
+              className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
             />
           </div>
         </motion.div>
@@ -102,19 +102,19 @@ const AdminUsers = () => {
         >
           {users.length === 0 ? (
             <div className="text-center py-12">
-              <Users className="mx-auto text-navy-300 mb-4" size={48} />
-              <p className="text-navy-600">No users found</p>
+              <Users className="mx-auto text-foregroundSecondary mb-4" size={48} />
+              <p className="text-foregroundSecondary">No users found</p>
             </div>
           ) : (
             <>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-gray-200">
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">User</th>
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">Contact</th>
-                      <th className="text-left py-4 px-4 font-semibold text-navy-900">Joined</th>
-                      <th className="text-right py-4 px-4 font-semibold text-navy-900">Actions</th>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">User</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">Contact</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground">Joined</th>
+                      <th className="text-right py-4 px-4 font-semibold text-foreground">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -124,11 +124,11 @@ const AdminUsers = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className="border-b border-gray-100 hover:bg-gray-50"
+                        className="border-b border-border100 hover:bg-gray-50 dark:hover:bg-cardSecondaryDark"
                       >
                         <td className="py-4 px-4">
                           <div>
-                            <p className="font-semibold text-navy-900">{user.fullName}</p>
+                            <p className="font-semibold text-foreground">{user.fullName}</p>
                             <p className="text-sm text-gray-600">{user.email}</p>
                           </div>
                         </td>
@@ -162,7 +162,7 @@ const AdminUsers = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-gray-200">
+                <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-border">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
@@ -171,7 +171,7 @@ const AdminUsers = () => {
                     <ChevronLeft size={16} />
                     Previous
                   </button>
-                  <span className="text-navy-600">
+                  <span className="text-foregroundSecondary">
                     Page {currentPage} of {totalPages}
                   </span>
                   <button
@@ -203,7 +203,7 @@ const AdminUsers = () => {
             className="bg-white rounded-2xl p-6 max-w-md w-full"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="text-xl font-bold text-navy-900 mb-4">Delete User</h3>
+            <h3 className="text-xl font-bold text-foreground mb-4">Delete User</h3>
             <p className="text-gray-600 mb-6">
               Are you sure you want to delete this user? This action cannot be undone.
             </p>

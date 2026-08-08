@@ -5,7 +5,9 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "kill-dev": "powershell -Command \"Get-NetTCPConnection -LocalPort 5173,5174 -ErrorAction SilentlyContinue | ForEach-Object { Stop-Process -Id $_.OwningProcess -Force -ErrorAction SilentlyContinue }; Write-Host 'Ports 5173/5174 cleared'\"",
+    "fresh": "npm run kill-dev && npm run dev"
   },
   "dependencies": {
     "react": "^18.2.0",

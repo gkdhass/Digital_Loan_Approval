@@ -1,0 +1,174 @@
+======================================================================
+TESSERACT OCR INSTALLATION GUIDE
+======================================================================
+
+Tesseract is a system-level OCR engine that MUST be installed separately
+from Python dependencies. The pytesseract package is just a Python wrapper.
+
+======================================================================
+WINDOWS INSTALLATION
+======================================================================
+
+1. Download Tesseract installer from:
+   https://github.com/UB-Mannheim/tesseract/wiki
+   
+   Direct link for latest version:
+   https://digi.bib.uni-mannheim.de/tesseract/tesseract-ocr-w64-setup-5.3.3.20231005.exe
+
+2. Run the installer
+   - Install to default location: C:\Program Files\Tesseract-OCR
+   - Make sure to check "Add to PATH" during installation
+   
+3. Verify installation:
+   Open Command Prompt and run:
+   tesseract --version
+   
+   You should see:
+   tesseract v5.3.x
+   
+4. If PATH not set automatically, add manually:
+   - Open System Properties → Environment Variables
+   - Edit PATH variable
+   - Add: C:\Program Files\Tesseract-OCR
+   - Restart terminal/IDE
+
+5. Install Python dependencies:
+   cd ai-service
+   pip install -r requirements.txt
+
+======================================================================
+MAC INSTALLATION
+======================================================================
+
+Using Homebrew (recommended):
+
+1. Install Homebrew if not installed:
+   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+2. Install Tesseract:
+   brew install tesseract
+
+3. Verify installation:
+   tesseract --version
+
+4. Install Python dependencies:
+   cd ai-service
+   pip install -r requirements.txt
+
+======================================================================
+LINUX (Ubuntu/Debian) INSTALLATION
+======================================================================
+
+1. Update package list:
+   sudo apt update
+
+2. Install Tesseract:
+   sudo apt install tesseract-ocr
+   sudo apt install libtesseract-dev
+
+3. Verify installation:
+   tesseract --version
+
+4. Install Python dependencies:
+   cd ai-service
+   pip install -r requirements.txt
+
+======================================================================
+VERCEL/PRODUCTION DEPLOYMENT
+======================================================================
+
+IMPORTANT: Tesseract requires system-level binaries which are NOT 
+available in Vercel's serverless environment by default.
+
+OPTIONS FOR PRODUCTION:
+
+Option 1: Use Vercel with Custom Docker Build (Recommended)
+   - Create a Dockerfile that installs Tesseract
+   - Deploy using Vercel's Docker support
+   - See: https://vercel.com/docs/functions/runtimes/docker
+
+Option 2: Deploy AI Service to Different Platform
+   - Heroku (supports buildpacks for Tesseract)
+   - Railway.app (supports custom Docker images)
+   - DigitalOcean App Platform
+   - AWS Lambda with custom layers
+   - Google Cloud Run
+
+Option 3: Use External OCR API
+   - Google Cloud Vision API
+   - AWS Textract
+   - Azure Computer Vision
+   - Tesseract.js (JavaScript OCR, runs in browser/Node)
+
+RECOMMENDED APPROACH FOR THIS PROJECT:
+Deploy the ai-service to Railway.app or Heroku with Tesseract buildpack,
+and update the server's AI_SERVICE_URL environment variable to point to it.
+
+Heroku Buildpack:
+   heroku buildpacks:add https://github.com/pathwaysmedical/heroku-buildpack-tesseract
+
+Railway.app:
+   - Create nixpacks.toml with Tesseract dependencies
+   - Railway automatically handles installation
+
+======================================================================
+TESTING TESSERACT INSTALLATION
+======================================================================
+
+1. Create a test image with text (or use existing document)
+
+2. Test from command line:
+   tesseract test-image.jpg output
+   cat output.txt
+
+3. Test Python integration:
+   python -c "import pytesseract; from PIL import Image; print(pytesseract.image_to_string(Image.open('test.jpg')))"
+
+4. Test Flask endpoint:
+   cd ai-service
+   python app.py
+   
+   Then in another terminal:
+   curl -X POST http://localhost:5001/ocr-verify \
+     -F "file=@test-pan.jpg" \
+     -F "documentType=pan" \
+     -F "registeredName=John Doe"
+
+======================================================================
+TROUBLESHOOTING
+======================================================================
+
+Error: "TesseractNotFoundError"
+   → Tesseract not installed or not in PATH
+   → Solution: Install Tesseract and add to PATH
+
+Error: "Failed to load image"
+   → Pillow/PIL not installed
+   → Solution: pip install Pillow
+
+Error: "rapidfuzz not found"
+   → Fuzzy matching library not installed
+   → Solution: pip install rapidfuzz
+
+Low accuracy/garbage text:
+   → Image quality too low
+   → Try with higher resolution image
+   → Ensure image is not rotated
+   → Ensure good contrast
+
+======================================================================
+SUPPORTED IMAGE FORMATS
+======================================================================
+
+- JPEG (.jpg, .jpeg)
+- PNG (.png)
+- TIFF (.tif, .tiff) - best quality
+- BMP (.bmp)
+
+Recommended:
+- Resolution: At least 300 DPI
+- Format: PNG or high-quality JPEG
+- Orientation: Upright (not rotated)
+- Lighting: Good contrast, no shadows
+
+======================================================================

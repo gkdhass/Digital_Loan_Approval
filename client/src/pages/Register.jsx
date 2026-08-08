@@ -71,13 +71,13 @@ const Register = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-accent-600 to-accent-700 rounded-2xl mb-4 shadow-soft">
+          <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl mb-4 shadow-soft">
             <UserPlus className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-heading mb-2">
+          <h2 className="text-3xl font-bold text-foreground mb-2">
             Create Account
           </h2>
-          <p className="text-secondary">
+          <p className="text-foregroundSecondary">
             Start your loan application journey today
           </p>
         </motion.div>
@@ -195,15 +195,15 @@ const Register = () => {
               <input
                 type="checkbox"
                 required
-                className="mt-1 rounded border-gray-300 text-accent-600 focus:ring-accent-500"
+                className="mt-1 rounded border-border300 text-primary-600 focus:ring-primary-500"
               />
               <label className="text-sm text-gray-600">
                 I agree to the{' '}
-                <Link to="/terms" className="text-accent-600 hover:text-accent-700 font-medium">
+                <Link to="/terms" className="text-primary-600 hover:text-primary-700 font-medium">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-accent-600 hover:text-accent-700 font-medium">
+                <Link to="/privacy" className="text-primary-600 hover:text-primary-700 font-medium">
                   Privacy Policy
                 </Link>
               </label>
@@ -215,7 +215,7 @@ const Register = () => {
               whileTap="tap"
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold shadow-soft hover:shadow-soft-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="w-full px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold shadow-soft hover:shadow-soft-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? <LoadingSpinner size="sm" /> : 'Create Account'}
             </motion.button>
@@ -226,7 +226,7 @@ const Register = () => {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="text-accent-600 hover:text-accent-700 font-semibold"
+                className="text-primary-600 hover:text-primary-700 font-semibold"
               >
                 Sign in
               </Link>

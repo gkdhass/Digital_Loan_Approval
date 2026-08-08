@@ -8,6 +8,7 @@ const {
   updateLoanType,
   deleteLoanType,
   getReports,
+  exportReports,
 } = require('../controllers/adminController');
 const { authenticate, authorizeRole } = require('../middleware/auth');
 
@@ -25,5 +26,6 @@ router.delete('/loan-types/:id', authenticate, authorizeRole('admin'), deleteLoa
 
 // Reports
 router.get('/reports', authenticate, authorizeRole('admin'), getReports);
+router.get('/reports/export', authenticate, authorizeRole('admin'), exportReports);
 
 module.exports = router;

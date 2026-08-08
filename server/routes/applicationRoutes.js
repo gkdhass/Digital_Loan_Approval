@@ -7,6 +7,7 @@ const {
   getAllApplications,
   updateApplicationStatus,
   deleteApplication,
+  deleteApplicationAdmin,
   generateAgreement,
 } = require('../controllers/applicationController');
 const { authenticate, authorizeRole } = require('../middleware/auth');
@@ -19,5 +20,6 @@ router.get('/:id', authenticate, getApplicationById);
 router.get('/:id/agreement', authenticate, generateAgreement);
 router.put('/:id/status', authenticate, authorizeRole('admin'), updateApplicationStatus);
 router.delete('/:id', authenticate, deleteApplication);
+router.delete('/admin/:id', authenticate, authorizeRole('admin'), deleteApplicationAdmin);
 
 module.exports = router;

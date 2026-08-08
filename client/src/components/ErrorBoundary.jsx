@@ -30,7 +30,7 @@ class ErrorBoundary extends Component {
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-gradient-to-br from-navy-50 to-navy-100 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-gradient-to-br from-surface to-surface flex items-center justify-center p-4">
           <div
             style={{
               background: 'white',

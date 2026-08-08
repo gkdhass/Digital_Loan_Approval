@@ -46,19 +46,19 @@ const Navbar = () => {
       ];
 
   return (
-    <nav className="bg-surface border-b border-border-primary sticky top-0 z-40 backdrop-blur-lg bg-surface/95 transition-colors duration-300">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <nav className="bg-surface border-b border-border dark:border-borderDark sticky top-0 z-40 backdrop-blur-lg bg-surface/95 transition-colors duration-300">
+      <div className="w-full mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
             <motion.div 
-              className="h-10 w-10 bg-gradient-to-br from-golden-600 to-golden-500 rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-glow-golden"
+              className="h-10 w-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-glow-yellow"
               whileHover={{ scale: 1.05, rotate: 5 }}
               whileTap={{ scale: 0.95 }}
             >
               L
             </motion.div>
-            <span className="text-xl font-bold text-heading">
+            <span className="text-xl font-bold text-foreground dark:text-foregroundDark">
               LoanApproval
             </span>
           </Link>
@@ -73,8 +73,8 @@ const Navbar = () => {
                   to={item.path}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                     isActive(item.path)
-                      ? 'bg-golden-100 text-golden-700 dark:bg-golden-900/30 dark:text-golden-400'
-                      : 'text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
+                      ? 'bg-secondary text-foreground dark:bg-secondaryDark/30 dark:text-foregroundDark'
+                      : 'text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -94,7 +94,7 @@ const Navbar = () => {
                 <motion.button
                   {...buttonSpring}
                   onClick={toggleTheme}
-                  className="p-2 text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-2 text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark rounded-lg transition-colors"
                   title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
                 >
                   <AnimatePresence mode="wait">
@@ -130,9 +130,9 @@ const Navbar = () => {
                   <motion.button
                     {...buttonSpring}
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark transition-colors"
                   >
-                    <div className="h-8 w-8 bg-golden-100 dark:bg-golden-900/30 rounded-full flex items-center justify-center overflow-hidden">
+                    <div className="h-8 w-8 bg-secondary dark:bg-secondary/30 rounded-full flex items-center justify-center overflow-hidden">
                       {user?.profilePicture ? (
                         <img
                           src={user.profilePicture}
@@ -140,12 +140,12 @@ const Navbar = () => {
                           className="h-full w-full object-cover"
                         />
                       ) : (
-                        <span className="text-sm font-semibold text-golden-700 dark:text-golden-400">
+                        <span className="text-sm font-semibold text-foreground dark:text-foregroundDark">
                           {user?.fullName?.charAt(0).toUpperCase()}
                         </span>
                       )}
                     </div>
-                    <span className="text-sm font-medium text-primary max-w-[120px] truncate">
+                    <span className="text-sm font-medium text-foreground dark:text-foregroundDark max-w-[120px] truncate">
                       {user?.fullName}
                     </span>
                   </motion.button>
@@ -157,7 +157,7 @@ const Navbar = () => {
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.95, y: -10 }}
                         transition={{ duration: 0.15 }}
-                        className="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-soft-lg border border-border-primary py-2"
+                        className="absolute right-0 mt-2 w-48 bg-surface rounded-xl shadow-soft-lg border border-border dark:border-borderDark py-2"
                       >
                         {isAdmin && (
                           <button
@@ -165,7 +165,7 @@ const Navbar = () => {
                               navigate('/admin/dashboard');
                               setProfileMenuOpen(false);
                             }}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
                           >
                             <LayoutDashboard className="h-4 w-4" />
                             Admin Dashboard
@@ -176,7 +176,7 @@ const Navbar = () => {
                             navigate('/profile');
                             setProfileMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
                         >
                           <User className="h-4 w-4" />
                           Profile
@@ -199,14 +199,14 @@ const Navbar = () => {
                 <motion.button
                   {...buttonSpring}
                   onClick={toggleTheme}
-                  className="p-2 text-primary hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition-colors"
+                  className="p-2 text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark rounded-lg transition-colors"
                 >
                   {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                 </motion.button>
                 
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-primary hover:text-heading"
+                  className="px-4 py-2 text-sm font-medium text-foreground hover:text-foreground"
                 >
                   Login
                 </Link>
@@ -223,7 +223,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
+            className="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-cardDark rounded-lg"
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -237,7 +237,7 @@ const Navbar = () => {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden border-t border-border-primary bg-surface"
+            className="md:hidden border-t border-border dark:border-borderDark bg-surface"
           >
             <div className="px-4 py-4 space-y-2">
               {navigation.map((item) => {
@@ -249,8 +249,8 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm ${
                       isActive(item.path)
-                        ? 'bg-golden-100 text-golden-700 dark:bg-golden-900/30 dark:text-golden-400'
-                        : 'text-primary hover:bg-gray-100 dark:hover:bg-gray-800'
+                        ? 'bg-secondary text-foreground dark:bg-secondaryDark/30 dark:text-foregroundDark'
+                        : 'text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -264,7 +264,7 @@ const Navbar = () => {
                     onClick={() => {
                       toggleTheme();
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
                   >
                     {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                     {theme === 'light' ? 'Dark' : 'Light'} Mode
@@ -274,7 +274,7 @@ const Navbar = () => {
                       navigate('/profile');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
                   >
                     <User className="h-5 w-5" />
                     Profile
@@ -291,14 +291,14 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={toggleTheme}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
                   >
                     {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                     {theme === 'light' ? 'Dark' : 'Light'} Mode
                   </button>
                   <Link
                     to="/login"
-                    className="block px-4 py-3 rounded-lg text-sm font-medium text-primary hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="block px-4 py-3 rounded-lg text-sm font-medium text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login

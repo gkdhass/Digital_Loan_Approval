@@ -81,13 +81,13 @@ const Login = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-accent-600 to-accent-700 rounded-2xl mb-4 shadow-soft">
+          <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-primary to-primaryDark rounded-2xl mb-4 shadow-soft">
             <LogIn className="h-8 w-8 text-white" />
           </div>
-          <h2 className="text-3xl font-bold text-heading mb-2">
+          <h2 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">
             Welcome Back
           </h2>
-          <p className="text-secondary">
+          <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
             Sign in to continue to your account
           </p>
         </motion.div>
@@ -100,14 +100,14 @@ const Login = () => {
         >
           {/* Role Selector Toggle */}
           <div className="mb-6">
-            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-gray-800 rounded-xl">
+            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-cardDark rounded-xl">
               <button
                 type="button"
                 onClick={() => handleRoleToggle('customer')}
                 className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   selectedRole === 'customer'
-                    ? 'bg-gradient-to-r from-accent-600 to-accent-700 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-gradient-to-r from-primary to-primaryDark text-white shadow-md'
+                    : 'text-gray-600 dark:text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 Customer Login
@@ -117,8 +117,8 @@ const Login = () => {
                 onClick={() => handleRoleToggle('admin')}
                 className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   selectedRole === 'admin'
-                    ? 'bg-gradient-to-r from-accent-600 to-accent-700 text-white shadow-md'
-                    : 'text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-gradient-to-r from-primary to-primaryDark text-white shadow-md'
+                    : 'text-gray-600 dark:text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-gray-900 dark:hover:text-gray-200'
                 }`}
               >
                 Admin Login
@@ -139,11 +139,11 @@ const Login = () => {
 
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-semibold text-primary mb-2">
+              <label className="block text-sm font-semibold text-foreground dark:text-foregroundDark mb-2">
                 Email Address
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundSecondary dark:text-foregroundSecondaryDark" />
                 <input
                   type="email"
                   name="email"
@@ -157,11 +157,11 @@ const Login = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-primary mb-2">
+              <label className="block text-sm font-semibold text-foreground dark:text-foregroundDark mb-2">
                 Password
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundSecondary dark:text-foregroundSecondaryDark" />
                 <input
                   type="password"
                   name="password"
@@ -178,13 +178,13 @@ const Login = () => {
               <label className="flex items-center gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  className="rounded border-gray-300 text-accent-600 focus:ring-accent-500"
+                  className="rounded border-border text-primary focus:ring-primary"
                 />
-                <span className="text-primary">Remember me</span>
+                <span className="text-foreground dark:text-foregroundDark">Remember me</span>
               </label>
               <Link
                 to="/forgot-password"
-                className="text-accent-600 hover:text-accent-700 font-medium"
+                className="text-primary hover:text-primaryDark font-medium"
               >
                 Forgot password?
               </Link>
@@ -196,7 +196,7 @@ const Login = () => {
               whileTap="tap"
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-accent-600 to-accent-700 text-white rounded-xl font-semibold shadow-soft hover:shadow-soft-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="w-full px-6 py-3 bg-gradient-to-r from-primary to-primaryDark text-white rounded-xl font-semibold shadow-soft hover:shadow-soft-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
             </motion.button>
@@ -205,11 +205,11 @@ const Login = () => {
           {/* Show Sign Up link only for Customer Login */}
           {selectedRole === 'customer' && (
             <div className="mt-6 text-center">
-              <p className="text-secondary">
+              <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="text-accent-600 hover:text-accent-700 font-semibold"
+                  className="text-primary hover:text-primaryDark font-semibold"
                 >
                   Sign up
                 </Link>

@@ -43,8 +43,8 @@ const StatusBadge = ({ status }) => {
     pending: {
       label: 'Pending',
       icon: Clock,
-      className: 'bg-gray-50 text-gray-700 border-gray-200',
-      iconColor: 'text-gray-600'
+      className: 'bg-gray-50 dark:bg-cardSecondaryDark text-gray-700 dark:text-gray-300 border-border dark:border-borderDark',
+      iconColor: 'text-gray-600 dark:text-gray-400'
     },
     verified: {
       label: 'Verified',
