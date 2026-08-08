@@ -419,19 +419,29 @@ exports.deleteApplication = async (req, res, next) => {
 // @access  Private
 exports.generateAgreement = async (req, res, next) => {
   try {
+    console.log('[generateAgreement] Request for application ID:', req.params.id);
+    
     const application = await LoanApplication.findById(req.params.id)
       .populate('loanType')
       .populate('user');
 
     if (!application) {
+      console.log('[generateAgreement] Application not found:', req.params.id);
       return res.status(404).json({
         success: false,
         message: 'Application not found',
       });
     }
 
+    console.log('[generateAgreement] Found application:', {
+      id: application._id,
+      applicationNumber: application.applicationNumber,
+      status: application.status,
+    });
+
     // Check authorization
     if (application.user._id.toString() !== req.user._id.toString() && req.user.role !== 'admin') {
+      console.log('[generateAgreement] Unauthorized access attempt');
       return res.status(403).json({
         success: false,
         message: 'Not authorized to view this agreement',
@@ -440,18 +450,34 @@ exports.generateAgreement = async (req, res, next) => {
 
     // Only allow agreement generation for approved applications
     if (application.status !== 'approved' && application.status !== 'disbursed') {
+      console.log('[generateAgreement] Invalid status for agreement generation:', application.status);
       return res.status(400).json({
         success: false,
         message: 'Agreement can only be generated for approved loans',
       });
     }
 
+    console.log('[generateAgreement] Starting PDF generation...');
     const pdfBuffer = await generateLoanAgreement(application, application.user, application.loanType);
+    
+    if (!pdfBuffer || pdfBuffer.length === 0) {
+      console.error('[generateAgreement] PDF generation returned empty buffer');
+      return res.status(500).json({
+        success: false,
+        message: 'Failed to generate PDF - empty buffer returned',
+      });
+    }
+
+    console.log('[generateAgreement] PDF generated successfully, size:', pdfBuffer.length);
+    console.log('[generateAgreement] Sending response, buffer length:', pdfBuffer.length);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename=loan-agreement-${application.applicationNumber}.pdf`);
+    res.setHeader('Content-Length', pdfBuffer.length);
     res.send(pdfBuffer);
+    console.log('[generateAgreement] Response sent');
   } catch (error) {
+    console.error('[generateAgreement] Error:', error);
     next(error);
   }
 };

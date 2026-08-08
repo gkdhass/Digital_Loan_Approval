@@ -26,9 +26,9 @@ const Navbar = () => {
   const navigation = isAuthenticated
     ? [
         { name: 'Dashboard', path: isAdmin ? '/admin/dashboard' : '/dashboard', icon: LayoutDashboard },
-        { name: 'Loan Types', path: '/loan-types', icon: FileText },
-        { name: 'EMI Calculator', path: '/emi-calculator', icon: Calculator },
         ...(!isAdmin ? [
+          { name: 'Loan Types', path: '/loan-types', icon: FileText },
+          { name: 'EMI Calculator', path: '/emi-calculator', icon: Calculator },
           { name: 'My Applications', path: '/applications', icon: FileText },
           { name: 'Loan History', path: '/loan-history', icon: History },
         ] : []),
@@ -64,22 +64,22 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-1 overflow-x-auto scrollbar-hide flex-shrink">
             {navigation.map((item) => {
               const Icon = item.icon;
               return (
                 <Link
                   key={item.path}
                   to={item.path}
-                  className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
+                  className={`px-2.5 py-2 rounded-lg font-medium text-sm transition-colors whitespace-nowrap flex-shrink-0 ${
                     isActive(item.path)
-                      ? 'bg-primary text-white dark:bg-primaryDark dark:text-foregroundDark'
-                      : 'text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark'
+                      ? 'bg-[#123B5D] text-white dark:bg-[#38BDF8] dark:text-white'
+                      : 'text-[#0F172A] dark:text-[#F8FAFC] hover:bg-input dark:hover:bg-cardDark'
                   }`}
                 >
-                  <span className="flex items-center gap-2">
-                    <Icon className="h-4 w-4" />
-                    {item.name}
+                  <span className="flex items-center gap-1.5">
+                    <Icon className="h-4 w-4 flex-shrink-0" />
+                    <span className="whitespace-nowrap">{item.name}</span>
                   </span>
                 </Link>
               );
@@ -247,10 +247,10 @@ const Navbar = () => {
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm ${
+                    className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm whitespace-nowrap ${
                       isActive(item.path)
-                        ? 'bg-primary text-white dark:bg-primaryDark dark:text-foregroundDark'
-                        : 'text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark'
+                        ? 'bg-[#123B5D] text-white dark:bg-[#38BDF8] dark:text-white'
+                        : 'text-[#0F172A] dark:text-[#F8FAFC] hover:bg-input dark:hover:bg-cardDark'
                     }`}
                   >
                     <Icon className="h-5 w-5" />

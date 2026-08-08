@@ -56,21 +56,47 @@ const LoanHistory = () => {
 
   const downloadPDF = async (applicationId, applicationNumber) => {
     try {
+      console.log('[downloadPDF] Starting download for application:', applicationId);
       const response = await api.get(`/applications/${applicationId}/agreement`, {
         responseType: 'blob',
       });
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      console.log('[downloadPDF] Response received:', {
+        hasData: !!response.data,
+        dataType: typeof response.data,
+        dataSize: response.data?.size || response.data?.length,
+        contentType: response.headers?.['content-type'],
+      });
+
+      // Validate that we received actual PDF data
+      if (!response.data || response.data.size === 0) {
+        console.error('[downloadPDF] Empty response detected');
+        throw new Error('Received empty file from server');
+      }
+
+      // Check if the response is actually a PDF (not an error response)
+      const contentType = response.headers?.['content-type'] || '';
+      if (!contentType.includes('application/pdf')) {
+        // Try to read as text to see if it's an error message
+        const text = await response.data.text();
+        console.error('[downloadPDF] Server returned non-PDF response:', text);
+        throw new Error('Server did not return a valid PDF file');
+      }
+
+      console.log('[downloadPDF] Creating blob and triggering download...');
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `loan-agreement-${applicationNumber}.pdf`);
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
+      console.log('[downloadPDF] Download completed');
       showToast('Loan agreement downloaded successfully', 'success');
     } catch (error) {
-      console.error('Failed to download PDF:', error);
-      showToast('Failed to download loan agreement', 'error');
+      console.error('[downloadPDF] Failed to download PDF:', error);
+      showToast('Failed to download loan agreement. Please try again.', 'error');
     }
   };
 

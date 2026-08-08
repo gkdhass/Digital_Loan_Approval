@@ -53,13 +53,28 @@ const AdminReports = () => {
       });
       console.log('[AdminReports] Export API response received, blob size:', response.data?.size);
 
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // Validate that we received actual CSV data
+      if (!response.data || response.data.size === 0) {
+        throw new Error('Received empty file from server');
+      }
+
+      // Check if the response is actually a CSV (not an error response)
+      const contentType = response.headers?.['content-type'] || '';
+      if (!contentType.includes('text/csv') && !contentType.includes('application/octet-stream')) {
+        // Try to read as text to see if it's an error message
+        const text = await response.data.text();
+        console.error('Server returned non-CSV response:', text);
+        throw new Error('Server did not return a valid CSV file');
+      }
+
+      const url = window.URL.createObjectURL(new Blob([response.data], { type: 'text/csv;charset=utf-8;' }));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `loan-reports-${period}-${new Date().toISOString().split('T')[0]}.csv`);
       document.body.appendChild(link);
       link.click();
       link.remove();
+      window.URL.revokeObjectURL(url);
       console.log('[AdminReports] CSV download triggered successfully');
       showToast('Report exported successfully', 'success');
     } catch (err) {
@@ -68,7 +83,7 @@ const AdminReports = () => {
         status: err.response?.status,
         responseData: err.response?.data,
       });
-      showToast('Failed to export report', 'error');
+      showToast('Failed to export report. Please try again.', 'error');
     }
   };
 

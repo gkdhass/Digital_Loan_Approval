@@ -26,16 +26,46 @@ const CustomCursor = () => {
     };
   }, []);
 
-  // Track mouse position
+  // Smooth cursor animation with consolidated mouse tracking
   useEffect(() => {
-    if (!isPointerDevice) return;
+    if (!isPointerDevice || !cursorRef.current) return;
 
+    const cursor = cursorRef.current;
+    let currentX = 0;
+    let currentY = 0;
+    let targetX = 0;
+    let targetY = 0;
+    const lerpFactor = 0.15;
+    let animationFrameId = null;
+
+    const animate = () => {
+      // Smooth lerp interpolation
+      currentX += (targetX - currentX) * lerpFactor;
+      currentY += (targetY - currentY) * lerpFactor;
+
+      // Use translate3d for GPU acceleration
+      cursor.style.transform = `translate3d(${currentX}px, ${currentY}px, 0)`;
+      
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    // Update target position on mouse move
     const handleMouseMove = (e) => {
+      targetX = e.clientX;
+      targetY = e.clientY;
+      // Update state for trail effect
       setPosition({ x: e.clientX, y: e.clientY });
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    animationFrameId = requestAnimationFrame(animate);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
+    };
   }, [isPointerDevice]);
 
   // Detect hoverable elements
@@ -68,26 +98,7 @@ const CustomCursor = () => {
     return () => document.removeEventListener('mouseover', handleMouseOver);
   }, [isPointerDevice]);
 
-  // Smooth cursor animation
-  useEffect(() => {
-    if (!isPointerDevice || !cursorRef.current) return;
-
-    const cursor = cursorRef.current;
-    let currentX = position.x;
-    let currentY = position.y;
-    const lerpFactor = 0.15;
-
-    const animate = () => {
-      currentX += (position.x - currentX) * lerpFactor;
-      currentY += (position.y - currentY) * lerpFactor;
-
-      cursor.style.transform = `translate(${currentX}px, ${currentY}px)`;
-      
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-  }, [position, isPointerDevice]);
+  // Mouse position is now tracked in the animation useEffect above to prevent duplicate listeners
 
   // Trail effect
   useEffect(() => {

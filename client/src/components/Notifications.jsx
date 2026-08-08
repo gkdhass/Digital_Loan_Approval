@@ -9,25 +9,39 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const [shouldPoll, setShouldPoll] = useState(true);
 
   useEffect(() => {
     fetchNotifications();
     // Poll for new notifications every 30 seconds
-    const interval = setInterval(fetchNotifications, 30000);
+    const interval = setInterval(() => {
+      if (shouldPoll) {
+        fetchNotifications();
+      }
+    }, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [shouldPoll]);
 
   const fetchNotifications = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/notifications', { params: { limit: 10 } });
       // Safely extract arrays - handle both response structures
       const data = response.data?.data || response.data || [];
       setNotifications(Array.isArray(data) ? data : []);
       setUnreadCount(response.data?.unreadCount || response.unreadCount || 0);
+      setShouldPoll(true); // Continue polling on success
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
+      // Stop polling on 401 Unauthorized errors
+      if (error.response?.status === 401) {
+        console.log('[Notifications] Stopping polling due to 401 error');
+        setShouldPoll(false);
+      }
       setNotifications([]);
       setUnreadCount(0);
+    } finally {
+      setLoading(false);
     }
   };
 

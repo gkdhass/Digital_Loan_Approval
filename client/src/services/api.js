@@ -27,7 +27,14 @@ api.interceptors.request.use(
 
 // Response interceptor - handle errors
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => {
+    // For blob responses (PDF, CSV, etc.), return the full response to preserve the blob
+    if (response.config.responseType === 'blob') {
+      return response;
+    }
+    // For JSON responses, return the data
+    return response.data;
+  },
   (error) => {
     // Don't auto-redirect on 401 - let components handle auth errors
     // The ProtectedRoute already handles authentication state
