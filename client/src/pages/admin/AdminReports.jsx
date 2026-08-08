@@ -6,7 +6,7 @@ import api from '../../services/api';
 import { pageVariants, cardVariants } from '../../animations/variants';
 import { useToast } from '../../hooks/useToast.jsx';
 
-const COLORS = ['#059669', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6'];
+const COLORS = ['#16A34A', '#F59E0B', '#0E7490', '#DC2626', '#EAB308'];
 
 const AdminReports = () => {
   const [reports, setReports] = useState(null);
@@ -77,10 +77,10 @@ const AdminReports = () => {
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-100 dark:bg-cardDark rounded w-1/4" />
+            <div className="h-8 bg-border dark:bg-cardDark rounded w-1/4" />
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               {[1, 2, 3, 4].map((i) => (
-                <div key={i} className="h-32 bg-gray-100 dark:bg-cardDark rounded-xl" />
+                <div key={i} className="h-32 bg-border dark:bg-cardDark rounded-xl" />
               ))}
             </div>
           </div>
@@ -94,8 +94,8 @@ const AdminReports = () => {
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-md mx-auto text-center py-16">
-            <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <div className="h-16 w-16 bg-error-50 dark:bg-error-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+              <svg className="h-8 w-8 text-error-600 dark:text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
@@ -103,7 +103,7 @@ const AdminReports = () => {
             <p className="text-foregroundSecondary mb-6">{error}</p>
             <button
               onClick={fetchReports}
-              className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+              className="px-6 py-3 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
             >
               Retry
             </button>
@@ -183,8 +183,8 @@ const AdminReports = () => {
                   {applicationTrends.reduce((sum, t) => sum + (t.totalApplications || 0), 0)}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-                <FileText className="text-blue-600" size={24} />
+              <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-xl flex items-center justify-center">
+                <FileText className="text-accent dark:text-accentDarkMode" size={24} />
               </div>
             </div>
           </motion.div>
@@ -199,12 +199,12 @@ const AdminReports = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-foregroundSecondary mb-2">Approved Amount</p>
-                <p className="text-3xl font-bold text-emerald-600">
+                <p className="text-3xl font-bold text-success dark:text-successDark">
                   ₹{(applicationTrends.reduce((sum, t) => sum + (t.approvedAmount || 0), 0) / 100000).toFixed(1)}L
                 </p>
               </div>
-              <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center">
-                <DollarSign className="text-emerald-600" size={24} />
+              <div className="w-12 h-12 bg-emerald-100 dark:bg-emerald-900/30 rounded-xl flex items-center justify-center">
+                <DollarSign className="text-success dark:text-successDark" size={24} />
               </div>
             </div>
           </motion.div>
@@ -223,8 +223,8 @@ const AdminReports = () => {
                   {processingTimes.avgProcessingDays?.toFixed(1) || 0}d
                 </p>
               </div>
-              <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-                <Calendar className="text-purple-600" size={24} />
+              <div className="w-12 h-12 bg-amber-100 dark:bg-amber-900/30 rounded-xl flex items-center justify-center">
+                <Calendar className="text-accent dark:text-accentDark" size={24} />
               </div>
             </div>
           </motion.div>
@@ -243,8 +243,8 @@ const AdminReports = () => {
                   {topUsers.length}
                 </p>
               </div>
-              <div className="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center">
-                <Users className="text-orange-600" size={24} />
+              <div className="w-12 h-12 bg-warningBadge dark:bg-warningBadgeDark rounded-xl flex items-center justify-center">
+                <Users className="text-warningText dark:text-warningTextDark" size={24} />
               </div>
             </div>
           </motion.div>
@@ -346,14 +346,14 @@ const AdminReports = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-border100 hover:bg-gray-50 dark:bg-cardSecondaryDark"
+                      className="border-b border-border hover:bg-input dark:bg-cardSecondaryDark"
                     >
                       <td className="py-4 px-4 font-medium text-foreground">{type._id}</td>
                       <td className="py-4 px-4 text-right">{type.totalApplications}</td>
-                      <td className="py-4 px-4 text-right text-emerald-600">{type.approvedApplications}</td>
-                      <td className="py-4 px-4 text-right text-red-600">{type.rejectedApplications}</td>
+                      <td className="py-4 px-4 text-right text-success dark:text-successDark">{type.approvedApplications}</td>
+                      <td className="py-4 px-4 text-right text-error dark:text-errorDark">{type.rejectedApplications}</td>
                       <td className="py-4 px-4 text-right">
-                        <span className="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm font-medium">
+                        <span className="px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-accent dark:text-accentDarkMode rounded-full text-sm font-medium">
                           {type.approvalRate.toFixed(1)}%
                         </span>
                       </td>
@@ -385,25 +385,25 @@ const AdminReports = () => {
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: index * 0.05 }}
-                  className="flex items-center justify-between p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-xl"
+                  className="flex items-center justify-between p-4 bg-input dark:bg-cardSecondaryDark rounded-xl"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center font-bold text-primary-600">
+                    <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center font-bold text-primary-700 dark:text-primary-300">
                       {index + 1}
                     </div>
                     <div>
                       <p className="font-semibold text-foreground">{user.fullName}</p>
-                      <p className="text-sm text-gray-600">{user.email}</p>
+                      <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{user.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right">
-                      <p className="text-sm text-gray-600">Applications</p>
+                      <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Applications</p>
                       <p className="font-bold text-foreground">{user.applicationCount}</p>
                     </div>
                     <div className="text-right">
-                      <p className="text-sm text-gray-600">Total Amount</p>
-                      <p className="font-bold text-primary-600">₹{(user.totalAmount / 100000).toFixed(1)}L</p>
+                      <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Total Amount</p>
+                      <p className="font-bold text-primary-700 dark:text-primary-300">₹{(user.totalAmount / 100000).toFixed(1)}L</p>
                     </div>
                   </div>
                 </motion.div>

@@ -366,7 +366,7 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-6">
                   Loan Details
                 </h2>
 
@@ -446,7 +446,7 @@ const ApplyLoan = () => {
                     >
                       <div className="flex items-center gap-2 mb-4">
                         <Calculator className="text-foreground dark:text-secondaryDark" size={20} />
-                        <h3 className="font-bold text-foreground dark:text-surfaceDark">EMI Calculation</h3>
+                        <h3 className="font-bold text-foreground dark:text-foregroundDark">EMI Calculation</h3>
                       </div>
                       <div className="grid grid-cols-2 gap-4">
                         <div>
@@ -457,7 +457,7 @@ const ApplyLoan = () => {
                         </div>
                         <div>
                           <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">Total Payable</p>
-                          <p className="text-xl font-bold text-foreground dark:text-surfaceDark">
+                          <p className="text-xl font-bold text-foreground dark:text-foregroundDark">
                             ₹{emiCalculation.totalPayable.toLocaleString()}
                           </p>
                         </div>
@@ -482,7 +482,7 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-6">
                   Employment Details
                 </h2>
 
@@ -569,7 +569,7 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-6">
                   Eligibility Check
                 </h2>
 
@@ -641,7 +641,7 @@ const ApplyLoan = () => {
                             ? 'bg-white dark:bg-surfaceDark' 
                             : 'bg-danger-100 dark:bg-danger-900/20'
                         }`}>
-                          <p className="font-semibold mb-2 text-foreground dark:text-surfaceDark">
+                          <p className="font-semibold mb-2 text-foreground dark:text-foregroundDark">
                             {eligibility.isEligible ? 'Next Steps:' : 'Reasons:'}
                           </p>
                           <ul className="space-y-1 text-sm text-foreground dark:text-foregroundSecondary">
@@ -669,12 +669,12 @@ const ApplyLoan = () => {
                 transition={{ duration: 0.3 }}
                 className="space-y-6"
               >
-                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-6">
                   Upload Documents
                 </h2>
 
-                <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-xl">
-                  <p className="text-sm text-blue-900 dark:text-blue-200">
+                <div className="mb-6 p-4 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-xl">
+                  <p className="text-sm text-accent dark:text-accentDarkMode">
                     <strong>Required Documents:</strong> Please upload the following documents for your {selectedLoanType?.name} application.
                   </p>
                 </div>
@@ -712,25 +712,25 @@ const ApplyLoan = () => {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <h2 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-6">
+                <h2 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-6">
                   Review & Submit
                 </h2>
 
                 <div className="space-y-6">
                   <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
-                    <h3 className="font-bold text-foreground dark:text-surfaceDark mb-4">Loan Details</h3>
+                    <h3 className="font-bold text-foreground dark:text-foregroundDark mb-4">Loan Details</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Loan Type:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">{selectedLoanType?.name}</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">{selectedLoanType?.name}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Amount:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">₹{parseFloat(formData.loanAmount).toLocaleString()}</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">₹{parseFloat(formData.loanAmount).toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Duration:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.durationMonths} months</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">{formData.durationMonths} months</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Monthly EMI:</span>
@@ -740,44 +740,44 @@ const ApplyLoan = () => {
                   </div>
 
                   <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
-                    <h3 className="font-bold text-foreground dark:text-surfaceDark mb-4">Employment Details</h3>
+                    <h3 className="font-bold text-foreground dark:text-foregroundDark mb-4">Employment Details</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Employment Type:</span>
-                        <span className="font-semibold capitalize text-foreground dark:text-surfaceDark">
+                        <span className="font-semibold capitalize text-foreground dark:text-foregroundDark">
                           {formData.employmentDetails.employmentType}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Company:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.employmentDetails.companyName}</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">{formData.employmentDetails.companyName}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Designation:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.employmentDetails.designation}</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">{formData.employmentDetails.designation}</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Experience:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">{formData.employmentDetails.workExperienceYears} years</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">{formData.employmentDetails.workExperienceYears} years</span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-foregroundSecondary dark:text-foregroundSecondary">Monthly Income:</span>
-                        <span className="font-semibold text-foreground dark:text-surfaceDark">₹{parseFloat(formData.employmentDetails.monthlyIncome).toLocaleString()}</span>
+                        <span className="font-semibold text-foreground dark:text-foregroundDark">₹{parseFloat(formData.employmentDetails.monthlyIncome).toLocaleString()}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
-                    <h3 className="font-bold text-foreground dark:text-surfaceDark mb-4">Uploaded Documents</h3>
+                    <h3 className="font-bold text-foreground dark:text-foregroundDark mb-4">Uploaded Documents</h3>
                     {documents.length > 0 ? (
                       <div className="space-y-2 text-sm">
                         {documents.map((doc) => (
                           <div key={doc._id} className="flex justify-between items-center py-2 border-b border-border dark:border-borderDark dark:border-foregroundDark last:border-0">
                             <span className="text-foreground dark:text-foregroundSecondary">{doc.fileName}</span>
                             <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              doc.verificationStatus === 'verified' ? 'bg-success-100 dark:bg-success-900/20 text-success-800 dark:text-success-300' :
-                              doc.verificationStatus === 'rejected' ? 'bg-danger-100 dark:bg-danger-900/20 text-danger-800 dark:text-danger-300' :
-                              'bg-gray-100 dark:bg-cardDark text-gray-800 dark:text-gray-300'
+                              doc.verificationStatus === 'verified' ? 'bg-successBadge text-successText dark:bg-successBadgeDark dark:text-successTextDark' :
+                              doc.verificationStatus === 'rejected' ? 'bg-errorBadge text-errorText dark:bg-errorBadgeDark dark:text-errorTextDark' :
+                              'bg-warningBadge text-warningText dark:bg-warningBadgeDark dark:text-warningTextDark'
                             }`}>
                               {doc.verificationStatus || 'Pending'}
                             </span>
@@ -806,17 +806,17 @@ const ApplyLoan = () => {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl"
+                className="mb-4 p-4 bg-amber-50 dark:bg-amber-900/20 border-2 border-amber-200 dark:border-amber-800 rounded-xl"
               >
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+                  <AlertCircle className="h-5 w-5 text-warning dark:text-warningDark flex-shrink-0 mt-0.5" />
                   <div className="flex-1">
-                    <p className="font-semibold text-amber-900 dark:text-amber-200 mb-1">
+                    <p className="font-semibold text-warning dark:text-warningDark mb-1">
                       Please upload the following required documents:
                     </p>
                     <ul className="space-y-1">
                       {getMissingDocuments().map((doc) => (
-                        <li key={doc} className="text-sm text-amber-800 dark:text-amber-300">
+                        <li key={doc} className="text-sm text-warning dark:text-warningDark">
                           • {doc}
                         </li>
                       ))}

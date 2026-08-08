@@ -6,23 +6,23 @@ const Toast = ({ message, type = 'info', onClose, duration = 5000 }) => {
   const config = {
     success: {
       icon: CheckCircle,
-      className: 'bg-emerald-50 border-emerald-200 text-emerald-800',
-      iconColor: 'text-emerald-600'
+      className: 'bg-successBadge border-successBorder text-successText dark:bg-successBadgeDark dark:border-successBorderDark dark:text-successTextDark',
+      iconColor: 'text-success dark:text-successDark'
     },
     error: {
       icon: XCircle,
-      className: 'bg-red-50 border-red-200 text-red-800',
-      iconColor: 'text-red-600'
+      className: 'bg-errorBadge border-errorBorder text-errorText dark:bg-errorBadgeDark dark:border-errorBorderDark dark:text-errorTextDark',
+      iconColor: 'text-error dark:text-errorDark'
     },
     warning: {
       icon: AlertCircle,
-      className: 'bg-amber-50 border-amber-200 text-amber-800',
-      iconColor: 'text-amber-600'
+      className: 'bg-warningBadge border-warningBorder text-warningText dark:bg-warningBadgeDark dark:border-warningBorderDark dark:text-warningTextDark',
+      iconColor: 'text-warning dark:text-warningDark'
     },
     info: {
       icon: Info,
-      className: 'bg-blue-50 border-blue-200 text-blue-800',
-      iconColor: 'text-blue-600'
+      className: 'bg-accent-50 text-accent-700 border-accent-200 dark:bg-accent-900/20 dark:text-accent-300 dark:border-accent-800',
+      iconColor: 'text-accent dark:text-accentDarkMode'
     }
   };
 

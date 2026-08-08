@@ -118,7 +118,7 @@ const AdminApplications = () => {
           <div className="flex flex-col md:flex-row gap-4">
             {/* Search */}
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundMuted dark:text-foregroundMutedDark" />
               <input
                 type="text"
                 placeholder="Search by name, email, or application number..."
@@ -138,7 +138,7 @@ const AdminApplications = () => {
               <Filter size={16} />
               Filters
               {(filter || searchTerm) && (
-                <span className="h-2 w-2 bg-primary-600 rounded-full" />
+                <span className="h-2 w-2 bg-primary rounded-full" />
               )}
             </motion.button>
 
@@ -148,7 +148,7 @@ const AdminApplications = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={clearFilters}
-                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-error dark:text-errorDark hover:bg-errorBadge dark:hover:bg-errorDark/20 rounded-lg transition-colors"
               >
                 Clear
               </motion.button>
@@ -172,7 +172,7 @@ const AdminApplications = () => {
                     }}
                     className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                       filter === ''
-                        ? 'bg-primary-600 text-white'
+                        ? 'bg-primary text-white'
                         : 'bg-surface text-foreground hover:bg-border'
                     }`}
                   >
@@ -187,7 +187,7 @@ const AdminApplications = () => {
                       }}
                       className={`px-4 py-2 rounded-xl font-medium transition-colors ${
                         filter === status
-                          ? 'bg-primary-600 text-white'
+                          ? 'bg-primary text-white'
                           : 'bg-surface text-foreground hover:bg-border'
                       }`}
                     >
@@ -198,7 +198,7 @@ const AdminApplications = () => {
 
                 {/* Sort Options */}
                 <div className="mt-4 flex items-center gap-3">
-                  <span className="text-sm text-gray-600">Sort by:</span>
+                  <span className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Sort by:</span>
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
@@ -247,7 +247,7 @@ const AdminApplications = () => {
                       <div className="flex items-start justify-between mb-4">
                         <div className="flex items-start gap-4 flex-1">
                           <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center flex-shrink-0">
-                            <FileText className="text-primary-600" size={24} />
+                            <FileText className="text-primary dark:text-primaryDarkMode" size={24} />
                           </div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-start justify-between gap-4 mb-2">
@@ -265,7 +265,7 @@ const AdminApplications = () => {
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                   onClick={(e) => handleDeleteClick(e, app)}
-                                  className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                  className="p-2 text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 rounded-lg transition-colors"
                                   title="Delete application"
                                 >
                                   <Trash2 size={18} />
@@ -355,12 +355,12 @@ const AdminApplications = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <Trash2 className="text-red-600" size={24} />
+                <div className="w-12 h-12 bg-errorBadge dark:bg-errorDark/30 rounded-full flex items-center justify-center">
+                  <Trash2 className="text-error dark:text-errorDark" size={24} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground">Delete Application</h3>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark mb-6">
                 Are you sure you want to delete this application from <span className="font-semibold text-foreground">{applicationToDelete.user?.fullName}</span>? This will permanently remove the application and cannot be undone.
               </p>
               <div className="flex gap-3">
@@ -369,13 +369,13 @@ const AdminApplications = () => {
                     setShowDeleteConfirm(false);
                     setApplicationToDelete(null);
                   }}
-                  className="flex-1 px-4 py-2 bg-gray-100 dark:bg-cardDark text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-4 py-2 bg-input dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-error text-white rounded-lg hover:bg-errorDark transition-colors"
                 >
                   Delete
                 </button>

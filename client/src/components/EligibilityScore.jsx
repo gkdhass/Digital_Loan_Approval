@@ -11,17 +11,17 @@ const EligibilityScore = ({ eligibilityScore }) => {
   // Color scheme based on eligibility
   const colors = isEligible
     ? {
-        bg: 'bg-success-50 dark:bg-success-900/10',
-        border: 'border-success-200 dark:border-success-800',
-        text: 'text-success-700 dark:text-success-300',
-        ring: 'stroke-success-600',
+        bg: 'bg-successBadge dark:bg-successBadgeDark',
+        border: 'border-successBorder dark:border-successBorderDark',
+        text: 'text-successText dark:text-successTextDark',
+        ring: 'stroke-success',
         icon: CheckCircle,
       }
     : {
-        bg: 'bg-danger-50 dark:bg-danger-900/10',
-        border: 'border-danger-200 dark:border-danger-800',
-        text: 'text-danger-700 dark:text-danger-300',
-        ring: 'stroke-danger-600',
+        bg: 'bg-errorBadge dark:bg-errorBadgeDark',
+        border: 'border-errorBorder dark:border-errorBorderDark',
+        text: 'text-errorText dark:text-errorTextDark',
+        ring: 'stroke-error',
         icon: XCircle,
       };
 
@@ -65,7 +65,7 @@ const EligibilityScore = ({ eligibilityScore }) => {
 
   return (
     <div className="card">
-      <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark mb-6">
+      <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark mb-6">
         Eligibility Assessment
       </h3>
 
@@ -82,7 +82,7 @@ const EligibilityScore = ({ eligibilityScore }) => {
                 stroke="currentColor"
                 strokeWidth="12"
                 fill="none"
-                className="text-surface dark:text-surfaceDark"
+                className="text-surface dark:text-foregroundDark"
               />
               {/* Progress Circle with animation */}
               <motion.circle
@@ -110,7 +110,7 @@ const EligibilityScore = ({ eligibilityScore }) => {
                 animate={{ scale: 1 }}
                 transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
               >
-                <p className="text-4xl font-bold text-foreground dark:text-surfaceDark">
+                <p className="text-4xl font-bold text-foreground dark:text-foregroundDark">
                   {Math.round(score)}
                 </p>
                 <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary text-center">
@@ -167,7 +167,7 @@ const EligibilityScore = ({ eligibilityScore }) => {
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <FactorIcon className="h-4 w-4 text-foregroundSecondary dark:text-foregroundSecondary" />
-                          <span className="text-sm font-medium text-surfaceDark dark:text-border">
+                          <span className="text-sm font-medium text-foregroundDark dark:text-border">
                             {factorData.label}
                           </span>
                         </div>
@@ -212,8 +212,8 @@ const EligibilityScore = ({ eligibilityScore }) => {
       )}
 
       {/* Weight Information */}
-      <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/10 border border-blue-200 dark:border-blue-800 rounded-lg">
-        <p className="text-xs text-blue-900 dark:text-blue-200">
+      <div className="mt-4 p-3 bg-accent-50 dark:bg-accent-900/20 border border-accent-200 dark:border-accent-800 rounded-lg">
+        <p className="text-xs text-accent dark:text-accentDarkMode">
           <strong>Scoring Weights:</strong> Income (40%), Employment Stability (30%), Debt-to-Income Ratio (30%)
         </p>
       </div>

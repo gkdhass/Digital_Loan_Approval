@@ -12,6 +12,8 @@ import ToastContainer from './components/ToastContainer';
 import { ToastProvider } from './hooks/useToast.jsx';
 import ErrorBoundary from './components/ErrorBoundary';
 import SplashScreen from './components/SplashScreen';
+import AnimatedBackground from './components/AnimatedBackground';
+import CustomCursor from './components/CustomCursor';
 
 // Pages
 import Home from './pages/Home';
@@ -162,9 +164,13 @@ function AnimatedRoutes() {
 // App Content Component
 function AppContent() {
   return (
-    <div className="min-h-screen bg-background transition-colors duration-300">
-      <Navbar />
-      <AnimatedRoutes />
+    <div className="min-h-screen bg-background dark:bg-transparent transition-colors duration-300 relative">
+      <AnimatedBackground />
+      <CustomCursor />
+      <div className="relative z-10">
+        <Navbar />
+        <AnimatedRoutes />
+      </div>
     </div>
   );
 }

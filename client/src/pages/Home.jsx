@@ -62,9 +62,9 @@ const Home = () => {
       className="min-h-screen"
     >
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-backgroundDark via-surfaceDark to-backgroundDark text-white overflow-hidden">
+      <section className="relative bg-gradient-to-br from-primary via-primaryDark to-secondary text-white overflow-hidden">
         {/* Animated Grid Background */}
-        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyMTIsIDE3NSwgNTUsIDAuMDUpIiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0icmdiYSgyNTUsIDI1NSwgMjU1LCAwLjA1KSIgc3Ryb2tlLXdpZHRoPSIxIi8+PC9wYXR0ZXJuPjwvZGVmcz48cmVjdCB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJ1cmwoI2dyaWQpIi8+PC9zdmc+')] opacity-40" />
         
         {/* Floating Background Shapes */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
@@ -131,7 +131,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
-                className="block bg-gradient-to-r from-secondary to-primary bg-clip-text text-transparent"
+                className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
               >
                 Our Priority
               </motion.span>
@@ -141,7 +141,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-xl text-gray-300 mb-8 leading-relaxed"
+              className="text-xl text-foregroundSecondary dark:text-foregroundSecondaryDark mb-8 leading-relaxed"
             >
               Experience hassle-free loan approvals with our digital platform. 
               From personal loans to home mortgages, we've got you covered.
@@ -155,12 +155,12 @@ const Home = () => {
             >
               <Link to="/loan-types">
                 <motion.button
-                  whileHover={{ 
+                  whileHover={{
                     scale: 1.02,
-                    boxShadow: '0 0 25px rgba(212, 175, 55, 0.5)'
+                    boxShadow: '0 0 25px rgba(79, 70, 229, 0.5)'
                   }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 bg-secondary hover:bg-background text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all"
+                  className="px-8 py-4 bg-primary hover:bg-primaryHover text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all"
                 >
                   Explore Loans
                   <ArrowRight className="h-5 w-5" />
@@ -197,10 +197,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-foreground dark:text-surfaceDark mb-4">
+            <h2 className="text-4xl font-bold text-foreground dark:text-foregroundDark mb-4">
               Why Choose Us?
             </h2>
-            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondary max-w-2xl mx-auto">
+            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondaryDark max-w-2xl mx-auto">
               We make loan approvals fast, secure, and hassle-free
             </p>
           </motion.div>
@@ -223,12 +223,12 @@ const Home = () => {
                   className="card"
                 >
                   <div className="h-12 w-12 bg-secondary/10 dark:bg-secondary/20 rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="h-6 w-6 text-foreground dark:text-foreground" />
+                    <Icon className="h-6 w-6 text-foreground dark:text-foregroundDark" />
                   </div>
-                  <h3 className="text-xl font-bold text-foreground dark:text-surfaceDark mb-2">
+                  <h3 className="text-xl font-bold text-foreground dark:text-foregroundDark mb-2">
                     {feature.title}
                   </h3>
-                  <p className="text-foregroundSecondary dark:text-foregroundSecondary">
+                  <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
                     {feature.description}
                   </p>
                 </motion.div>
@@ -248,10 +248,10 @@ const Home = () => {
             viewport={{ once: true }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl font-bold text-foreground dark:text-surfaceDark mb-4">
+            <h2 className="text-4xl font-bold text-foreground dark:text-foregroundDark mb-4">
               How It Works
             </h2>
-            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondary max-w-2xl mx-auto">
+            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondaryDark max-w-2xl mx-auto">
               Four simple steps to get your loan approved
             </p>
           </motion.div>
@@ -271,10 +271,10 @@ const Home = () => {
                   <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-secondary to-primary text-white rounded-2xl font-bold text-2xl mb-4 shadow-soft">
                     {step.number}
                   </div>
-                  <h3 className="text-xl font-bold text-foreground dark:text-surfaceDark mb-2">
+                  <h3 className="text-xl font-bold text-foreground dark:text-foregroundDark mb-2">
                     {step.title}
                   </h3>
-                  <p className="text-foregroundSecondary dark:text-foregroundSecondary">
+                  <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
                     {step.description}
                   </p>
                 </div>
@@ -299,7 +299,7 @@ const Home = () => {
             <h2 className="text-4xl font-bold mb-6">
               Ready to Get Started?
             </h2>
-            <p className="text-xl text-gray-300 mb-8">
+            <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondaryDark mb-8">
               Join thousands of satisfied customers who trusted us with their financial needs
             </p>
             <Link to="/register">

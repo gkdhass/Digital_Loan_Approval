@@ -87,8 +87,8 @@ const AdminDashboard = () => {
     return (
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-md mx-auto text-center py-16">
-          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="h-16 w-16 bg-error-50 dark:bg-error-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-error-600 dark:text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
@@ -96,7 +96,7 @@ const AdminDashboard = () => {
           <p className="text-foregroundSecondary mb-6">{error}</p>
           <button
             onClick={fetchDashboard}
-            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -117,7 +117,7 @@ const AdminDashboard = () => {
     ? dashboard.recentApplications
     : [];
 
-  const COLORS = ['#059669', '#F59E0B', '#3B82F6', '#EF4444', '#8B5CF6'];
+  const COLORS = ['#16A34A', '#F59E0B', '#0E7490', '#DC2626', '#EAB308'];
 
   return (
     <div className="min-h-screen bg-background py-8">
@@ -133,42 +133,42 @@ const AdminDashboard = () => {
             icon={FileText}
             label="Total Applications"
             value={overview.totalApplications || 0}
-            color="bg-gradient-to-br from-blue-600 to-blue-500"
+            color="bg-gradient-to-br from-primary to-primaryDark"
             delay={0}
           />
           <StatCard
             icon={Clock}
             label="Pending Review"
             value={overview.pendingApplications || 0}
-            color="bg-gradient-to-br from-amber-600 to-amber-500"
+            color="bg-gradient-to-br from-warning to-warningDark"
             delay={0.1}
           />
           <StatCard
             icon={CheckCircle}
             label="Approved"
             value={overview.approvedApplications || 0}
-            color="bg-gradient-to-br from-emerald-600 to-emerald-500"
+            color="bg-gradient-to-br from-success to-successDark"
             delay={0.2}
           />
           <StatCard
             icon={XCircle}
             label="Rejected"
             value={overview.rejectedApplications || 0}
-            color="bg-gradient-to-br from-red-600 to-red-500"
+            color="bg-gradient-to-br from-error to-errorDark"
             delay={0.3}
           />
           <StatCard
             icon={Users}
             label="Total Customers"
             value={overview.totalUsers || 0}
-            color="bg-gradient-to-br from-purple-600 to-purple-500"
+            color="bg-gradient-to-br from-accent to-accent"
             delay={0.4}
           />
           <StatCard
             icon={DollarSign}
             label="Total Disbursed"
             value={loanStats.totalDisbursed || 0}
-            color="bg-gradient-to-br from-primary-600 to-primary-500"
+            color="bg-gradient-to-br from-primary to-primaryHover"
             delay={0.5}
           />
           <StatCard
@@ -248,7 +248,7 @@ const AdminDashboard = () => {
         >
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-bold text-foreground">Recent Applications</h2>
-            <Link to="/admin/applications" className="text-primary-600 hover:text-primary-700 font-medium">
+            <Link to="/admin/applications" className="text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium">
               View All
             </Link>
           </div>
@@ -269,7 +269,7 @@ const AdminDashboard = () => {
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <FileText className="text-primary-600" size={20} />
+                        <FileText className="text-primary dark:text-primaryDarkMode" size={20} />
                       </div>
                       <div>
                         <p className="font-semibold text-foreground">

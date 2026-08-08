@@ -6,26 +6,26 @@ const Toast = ({ message, type, onClose }) => {
   const getIcon = () => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-emerald-600" />;
+        return <CheckCircle className="h-5 w-5 text-success dark:text-successDark" />;
       case 'error':
-        return <XCircle className="h-5 w-5 text-red-600" />;
+        return <XCircle className="h-5 w-5 text-error dark:text-errorDark" />;
       case 'warning':
-        return <AlertCircle className="h-5 w-5 text-amber-600" />;
+        return <AlertCircle className="h-5 w-5 text-warning dark:text-warningDark" />;
       default:
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return <Info className="h-5 w-5 text-accent dark:text-accentDarkMode" />;
     }
   };
 
   const getColors = () => {
     switch (type) {
       case 'success':
-        return 'bg-emerald-50 border-emerald-200 text-emerald-900';
+        return 'bg-successBadge border-successBorder text-successText dark:bg-successBadgeDark dark:border-successBorderDark dark:text-successTextDark';
       case 'error':
-        return 'bg-red-50 border-red-200 text-red-900';
+        return 'bg-errorBadge border-errorBorder text-errorText dark:bg-errorBadgeDark dark:border-errorBorderDark dark:text-errorTextDark';
       case 'warning':
-        return 'bg-amber-50 border-amber-200 text-amber-900';
+        return 'bg-warningBadge border-warningBorder text-warningText dark:bg-warningBadgeDark dark:border-warningBorderDark dark:text-warningTextDark';
       default:
-        return 'bg-blue-50 border-blue-200 text-blue-900';
+        return 'bg-accent-50 text-accent-700 border-accent-200 dark:bg-accent-900/20 dark:text-accent-300 dark:border-accent-800';
     }
   };
 

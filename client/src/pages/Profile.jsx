@@ -185,6 +185,7 @@ const Profile = () => {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className="input-field pl-11"
+                    placeholder="Enter your full name"
                     required
                   />
                 </div>
@@ -202,6 +203,7 @@ const Profile = () => {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className="input-field pl-11"
+                    placeholder="Enter your phone number"
                     required
                   />
                 </div>
@@ -219,6 +221,7 @@ const Profile = () => {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className="input-field pl-11"
+                    placeholder="Enter your street address"
                   />
                 </div>
               </div>
@@ -233,6 +236,7 @@ const Profile = () => {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className="input-field"
+                    placeholder="City"
                   />
                 </div>
                 <div>
@@ -244,6 +248,7 @@ const Profile = () => {
                     onChange={handleChange}
                     disabled={!isEditing}
                     className="input-field"
+                    placeholder="State"
                   />
                 </div>
               </div>
@@ -257,6 +262,7 @@ const Profile = () => {
                   onChange={handleChange}
                   disabled={!isEditing}
                   className="input-field"
+                  placeholder="Pincode"
                 />
               </div>
 
@@ -264,11 +270,11 @@ const Profile = () => {
               <div className="pt-4 border-t border-border dark:border-borderDark">
                 <label className="label mb-3">Account Information</label>
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
+                  <div className="p-4 bg-input dark:bg-cardSecondaryDark rounded-lg">
                     <p className="text-xs text-foregroundSecondary mb-1">Email</p>
                     <p className="text-sm font-medium text-foreground">{user?.email}</p>
                   </div>
-                  <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
+                  <div className="p-4 bg-input dark:bg-cardSecondaryDark rounded-lg">
                     <p className="text-xs text-foregroundSecondary mb-1">Member Since</p>
                     <p className="text-sm font-medium text-foreground">
                       {new Date(user?.createdAt).toLocaleDateString()}
@@ -293,7 +299,7 @@ const Profile = () => {
                     {...buttonSpring}
                     type="submit"
                     disabled={loading}
-                    className="btn-primary flex-1 flex items-center justify-center gap-2"
+                    className="btn-primary flex-1 flex items-center justify-center gap-2 disabled:bg-gray-300 disabled:text-gray-500 disabled:cursor-not-allowed disabled:opacity-100"
                   >
                     <Save className="h-4 w-4" />
                     {loading ? 'Saving...' : 'Save Changes'}

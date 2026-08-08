@@ -133,10 +133,10 @@ const AdminLoanTypes = () => {
       <div className="min-h-screen bg-background py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 rounded w-1/4" />
+            <div className="h-8 bg-border rounded w-1/4" />
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-48 bg-gray-200 rounded-xl" />
+                <div key={i} className="h-48 bg-border rounded-xl" />
               ))}
             </div>
           </div>
@@ -166,7 +166,7 @@ const AdminLoanTypes = () => {
               setEditingType(null);
               setShowModal(true);
             }}
-            className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover transition-colors"
           >
             <Plus size={16} />
             Add Loan Type
@@ -187,14 +187,14 @@ const AdminLoanTypes = () => {
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 bg-primary-100 rounded-xl flex items-center justify-center">
-                  <DollarSign className="text-primary-600" size={24} />
+                  <DollarSign className="text-primary dark:text-primaryDarkMode" size={24} />
                 </div>
                 <div className="flex gap-2">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleEdit(type)}
-                    className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                    className="p-2 text-primary dark:text-primaryDarkMode hover:bg-cyan-50 dark:hover:bg-cyan-900/20 rounded-lg transition-colors"
                   >
                     <Edit size={18} />
                   </motion.button>
@@ -202,7 +202,7 @@ const AdminLoanTypes = () => {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
                     onClick={() => handleDelete(type._id)}
-                    className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    className="p-2 text-error dark:text-errorDark hover:bg-errorBadge dark:hover:bg-errorDark/20 rounded-lg transition-colors"
                   >
                     <Trash2 size={18} />
                   </motion.button>
@@ -211,28 +211,28 @@ const AdminLoanTypes = () => {
 
               <h3 className="text-xl font-bold text-foreground mb-2">{type.name}</h3>
               {type.description && (
-                <p className="text-sm text-gray-600 mb-4">{type.description}</p>
+                <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-4">{type.description}</p>
               )}
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Interest Rate</span>
+                  <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Interest Rate</span>
                   <span className="font-semibold text-foreground">{type.interestRate}% p.a.</span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Amount Range</span>
+                  <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Amount Range</span>
                   <span className="font-semibold text-foreground">
                     ₹{(type.minAmount / 100000).toFixed(0)}L - ₹{(type.maxAmount / 100000).toFixed(0)}L
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Tenure</span>
+                  <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Tenure</span>
                   <span className="font-semibold text-foreground">
                     {type.minTenureMonths} - {type.maxTenureMonths} months
                   </span>
                 </div>
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-gray-600">Processing Fee</span>
+                  <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Processing Fee</span>
                   <span className="font-semibold text-foreground">{type.processingFeePercent}%</span>
                 </div>
               </div>
@@ -247,7 +247,7 @@ const AdminLoanTypes = () => {
           >
             <DollarSign className="mx-auto text-foregroundSecondary mb-4" size={48} />
             <p className="text-foregroundSecondary">No loan types configured</p>
-            <p className="text-sm text-gray-500 mt-2">Add your first loan type to get started</p>
+            <p className="text-sm text-foregroundMuted dark:text-foregroundMutedDark mt-2">Add your first loan type to get started</p>
           </motion.div>
         )}
       </div>
@@ -371,7 +371,7 @@ const AdminLoanTypes = () => {
                     <button
                       type="button"
                       onClick={handleDeleteFromModal}
-                      className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                      className="px-4 py-2 bg-error text-white rounded-lg hover:bg-errorDark transition-colors"
                     >
                       Delete
                     </button>
@@ -379,13 +379,13 @@ const AdminLoanTypes = () => {
                   <button
                     type="button"
                     onClick={() => setShowModal(false)}
-                    className="flex-1 px-4 py-2 bg-gray-100 dark:bg-cardDark text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                    className="flex-1 px-4 py-2 bg-input dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                    className="flex-1 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primaryHover transition-colors"
                   >
                     {editingType ? 'Update' : 'Create'}
                   </button>
@@ -414,24 +414,24 @@ const AdminLoanTypes = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center gap-3 mb-4">
-                <div className="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center">
-                  <Trash2 className="text-red-600" size={24} />
+                <div className="w-12 h-12 bg-errorBadge dark:bg-errorDark/30 rounded-full flex items-center justify-center">
+                  <Trash2 className="text-error dark:text-errorDark" size={24} />
                 </div>
                 <h3 className="text-xl font-bold text-foreground">Delete Loan Type</h3>
               </div>
-              <p className="text-gray-600 mb-6">
+              <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark mb-6">
                 Are you sure you want to delete <span className="font-semibold text-foreground">{editingType?.name}</span>? This cannot be undone.
               </p>
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="flex-1 px-4 py-2 bg-gray-100 dark:bg-cardDark text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                  className="flex-1 px-4 py-2 bg-input dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={confirmDelete}
-                  className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                  className="flex-1 px-4 py-2 bg-error text-white rounded-lg hover:bg-errorDark transition-colors"
                 >
                   Delete
                 </button>

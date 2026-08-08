@@ -53,11 +53,11 @@ const AdminAuditLogs = () => {
   };
 
   const getActionColor = (action) => {
-    if (action.includes('delete')) return 'text-red-600 bg-red-50';
-    if (action.includes('create')) return 'text-emerald-600 bg-emerald-50';
-    if (action.includes('update')) return 'text-blue-600 bg-blue-50';
-    if (action.includes('verify')) return 'text-purple-600 bg-purple-50';
-    return 'text-gray-600 bg-gray-50 dark:bg-cardSecondaryDark';
+    if (action.includes('delete')) return 'text-error dark:text-errorDark bg-errorBadge dark:bg-errorDark/20';
+    if (action.includes('create')) return 'text-success dark:text-successDark bg-successBadge dark:bg-successBadgeDark';
+    if (action.includes('update')) return 'text-primary dark:text-primaryDarkMode bg-cyan-50 dark:bg-cyan-900/20';
+    if (action.includes('verify')) return 'text-accent dark:text-accentDark bg-warningBadge dark:bg-warningBadgeDark';
+    return 'text-foregroundSecondary dark:text-foregroundSecondaryDark bg-input dark:bg-cardSecondaryDark';
   };
 
   const getEntityIcon = (entityType) => {
@@ -105,7 +105,7 @@ const AdminAuditLogs = () => {
         >
           <div className="flex flex-col md:flex-row gap-4">
             <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundMuted dark:text-foregroundMutedDark" />
               <input
                 type="text"
                 placeholder="Search by action..."
@@ -133,7 +133,7 @@ const AdminAuditLogs = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={clearFilters}
-                className="px-4 py-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="px-4 py-2 text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 rounded-lg transition-colors"
               >
                 Clear
               </motion.button>
@@ -207,11 +207,11 @@ const AdminAuditLogs = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.02 }}
-                        className="border-b border-border100 hover:bg-gray-50 dark:hover:bg-cardSecondaryDark"
+                        className="border-b border-border hover:bg-input dark:hover:bg-cardSecondaryDark"
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
-                            <User size={16} className="text-gray-400" />
+                            <User size={16} className="text-foregroundMuted dark:text-foregroundMutedDark" />
                             <span className="font-medium text-foreground">
                               {log.user?.fullName || 'System'}
                             </span>
@@ -223,13 +223,13 @@ const AdminAuditLogs = () => {
                           </span>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-gray-600">
+                          <div className="flex items-center gap-2 text-foregroundSecondary dark:text-foregroundSecondaryDark">
                             {getEntityIcon(log.entityType)}
                             <span className="capitalize">{log.entityType.replace(/_/g, ' ')}</span>
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">
                             <Clock size={14} />
                             {new Date(log.timestamp).toLocaleString()}
                           </div>

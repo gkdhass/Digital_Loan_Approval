@@ -200,8 +200,8 @@ const AdminApplicationDetail = () => {
       <div className="min-h-screen bg-surface py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="animate-pulse space-y-6">
-            <div className="h-8 bg-gray-200 dark:bg-cardDark rounded w-1/4" />
-            <div className="h-64 bg-gray-200 dark:bg-cardDark rounded-xl" />
+            <div className="h-8 bg-border dark:bg-cardDark rounded w-1/4" />
+            <div className="h-64 bg-border dark:bg-cardDark rounded-xl" />
           </div>
         </div>
       </div>
@@ -213,11 +213,11 @@ const AdminApplicationDetail = () => {
       <div className="min-h-screen bg-surface py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center py-12">
-            <AlertCircle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-gray-600">Application not found</p>
+            <AlertCircle className="h-12 w-12 text-foregroundMuted dark:text-foregroundMutedDark mx-auto mb-4" />
+            <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Application not found</p>
             <Link
               to="/admin/applications"
-              className="inline-flex items-center gap-2 mt-4 text-primary-600 hover:text-primary-700"
+              className="inline-flex items-center gap-2 mt-4 text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark"
             >
               <ArrowLeft size={16} />
               Back to Applications
@@ -240,7 +240,7 @@ const AdminApplicationDetail = () => {
         <div className="mb-8">
           <Link
             to="/admin/applications"
-            className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4"
+            className="inline-flex items-center gap-2 text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-foreground mb-4"
           >
             <ArrowLeft size={16} />
             Back to Applications
@@ -253,7 +253,7 @@ const AdminApplicationDetail = () => {
               <div className="flex items-center gap-3">
                 <StatusBadge status={application.status} />
                 {application.createdAt && (
-                  <span className="text-sm text-gray-600">
+                  <span className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">
                     Applied on {formatDate(application.createdAt)}
                   </span>
                 )}
@@ -296,7 +296,7 @@ const AdminApplicationDetail = () => {
         >
           <h3 className="text-lg font-bold text-foreground mb-6">Application Timeline</h3>
           <div className="relative">
-            <div className="absolute top-4 left-0 right-0 h-1 bg-gray-200 dark:bg-cardDark">
+            <div className="absolute top-4 left-0 right-0 h-1 bg-border dark:bg-cardDark">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${(getCurrentStatusIndex() / (statusTimeline.length - 1)) * 100}%` }}
@@ -318,13 +318,13 @@ const AdminApplicationDetail = () => {
                       animate={{ scale: 1 }}
                       transition={{ delay: index * 0.1 }}
                       className={`w-8 h-8 rounded-full flex items-center justify-center relative z-10 ${
-                        isActive ? 'bg-primary text-white' : 'bg-gray-200 dark:bg-cardDark text-gray-400'
+                        isActive ? 'bg-primary text-white' : 'bg-border dark:bg-cardDark text-foregroundMuted dark:text-foregroundMutedDark'
                       } ${isCurrent ? 'ring-4 ring-primary/20' : ''}`}
                     >
                       <Icon size={16} />
                     </motion.div>
                     <span className={`text-xs font-medium ${
-                      isActive ? 'text-primary' : 'text-gray-400'
+                      isActive ? 'text-primary' : 'text-foregroundMuted dark:text-foregroundMutedDark'
                     }`}>
                       {step.label}
                     </span>
@@ -344,7 +344,7 @@ const AdminApplicationDetail = () => {
               className={`px-4 py-3 font-medium transition-colors ${
                 activeTab === tab
                   ? 'text-primary border-b-2 border-primary'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-foreground'
               }`}
             >
               {tab.charAt(0).toUpperCase() + tab.slice(1)}
@@ -377,19 +377,19 @@ const AdminApplicationDetail = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-gray-600">Full Name</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Full Name</p>
                     <p className="font-semibold text-foreground">{application.user?.fullName}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Email</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Email</p>
                     <p className="font-semibold text-foreground">{application.user?.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Phone</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Phone</p>
                     <p className="font-semibold text-foreground">{application.user?.phone}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Address</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Address</p>
                     <p className="font-semibold text-foreground">
                       {application.user?.address?.street}, {application.user?.address?.city}
                     </p>
@@ -413,27 +413,27 @@ const AdminApplicationDetail = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-gray-600">Loan Type</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Loan Type</p>
                     <p className="font-semibold text-foreground">{application.loanType?.name}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Loan Amount</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Loan Amount</p>
                     <p className="font-semibold text-foreground">{formatCurrency(application.loanAmount)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Duration</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Duration</p>
                     <p className="font-semibold text-foreground">{application.durationMonths} months</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Interest Rate</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Interest Rate</p>
                     <p className="font-semibold text-foreground">{application.loanType?.interestRate}% p.a.</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Monthly EMI</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Monthly EMI</p>
                     <p className="font-bold text-primary">{formatCurrency(application.emi)}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Total Payable</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Total Payable</p>
                     <p className="font-semibold text-foreground">{formatCurrency(application.totalPayable)}</p>
                   </div>
                 </div>
@@ -455,31 +455,31 @@ const AdminApplicationDetail = () => {
                 </div>
                 <div className="space-y-4">
                   <div>
-                    <p className="text-sm text-gray-600">Employment Type</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Employment Type</p>
                     <p className="font-semibold text-foreground capitalize">
                       {application.employmentDetails?.employmentType}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Company</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Company</p>
                     <p className="font-semibold text-foreground">
                       {application.employmentDetails?.companyName}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Designation</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Designation</p>
                     <p className="font-semibold text-foreground">
                       {application.employmentDetails?.designation}
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Experience</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Experience</p>
                     <p className="font-semibold text-foreground">
                       {application.employmentDetails?.workExperienceYears} years
                     </p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Monthly Income</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Monthly Income</p>
                     <p className="font-semibold text-foreground">
                       {formatCurrency(application.employmentDetails?.monthlyIncome)}
                     </p>
@@ -501,11 +501,11 @@ const AdminApplicationDetail = () => {
                   </div>
                   <h3 className="text-lg font-bold text-foreground">Loan Purpose</h3>
                 </div>
-                <p className="text-gray-700">{application.purpose}</p>
+                <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">{application.purpose}</p>
                 
                 {application.adminNotes && (
                   <div className="mt-6 p-4 bg-surface rounded-lg">
-                    <p className="text-sm text-gray-600 mb-2">Admin Notes</p>
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-2">Admin Notes</p>
                     <p className="text-foreground">{application.adminNotes}</p>
                   </div>
                 )}
@@ -546,7 +546,7 @@ const AdminApplicationDetail = () => {
                         fetchDocuments().finally(() => setRefreshingDocs(false));
                       }}
                       disabled={refreshingDocs}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-100 disabled:opacity-50"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-cyan-900/20 text-accent dark:text-accentDarkMode rounded-lg text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 disabled:opacity-50"
                     >
                       <motion.div
                         animate={{ rotate: refreshingDocs ? 360 : 0 }}
@@ -561,8 +561,8 @@ const AdminApplicationDetail = () => {
                 
                 {documents.length === 0 ? (
                   <div className="text-center py-12">
-                    <FileText className="h-12 w-12 text-gray-300 mx-auto mb-4" />
-                    <p className="text-gray-600">No documents uploaded</p>
+                    <FileText className="h-12 w-12 text-foregroundMuted dark:text-foregroundMutedDark mx-auto mb-4" />
+                    <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">No documents uploaded</p>
                   </div>
                 ) : (
                   <div className="space-y-4">
@@ -572,17 +572,17 @@ const AdminApplicationDetail = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: index * 0.1 }}
-                        className="bg-gray-50 dark:bg-cardSecondaryDark rounded-xl border border-border overflow-hidden"
+                        className="bg-input dark:bg-cardSecondaryDark rounded-xl border border-border overflow-hidden"
                       >
                         {/* Document Header */}
                         <div className="flex items-center justify-between p-4">
                           <div className="flex items-center gap-4 flex-1">
                             <div className="h-10 w-10 bg-white rounded-lg flex items-center justify-center border border-border">
-                              <FileText className="h-5 w-5 text-gray-600" />
+                              <FileText className="h-5 w-5 text-foregroundSecondary dark:text-foregroundSecondaryDark" />
                             </div>
                             <div className="flex-1">
                               <p className="font-medium text-foreground">{doc.fileName}</p>
-                              <p className="text-sm text-gray-600 capitalize">
+                              <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark capitalize">
                                 {doc.documentType?.replace(/_/g, ' ')}
                               </p>
                             </div>
@@ -592,7 +592,7 @@ const AdminApplicationDetail = () => {
                               href={doc.fileUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-sm font-medium hover:bg-blue-200 flex items-center gap-1"
+                              className="px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-accent dark:text-accentDarkMode rounded-lg text-sm font-medium hover:bg-cyan-200 dark:hover:bg-cyan-900/40 flex items-center gap-1"
                             >
                               <Download size={14} />
                               View
@@ -624,7 +624,7 @@ const AdminApplicationDetail = () => {
                                     const remarks = prompt('Enter verification remarks (optional):');
                                     handleVerifyDocument(doc._id, 'verified', remarks);
                                   }}
-                                  className="px-3 py-1 bg-emerald-100 text-emerald-700 rounded-lg text-sm font-medium hover:bg-emerald-200"
+                                  className="px-3 py-1 bg-success-50 dark:bg-success-900/20 text-success-700 dark:text-success-300 rounded-lg text-sm font-medium hover:bg-success-100 dark:hover:bg-success-900/30"
                                 >
                                   Verify
                                 </motion.button>
@@ -635,7 +635,7 @@ const AdminApplicationDetail = () => {
                                     const remarks = prompt('Enter rejection reason:');
                                     if (remarks) handleVerifyDocument(doc._id, 'rejected', remarks);
                                   }}
-                                  className="px-3 py-1 bg-red-100 text-red-700 rounded-lg text-sm font-medium hover:bg-red-200"
+                                  className="px-3 py-1 bg-error-50 dark:bg-error-900/20 text-error-700 dark:text-error-300 rounded-lg text-sm font-medium hover:bg-error-100 dark:hover:bg-error-900/30"
                                 >
                                   Reject
                                 </motion.button>
@@ -683,29 +683,29 @@ const AdminApplicationDetail = () => {
                   <div className="space-y-6">
                     <div className="flex items-center justify-between p-4 bg-primary/10 rounded-xl">
                       <div>
-                        <p className="text-sm text-gray-600">Eligibility Score</p>
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Eligibility Score</p>
                         <p className="text-3xl font-bold text-primary">
                           {application.eligibilityScore || 'N/A'}
                         </p>
                       </div>
                       <div className="h-16 w-16 bg-primary/10 rounded-full flex items-center justify-center">
                         {application.eligibilityScore >= 70 ? (
-                          <CheckCircle className="h-8 w-8 text-emerald-600" />
+                          <CheckCircle className="h-8 w-8 text-success-600 dark:text-success-400" />
                         ) : (
-                          <XCircle className="h-8 w-8 text-red-600" />
+                          <XCircle className="h-8 w-8 text-error-600 dark:text-error-400" />
                         )}
                       </div>
                     </div>
 
                     <div className="grid grid-cols-2 gap-4">
-                      <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
-                        <p className="text-sm text-gray-600">EMI Ratio</p>
+                      <div className="p-4 bg-input dark:bg-cardSecondaryDark rounded-lg">
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">EMI Ratio</p>
                         <p className="text-lg font-bold text-foreground">
                           {((application.emi / application.employmentDetails?.monthlyIncome) * 100).toFixed(1)}%
                         </p>
                       </div>
-                      <div className="p-4 bg-gray-50 dark:bg-cardSecondaryDark rounded-lg">
-                        <p className="text-sm text-gray-600">Debt-to-Income</p>
+                      <div className="p-4 bg-input dark:bg-cardSecondaryDark rounded-lg">
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Debt-to-Income</p>
                         <p className="text-lg font-bold text-foreground">
                           {((application.loanAmount / (application.employmentDetails?.monthlyIncome * 12)) * 100).toFixed(1)}%
                         </p>
@@ -738,11 +738,11 @@ const AdminApplicationDetail = () => {
                       <div className="h-8 w-8 bg-primary-600 rounded-full flex items-center justify-center">
                         <FileText size={16} className="text-white" />
                       </div>
-                      <div className="w-0.5 h-full bg-gray-200 dark:bg-cardDark mt-2" />
+                      <div className="w-0.5 h-full bg-border dark:bg-cardDark mt-2" />
                     </div>
                     <div className="flex-1 pb-8">
                       <p className="font-medium text-foreground">Application Submitted</p>
-                      <p className="text-sm text-gray-600">{application.createdAt ? formatDate(application.createdAt) : 'N/A'}</p>
+                      <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{application.createdAt ? formatDate(application.createdAt) : 'N/A'}</p>
                     </div>
                   </div>
 
@@ -752,13 +752,13 @@ const AdminApplicationDetail = () => {
                         <div className="h-8 w-8 bg-foregroundSecondary rounded-full flex items-center justify-center">
                           <Clock size={16} className="text-white" />
                         </div>
-                        <div className="w-0.5 h-full bg-gray-200 dark:bg-cardDark mt-2" />
+                        <div className="w-0.5 h-full bg-border dark:bg-cardDark mt-2" />
                       </div>
                       <div className="flex-1 pb-8">
                         <p className="font-medium text-foreground">Application Reviewed</p>
-                        <p className="text-sm text-gray-600">{application.reviewedAt ? formatDate(application.reviewedAt) : 'N/A'}</p>
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{application.reviewedAt ? formatDate(application.reviewedAt) : 'N/A'}</p>
                         {application.reviewedBy && (
-                          <p className="text-sm text-gray-500">
+                          <p className="text-sm text-foregroundMuted dark:text-foregroundMutedDark">
                             Reviewed by: {application.reviewedBy?.fullName}
                           </p>
                         )}
@@ -769,13 +769,13 @@ const AdminApplicationDetail = () => {
                   {application.approvedAt && (
                     <div className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className="h-8 w-8 bg-emerald-600 rounded-full flex items-center justify-center">
+                        <div className="h-8 w-8 bg-success-600 dark:bg-success-500 rounded-full flex items-center justify-center">
                           <CheckCircle size={16} className="text-white" />
                         </div>
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-foreground">Application Approved</p>
-                        <p className="text-sm text-gray-600">{application.approvedAt ? formatDate(application.approvedAt) : 'N/A'}</p>
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{application.approvedAt ? formatDate(application.approvedAt) : 'N/A'}</p>
                       </div>
                     </div>
                   )}
@@ -783,13 +783,13 @@ const AdminApplicationDetail = () => {
                   {application.disbursedAt && (
                     <div className="flex gap-4">
                       <div className="flex flex-col items-center">
-                        <div className="h-8 w-8 bg-purple-600 rounded-full flex items-center justify-center">
+                        <div className="h-8 w-8 bg-accent dark:bg-accent rounded-full flex items-center justify-center">
                           <DollarSign size={16} className="text-white" />
                         </div>
                       </div>
                       <div className="flex-1">
                         <p className="font-medium text-foreground">Loan Disbursed</p>
-                        <p className="text-sm text-gray-600">{application.disbursedAt ? formatDate(application.disbursedAt) : 'N/A'}</p>
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{application.disbursedAt ? formatDate(application.disbursedAt) : 'N/A'}</p>
                       </div>
                     </div>
                   )}
@@ -851,7 +851,7 @@ const AdminApplicationDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDecisionModal(false)}
-                  className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 dark:bg-cardDark transition-colors"
+                  className="flex-1 px-4 py-2 bg-input dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors"
                 >
                   Cancel
                 </button>

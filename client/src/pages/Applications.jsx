@@ -74,8 +74,8 @@ const Applications = () => {
     return (
       <div className="container-custom py-8">
         <div className="max-w-md mx-auto text-center py-16">
-          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="h-16 w-16 bg-errorBadge dark:bg-errorBadgeDark rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-error dark:text-errorDark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
@@ -83,7 +83,7 @@ const Applications = () => {
           <p className="text-foregroundSecondary mb-6">{error}</p>
           <button
             onClick={fetchApplications}
-            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -101,7 +101,7 @@ const Applications = () => {
     >
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-3xl font-bold text-foreground dark:text-surfaceDark mb-2">
+          <h1 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">
             My Applications
           </h1>
           <p className="text-foregroundSecondary dark:text-foregroundSecondary">
@@ -110,7 +110,7 @@ const Applications = () => {
         </div>
         <Link
           to="/loan-types"
-          className="px-6 py-3 bg-secondary hover:bg-background text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+          className="px-6 py-3 bg-primary hover:bg-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-all"
         >
           New Application
         </Link>
@@ -119,18 +119,18 @@ const Applications = () => {
       {/* Search Bar */}
       <div className="mb-6">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundSecondary dark:text-surface0Dark" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundSecondary dark:text-foregroundSecondaryDark" />
           <input
             type="text"
             placeholder="Search by application number, loan type, or status..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-backgroundDark border border-border dark:border-borderDark dark:border-foregroundDark rounded-xl text-foreground dark:text-surfaceDark placeholder:text-foregroundSecondary dark:placeholder:text-surface0 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-cardDark border border-border dark:border-borderDark rounded-xl text-foreground dark:text-foregroundDark placeholder:text-foregroundSecondary dark:placeholder:text-foregroundSecondaryDark focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
           />
           {searchQuery && (
             <button
               onClick={() => setSearchQuery('')}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-foregroundSecondary hover:text-foregroundSecondary dark:text-surface0Dark dark:hover:text-foregroundSecondary"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-foregroundSecondary hover:text-foreground dark:text-foregroundSecondaryDark dark:hover:text-foregroundDark"
             >
               ✕
             </button>
@@ -148,8 +148,8 @@ const Applications = () => {
             onClick={() => setFilter(status)}
             className={`px-4 py-2 rounded-lg font-medium text-sm whitespace-nowrap transition-colors ${
               filter === status
-                ? 'bg-secondary text-white shadow-md'
-                : 'bg-white dark:bg-surfaceDark border border-border dark:border-borderDark dark:border-foregroundDark text-foreground dark:text-border hover:bg-surface dark:hover:bg-foregroundDark'
+                ? 'bg-primary text-white shadow-md dark:bg-primaryDark dark:text-foregroundDark'
+                : 'bg-white dark:bg-cardElevatedDark border border-border dark:border-borderDark text-foregroundSecondary dark:text-foregroundSecondaryDark hover:bg-input dark:hover:bg-cardDark'
             }`}
           >
             {status === 'all' ? 'All' : status.replace('_', ' ').toUpperCase()}
@@ -173,7 +173,7 @@ const Applications = () => {
             >
               <Link
                 to={`/applications/${app._id}`}
-                className="card block hover:shadow-soft-lg hover:border-secondary dark:hover:border-secondary transition-all"
+                className="card block hover:shadow-soft-lg hover:border-primary dark:hover:border-primary transition-all"
               >
                 <div className="flex items-center justify-between mb-4">
                   <div className="flex items-center gap-4">
@@ -185,7 +185,7 @@ const Applications = () => {
                       <FileText className="h-6 w-6 text-foreground dark:text-foregroundSecondaryDark" />
                     </motion.div>
                     <div>
-                      <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark">
+                      <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark">
                         {app.loanType?.name}
                       </h3>
                       <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">
@@ -198,26 +198,26 @@ const Applications = () => {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div>
-                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mb-1">Loan Amount</p>
-                    <p className="font-semibold text-foreground dark:text-surfaceDark">
+                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondaryDark mb-1">Loan Amount</p>
+                    <p className="font-semibold text-foreground dark:text-foregroundDark">
                       {formatCurrency(app.loanAmount)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mb-1">EMI</p>
-                    <p className="font-semibold text-foreground dark:text-surfaceDark">
+                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondaryDark mb-1">EMI</p>
+                    <p className="font-semibold text-foreground dark:text-foregroundDark">
                       {formatCurrency(app.emi)}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mb-1">Duration</p>
-                    <p className="font-semibold text-foreground dark:text-surfaceDark">
+                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondaryDark mb-1">Duration</p>
+                    <p className="font-semibold text-foreground dark:text-foregroundDark">
                       {app.durationMonths} months
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mb-1">Applied On</p>
-                    <p className="font-semibold text-foreground dark:text-surfaceDark">
+                    <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondaryDark mb-1">Applied On</p>
+                    <p className="font-semibold text-foreground dark:text-foregroundDark">
                       {app.createdAt ? formatDate(app.createdAt) : 'N/A'}
                     </p>
                   </div>
@@ -234,7 +234,7 @@ const Applications = () => {
         >
           <div className="py-12">
             <FileText className="h-16 w-16 text-foregroundSecondary dark:text-foregroundSecondary mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-foreground dark:text-surfaceDark mb-2">
+            <h3 className="text-xl font-bold text-foreground dark:text-foregroundDark mb-2">
               {searchQuery ? 'No matching applications' : 'No applications found'}
             </h3>
             <p className="text-foregroundSecondary dark:text-foregroundSecondary mb-6">

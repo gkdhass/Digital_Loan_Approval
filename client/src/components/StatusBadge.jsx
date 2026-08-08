@@ -7,50 +7,50 @@ const StatusBadge = ({ status }) => {
     submitted: {
       label: 'Submitted',
       icon: FileText,
-      className: 'bg-blue-50 text-blue-700 border-blue-200',
-      iconColor: 'text-blue-600'
+      className: 'bg-cyan-50 text-cyan-700 border-cyan-200 dark:bg-cyan-900/20 dark:text-cyan-300 dark:border-cyan-800',
+      iconColor: 'text-cyan-600 dark:text-cyan-400'
     },
     under_review: {
-      label: 'Under Review',
+      label: '⏳ UNDER REVIEW',
       icon: Clock,
-      className: 'bg-amber-50 text-amber-700 border-amber-200',
-      iconColor: 'text-amber-600'
+      className: 'bg-warningBadge text-warningText border border-warningBorder dark:bg-warningBadgeDark dark:text-warningTextDark dark:border-warningBorderDark',
+      iconColor: 'text-warning dark:text-warningDark'
     },
     documents_requested: {
       label: 'Documents Requested',
       icon: AlertCircle,
-      className: 'bg-purple-50 text-purple-700 border-purple-200',
-      iconColor: 'text-purple-600'
+      className: 'bg-warningBadge text-warningText border border-warningBorder dark:bg-warningBadgeDark dark:text-warningTextDark dark:border-warningBorderDark',
+      iconColor: 'text-warning dark:text-warningDark'
     },
     approved: {
-      label: 'Approved',
+      label: '✓ APPROVED',
       icon: CheckCircle,
-      className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      iconColor: 'text-emerald-600'
+      className: 'bg-successBadge text-successText border border-successBorder dark:bg-successBadgeDark dark:text-successTextDark dark:border-successBorderDark',
+      iconColor: 'text-success dark:text-successDark'
     },
     rejected: {
-      label: 'Rejected',
+      label: '✕ REJECTED',
       icon: XCircle,
-      className: 'bg-red-50 text-red-700 border-red-200',
-      iconColor: 'text-red-600'
+      className: 'bg-errorBadge text-errorText border border-errorBorder dark:bg-errorBadgeDark dark:text-errorTextDark dark:border-errorBorderDark',
+      iconColor: 'text-error dark:text-errorDark'
     },
     disbursed: {
       label: 'Disbursed',
       icon: DollarSign,
-      className: 'bg-green-50 text-green-700 border-green-200',
-      iconColor: 'text-green-600'
+      className: 'bg-successBadge text-successText border border-successBorder dark:bg-successBadgeDark dark:text-successTextDark dark:border-successBorderDark',
+      iconColor: 'text-success dark:text-successDark'
     },
     pending: {
       label: 'Pending',
       icon: Clock,
-      className: 'bg-gray-50 dark:bg-cardSecondaryDark text-gray-700 dark:text-gray-300 border-border dark:border-borderDark',
-      iconColor: 'text-gray-600 dark:text-gray-400'
+      className: 'bg-warningBadge text-warningText border border-warningBorder dark:bg-warningBadgeDark dark:text-warningTextDark dark:border-warningBorderDark',
+      iconColor: 'text-warning dark:text-warningDark'
     },
     verified: {
-      label: 'Verified',
+      label: '✓ APPROVED',
       icon: CheckCircle,
-      className: 'bg-emerald-50 text-emerald-700 border-emerald-200',
-      iconColor: 'text-emerald-600'
+      className: 'bg-successBadge text-successText border border-successBorder dark:bg-successBadgeDark dark:text-successTextDark dark:border-successBorderDark',
+      iconColor: 'text-success dark:text-successDark'
     }
   };
 

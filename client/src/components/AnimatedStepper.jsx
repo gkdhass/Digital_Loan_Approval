@@ -23,7 +23,7 @@ const AnimatedStepper = ({ steps, currentStep }) => {
                   }
                   className={`
                     relative z-10 w-12 h-12 rounded-full flex items-center justify-center
-                    ${isCompleted ? 'bg-success-600' : isCurrent ? 'bg-secondary' : 'bg-border dark:bg-foregroundDark'}
+                    ${isCompleted ? 'bg-success' : isCurrent ? 'bg-secondary' : 'bg-border dark:bg-foregroundDark'}
                     transition-colors duration-300
                   `}
                 >
@@ -51,7 +51,7 @@ const AnimatedStepper = ({ steps, currentStep }) => {
                     <motion.div
                       variants={pulseVariants}
                       animate="pulse"
-                      className="absolute inset-0 rounded-full bg-secondary opacity-30"
+                      className="absolute inset-0 rounded-full bg-primary opacity-30"
                     />
                   )}
                 </motion.div>
@@ -79,7 +79,7 @@ const AnimatedStepper = ({ steps, currentStep }) => {
                       width: index < currentStep ? '100%' : '0%'
                     }}
                     transition={{ duration: 0.5, ease: [0.4, 0, 0.2, 1] }}
-                    className="h-full bg-success-600"
+                    className="h-full bg-success"
                   />
                 </div>
               )}

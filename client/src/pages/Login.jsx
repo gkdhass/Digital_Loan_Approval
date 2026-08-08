@@ -100,14 +100,14 @@ const Login = () => {
         >
           {/* Role Selector Toggle */}
           <div className="mb-6">
-            <div className="flex gap-2 p-1 bg-gray-100 dark:bg-cardDark rounded-xl">
+            <div className="flex gap-2 p-1 bg-input dark:bg-cardDark rounded-xl">
               <button
                 type="button"
                 onClick={() => handleRoleToggle('customer')}
                 className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   selectedRole === 'customer'
-                    ? 'bg-gradient-to-r from-primary to-primaryDark text-white shadow-md'
-                    : 'text-gray-600 dark:text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-gradient-to-r from-primary to-primaryHover text-white shadow-md dark:from-primaryDark dark:to-primaryHoverDark'
+                    : 'text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-foreground dark:hover:text-foregroundDark hover:bg-input dark:hover:bg-cardElevatedDark'
                 }`}
               >
                 Customer Login
@@ -117,8 +117,8 @@ const Login = () => {
                 onClick={() => handleRoleToggle('admin')}
                 className={`flex-1 px-4 py-2.5 rounded-lg font-semibold text-sm transition-all duration-200 ${
                   selectedRole === 'admin'
-                    ? 'bg-gradient-to-r from-primary to-primaryDark text-white shadow-md'
-                    : 'text-gray-600 dark:text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-gray-900 dark:hover:text-gray-200'
+                    ? 'bg-gradient-to-r from-primary to-primaryHover text-white shadow-md dark:from-primaryDark dark:to-primaryHoverDark'
+                    : 'text-foregroundSecondary dark:text-foregroundSecondaryDark hover:text-foreground dark:hover:text-foregroundDark hover:bg-input dark:hover:bg-cardElevatedDark'
                 }`}
               >
                 Admin Login
@@ -130,10 +130,10 @@ const Login = () => {
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl flex items-start gap-3"
+              className="mb-6 p-4 bg-errorBadge text-errorText border border-errorBorder dark:bg-errorBadgeDark dark:text-errorTextDark dark:border-errorBorderDark rounded-xl flex items-start gap-3"
             >
-              <AlertCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-red-800 dark:text-red-200">{error}</p>
+              <AlertCircle className="h-5 w-5 text-error dark:text-errorDark flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-errorText dark:text-errorTextDark">{error}</p>
             </motion.div>
           )}
 
@@ -184,7 +184,7 @@ const Login = () => {
               </label>
               <Link
                 to="/forgot-password"
-                className="text-primary hover:text-primaryDark font-medium"
+                className="text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium transition-colors duration-200"
               >
                 Forgot password?
               </Link>
@@ -196,7 +196,7 @@ const Login = () => {
               whileTap="tap"
               type="submit"
               disabled={loading}
-              className="w-full px-6 py-3 bg-gradient-to-r from-primary to-primaryDark text-white rounded-xl font-semibold shadow-soft hover:shadow-soft-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
+              className="w-full px-6 py-3 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold shadow-soft hover:shadow-soft-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-200"
             >
               {loading ? <LoadingSpinner size="sm" /> : 'Sign In'}
             </motion.button>
@@ -209,7 +209,7 @@ const Login = () => {
                 Don't have an account?{' '}
                 <Link
                   to="/register"
-                  className="text-primary hover:text-primaryDark font-semibold"
+                  className="text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-semibold transition-colors duration-200"
                 >
                   Sign up
                 </Link>

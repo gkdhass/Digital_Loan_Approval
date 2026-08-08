@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { buttonSpring } from '../animations/springs';
 import Notifications from './Notifications';
+import Logo from './Logo';
 
 const Navbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -51,15 +52,14 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link to="/" className="flex items-center gap-2">
-            <motion.div 
-              className="h-10 w-10 bg-gradient-to-br from-primary to-secondary rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-glow-yellow"
-              whileHover={{ scale: 1.05, rotate: 5 }}
+            <motion.div
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
             >
-              L
+              <Logo size="default" showText={false} />
             </motion.div>
-            <span className="text-xl font-bold text-foreground dark:text-foregroundDark">
-              LoanApproval
+            <span className="text-xl font-bold text-foreground dark:text-foregroundDark hidden sm:block">
+              Digital Loan Approval
             </span>
           </Link>
 
@@ -73,8 +73,8 @@ const Navbar = () => {
                   to={item.path}
                   className={`px-4 py-2 rounded-lg font-medium text-sm transition-colors ${
                     isActive(item.path)
-                      ? 'bg-secondary text-foreground dark:bg-secondaryDark/30 dark:text-foregroundDark'
-                      : 'text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark'
+                      ? 'bg-primary text-white dark:bg-primaryDark dark:text-foregroundDark'
+                      : 'text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark'
                   }`}
                 >
                   <span className="flex items-center gap-2">
@@ -94,7 +94,7 @@ const Navbar = () => {
                 <motion.button
                   {...buttonSpring}
                   onClick={toggleTheme}
-                  className="p-2 text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark rounded-lg transition-colors"
+                  className="p-2 text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark rounded-lg transition-colors"
                   title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
                 >
                   <AnimatePresence mode="wait">
@@ -130,7 +130,7 @@ const Navbar = () => {
                   <motion.button
                     {...buttonSpring}
                     onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-cardDark transition-colors"
+                    className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-input dark:hover:bg-cardDark transition-colors"
                   >
                     <div className="h-8 w-8 bg-secondary dark:bg-secondary/30 rounded-full flex items-center justify-center overflow-hidden">
                       {user?.profilePicture ? (
@@ -165,7 +165,7 @@ const Navbar = () => {
                               navigate('/admin/dashboard');
                               setProfileMenuOpen(false);
                             }}
-                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
+                            className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark"
                           >
                             <LayoutDashboard className="h-4 w-4" />
                             Admin Dashboard
@@ -176,14 +176,14 @@ const Navbar = () => {
                             navigate('/profile');
                             setProfileMenuOpen(false);
                           }}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark"
                         >
                           <User className="h-4 w-4" />
                           Profile
                         </button>
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50"
+                          className="w-full flex items-center gap-2 px-4 py-2 text-sm text-error dark:text-errorDark hover:bg-errorBadge dark:hover:bg-errorDark/20"
                         >
                           <LogOut className="h-4 w-4" />
                           Logout
@@ -199,14 +199,14 @@ const Navbar = () => {
                 <motion.button
                   {...buttonSpring}
                   onClick={toggleTheme}
-                  className="p-2 text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark rounded-lg transition-colors"
+                  className="p-2 text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark rounded-lg transition-colors"
                 >
                   {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                 </motion.button>
                 
                 <Link
                   to="/login"
-                  className="px-4 py-2 text-sm font-medium text-foreground hover:text-foreground"
+                  className="px-4 py-2 text-sm font-medium text-foreground dark:text-foregroundDark hover:text-primary dark:hover:text-primaryDark transition-colors duration-200"
                 >
                   Login
                 </Link>
@@ -223,7 +223,7 @@ const Navbar = () => {
           {/* Mobile Menu Button */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-cardDark rounded-lg"
+            className="md:hidden p-2 text-foregroundSecondary dark:text-foregroundSecondaryDark hover:bg-input dark:hover:bg-cardDark rounded-lg"
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
@@ -249,8 +249,8 @@ const Navbar = () => {
                     onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-2 px-4 py-3 rounded-lg font-medium text-sm ${
                       isActive(item.path)
-                        ? 'bg-secondary text-foreground dark:bg-secondaryDark/30 dark:text-foregroundDark'
-                        : 'text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark'
+                        ? 'bg-primary text-white dark:bg-primaryDark dark:text-foregroundDark'
+                        : 'text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark'
                     }`}
                   >
                     <Icon className="h-5 w-5" />
@@ -264,7 +264,7 @@ const Navbar = () => {
                     onClick={() => {
                       toggleTheme();
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark"
                   >
                     {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                     {theme === 'light' ? 'Dark' : 'Light'} Mode
@@ -274,14 +274,14 @@ const Navbar = () => {
                       navigate('/profile');
                       setMobileMenuOpen(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark"
                   >
                     <User className="h-5 w-5" />
                     Profile
                   </button>
                   <button
                     onClick={handleLogout}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-error dark:text-errorDark hover:bg-errorBadge dark:hover:bg-errorDark/20"
                   >
                     <LogOut className="h-5 w-5" />
                     Logout
@@ -291,21 +291,21 @@ const Navbar = () => {
                 <>
                   <button
                     onClick={toggleTheme}
-                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
+                    className="w-full flex items-center gap-2 px-4 py-3 rounded-lg text-sm text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark"
                   >
                     {theme === 'light' ? <Moon className="h-5 w-5" /> : <Sun className="h-5 w-5" />}
                     {theme === 'light' ? 'Dark' : 'Light'} Mode
                   </button>
                   <Link
                     to="/login"
-                    className="block px-4 py-3 rounded-lg text-sm font-medium text-foreground dark:text-foregroundDark hover:bg-gray-100 dark:hover:bg-cardDark"
+                    className="block px-4 py-3 rounded-lg text-sm font-medium text-foreground dark:text-foregroundDark hover:bg-input dark:hover:bg-cardDark"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="block px-4 py-3 bg-success-300 text-success-900 rounded-lg font-medium text-sm text-center hover:bg-success-400"
+                    className="block px-4 py-3 bg-primary text-white rounded-lg font-medium text-sm text-center hover:bg-primaryHover dark:bg-primaryDark dark:hover:bg-primaryHoverDark"
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     Get Started

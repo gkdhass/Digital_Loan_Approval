@@ -23,7 +23,7 @@ const SuccessAnimation = ({ title = 'Success!', message, onComplete }) => {
             variants={circleExpansionVariants}
             initial="hidden"
             animate="visible"
-            className="absolute inset-0 bg-success-100 dark:bg-success-900/20 rounded-full"
+            className="absolute inset-0 bg-successBadge dark:bg-successBadgeDark rounded-full"
           />
 
           {/* Success Icon Circle */}
@@ -32,7 +32,7 @@ const SuccessAnimation = ({ title = 'Success!', message, onComplete }) => {
             initial="hidden"
             animate="visible"
             transition={{ delay: 0.2 }}
-            className="absolute inset-2 bg-success-500 rounded-full flex items-center justify-center"
+            className="absolute inset-2 bg-success rounded-full flex items-center justify-center"
           >
             <motion.div
               variants={successCheckVariants}
@@ -49,7 +49,7 @@ const SuccessAnimation = ({ title = 'Success!', message, onComplete }) => {
             initial={{ scale: 1, opacity: 0.5 }}
             animate={{ scale: 1.5, opacity: 0 }}
             transition={{ duration: 1, repeat: Infinity }}
-            className="absolute inset-0 border-4 border-success-500 rounded-full"
+            className="absolute inset-0 border-4 border-success rounded-full"
           />
         </div>
 
@@ -58,7 +58,7 @@ const SuccessAnimation = ({ title = 'Success!', message, onComplete }) => {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-2"
+          className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-2"
         >
           {title}
         </motion.h2>
@@ -84,7 +84,7 @@ const SuccessAnimation = ({ title = 'Success!', message, onComplete }) => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={onComplete}
-            className="mt-6 px-6 py-3 bg-secondary hover:bg-background text-white rounded-xl font-semibold transition-colors"
+            className="mt-6 px-6 py-3 bg-primary hover:bg-primaryHover text-white rounded-xl font-semibold transition-colors"
           >
             Continue
           </motion.button>

@@ -63,7 +63,7 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
     return (
       <div className="card p-4">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="font-semibold text-foreground dark:text-surfaceDark">
+          <h4 className="font-semibold text-foreground dark:text-foregroundDark">
             Document Checklist
           </h4>
           <div className="flex items-center gap-2">
@@ -72,7 +72,7 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: 'spring', stiffness: 200 }}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-100 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300 rounded-full text-xs font-medium"
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-warningBadge text-warningText border border-warningBorder dark:bg-warningBadgeDark dark:text-warningTextDark dark:border-warningBorderDark rounded-full text-xs font-medium"
                 title="OCR flags detected on PAN/Aadhaar documents"
               >
                 <AlertTriangle className="h-3 w-3" />
@@ -80,16 +80,16 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
               </motion.div>
             )}
             <span className={`text-sm font-medium ${
-              isComplete 
-                ? 'text-success-600 dark:text-success-400' 
-                : 'text-amber-600 dark:text-amber-400'
+              isComplete
+                ? 'text-success dark:text-successDark'
+                : 'text-warning dark:text-warningDark'
             }`}>
               {totalUploaded}/{totalRequired}
             </span>
             {isComplete ? (
-              <CheckCircle className="h-5 w-5 text-success-600 dark:text-success-400" />
+              <CheckCircle className="h-5 w-5 text-success dark:text-successDark" />
             ) : (
-              <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+              <AlertCircle className="h-5 w-5 text-warning dark:text-warningDark" />
             )}
           </div>
         </div>
@@ -98,9 +98,9 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
         <div className="w-full h-2 bg-surface dark:bg-surfaceDark rounded-full overflow-hidden mb-4">
           <motion.div
             className={`h-full ${
-              isComplete 
-                ? 'bg-success-600' 
-                : 'bg-amber-500'
+              isComplete
+                ? 'bg-success'
+                : 'bg-warning'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
@@ -121,14 +121,14 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
                 className="flex items-center gap-2 text-sm"
               >
                 {isUploaded ? (
-                  <CheckCircle className="h-4 w-4 text-success-600 dark:text-success-400 flex-shrink-0" />
+                  <CheckCircle className="h-4 w-4 text-success dark:text-successDark flex-shrink-0" />
                 ) : (
-                  <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400 flex-shrink-0" />
+                  <AlertCircle className="h-4 w-4 text-warning dark:text-warningDark flex-shrink-0" />
                 )}
                 <span className={
-                  isUploaded 
-                    ? 'text-foreground dark:text-foregroundSecondary' 
-                    : 'text-amber-700 dark:text-amber-300 font-medium'
+                  isUploaded
+                    ? 'text-foreground dark:text-foregroundSecondary'
+                    : 'text-warning dark:text-warningDark font-medium'
                 }>
                   {docType}
                 </span>
@@ -145,7 +145,7 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
     <div className="card">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark">
+          <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark">
             Document Checklist
           </h3>
           <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary mt-1">
@@ -157,9 +157,9 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
         </div>
         <div className="text-right">
           <div className={`text-3xl font-bold ${
-            isComplete 
-              ? 'text-success-600 dark:text-success-400' 
-              : 'text-amber-600 dark:text-amber-400'
+            isComplete
+              ? 'text-success dark:text-successDark'
+              : 'text-warning dark:text-warningDark'
           }`}>
             {totalUploaded}/{totalRequired}
           </div>
@@ -174,9 +174,9 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
         <div className="w-full h-3 bg-surface dark:bg-surfaceDark rounded-full overflow-hidden">
           <motion.div
             className={`h-full ${
-              isComplete 
-                ? 'bg-gradient-to-r from-success-500 to-success-600' 
-                : 'bg-gradient-to-r from-amber-400 to-amber-500'
+              isComplete
+                ? 'bg-gradient-to-r from-success to-successDark'
+                : 'bg-gradient-to-r from-warning to-warningDark'
             }`}
             initial={{ width: 0 }}
             animate={{ width: `${completionPercentage}%` }}
@@ -204,8 +204,8 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
               transition={{ delay: index * 0.08, duration: 0.3 }}
               className={`p-4 rounded-xl border-2 transition-all ${
                 isUploaded
-                  ? 'bg-success-50 dark:bg-success-900/10 border-success-200 dark:border-success-800'
-                  : 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800'
+                  ? 'bg-successBadge dark:bg-successBadgeDark border-successBorder dark:border-successBorderDark'
+                  : 'bg-warningBadge dark:bg-warningBadgeDark border-warningBorder dark:border-warningBorderDark'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -216,8 +216,8 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
                     transition={{ delay: index * 0.08 + 0.2, type: 'spring', stiffness: 200 }}
                     className={`h-10 w-10 rounded-full flex items-center justify-center ${
                       isUploaded
-                        ? 'bg-success-600 dark:bg-success-700'
-                        : 'bg-amber-500 dark:bg-amber-600'
+                        ? 'bg-success dark:bg-successDark'
+                        : 'bg-warning dark:bg-warningDark'
                     }`}
                   >
                     {isUploaded ? (
@@ -230,20 +230,20 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
                   <div className="flex-1">
                     <p className={`font-semibold ${
                       isUploaded
-                        ? 'text-success-900 dark:text-success-200'
-                        : 'text-amber-900 dark:text-amber-200'
+                        ? 'text-success dark:text-successDark'
+                        : 'text-warning dark:text-warningDark'
                     }`}>
                       {docType}
                     </p>
                     {isUploaded && uploadedDoc ? (
-                      <p className="text-xs text-success-700 dark:text-success-300 mt-0.5">
+                      <p className="text-xs text-success dark:text-successDark mt-0.5">
                         ✓ Uploaded: {uploadedDoc.fileName}
                         {uploadedDoc.verificationStatus === 'verified' && (
                           <span className="ml-2 font-medium">• Verified</span>
                         )}
                       </p>
                     ) : (
-                      <p className="text-xs text-amber-700 dark:text-amber-300 mt-0.5">
+                      <p className="text-xs text-warning dark:text-warningDark mt-0.5">
                         Required for loan approval
                       </p>
                     )}
@@ -256,12 +256,12 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
                       initial={{ scale: 0, rotate: -90 }}
                       animate={{ scale: 1, rotate: 0 }}
                       transition={{ delay: index * 0.08 + 0.3, type: 'spring' }}
-                      className="px-3 py-1 bg-success-600 dark:bg-success-700 text-white text-xs font-bold rounded-full"
+                      className="px-3 py-1 bg-success dark:bg-successDark text-white text-xs font-bold rounded-full"
                     >
                       DONE
                     </motion.div>
                   ) : (
-                    <div className="px-3 py-1 bg-amber-500 dark:bg-amber-600 text-white text-xs font-bold rounded-full">
+                    <div className="px-3 py-1 bg-warning dark:bg-warningDark text-white text-xs font-bold rounded-full">
                       PENDING
                     </div>
                   )}
@@ -278,18 +278,18 @@ const DocumentChecklist = ({ requiredDocuments = [], uploadedDocuments = [], com
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5 }}
-          className="mt-6 p-4 bg-amber-50 dark:bg-amber-900/10 border-2 border-amber-200 dark:border-amber-800 rounded-xl"
+          className="mt-6 p-4 bg-warning-50 dark:bg-warning-900/20 border-2 border-warning-200 dark:border-warning-800 rounded-xl"
         >
           <div className="flex items-start gap-3">
-            <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5" />
+            <AlertCircle className="h-5 w-5 text-warning-600 dark:text-warning-400 flex-shrink-0 mt-0.5" />
             <div className="flex-1">
-              <p className="font-semibold text-amber-900 dark:text-amber-200 mb-2">
+              <p className="font-semibold text-warning-900 dark:text-warning-200 mb-2">
                 Still Required:
               </p>
               <ul className="space-y-1">
                 {missingDocuments.map((doc) => (
-                  <li key={doc} className="text-sm text-amber-800 dark:text-amber-300 flex items-center gap-2">
-                    <span className="h-1.5 w-1.5 rounded-full bg-amber-600 dark:bg-amber-400" />
+                  <li key={doc} className="text-sm text-warning-800 dark:text-warning-300 flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-warning-600 dark:bg-warning-400" />
                     {doc}
                   </li>
                 ))}

@@ -35,9 +35,9 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
     statusConfig = {
       icon: Loader2,
       label: 'Processing...',
-      color: 'text-blue-600 dark:text-blue-400',
-      bg: 'bg-blue-50 dark:bg-blue-900/10',
-      border: 'border-blue-200 dark:border-blue-800',
+      color: 'text-primary dark:text-primaryDarkMode',
+      bg: 'bg-primary-50 dark:bg-primary-900/20',
+      border: 'border-primary-200 dark:border-primary-800',
       spin: true,
     };
   } else if (ocrStatus === 'processed') {
@@ -45,24 +45,24 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
       statusConfig = {
         icon: AlertTriangle,
         label: 'OCR Flags Raised',
-        color: 'text-amber-600 dark:text-amber-400',
-        bg: 'bg-amber-50 dark:bg-amber-900/10',
-        border: 'border-amber-200 dark:border-amber-800',
+        color: 'text-warning dark:text-warningDark',
+        bg: 'bg-warningBadge dark:bg-warningBadgeDark',
+        border: 'border-warningBorder dark:border-warningBorderDark',
       };
     } else {
       statusConfig = {
         icon: CheckCircle,
         label: 'OCR Verified',
-        color: 'text-success-600 dark:text-success-400',
-        bg: 'bg-success-50 dark:bg-success-900/10',
-        border: 'border-success-200 dark:border-success-800',
+        color: 'text-success dark:text-successDark',
+        bg: 'bg-successBadge dark:bg-successBadgeDark',
+        border: 'border-successBorder dark:border-successBorderDark',
       };
     }
   } else if (ocrStatus === 'unreadable') {
     statusConfig = {
       icon: FileQuestion,
       label: 'Could not read document',
-      color: 'text-surface0 dark:text-surface0Dark',
+      color: 'text-foregroundSecondary dark:text-foregroundSecondaryDark',
       bg: 'bg-surface dark:bg-surfaceDark/30',
       border: 'border-border dark:border-borderDark dark:border-foregroundDark',
       subtitle: 'Verify manually',
@@ -71,7 +71,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
     statusConfig = {
       icon: AlertCircle,
       label: 'OCR unavailable',
-      color: 'text-surface0 dark:text-surface0Dark',
+      color: 'text-foregroundSecondary dark:text-foregroundSecondaryDark',
       bg: 'bg-surface dark:bg-surfaceDark/30',
       border: 'border-border dark:border-borderDark dark:border-foregroundDark',
       subtitle: 'Verify manually',
@@ -140,7 +140,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
             {flags.map((flag) => (
               <span
                 key={flag}
-                className="inline-flex items-center gap-1 px-2 py-0.5 bg-amber-600 dark:bg-amber-700 text-white text-xs font-medium rounded"
+                className="inline-flex items-center gap-1 px-2 py-0.5 bg-warningBadge text-warningText border border-warningBorder dark:bg-warningBadgeDark dark:text-warningTextDark dark:border-warningBorderDark text-xs font-medium rounded"
               >
                 • {flag}
               </span>
@@ -169,7 +169,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
                   {extractedName && (
                     <div className="flex justify-between items-start">
                       <span className="text-foregroundSecondary dark:text-foregroundSecondary">Name:</span>
-                      <span className={`font-medium text-right ${nameMismatch ? 'text-amber-700 dark:text-amber-300' : 'text-foreground dark:text-surfaceDark'}`}>
+                      <span className={`font-medium text-right ${nameMismatch ? 'text-warning dark:text-warningDark' : 'text-foreground dark:text-foregroundDark'}`}>
                         {extractedName}
                       </span>
                     </div>
@@ -177,7 +177,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
                   {extractedPAN && (
                     <div className="flex justify-between items-start">
                       <span className="text-foregroundSecondary dark:text-foregroundSecondary">PAN:</span>
-                      <span className={`font-mono font-medium ${invalidPAN ? 'text-amber-700 dark:text-amber-300' : 'text-foreground dark:text-surfaceDark'}`}>
+                      <span className={`font-mono font-medium ${invalidPAN ? 'text-warning dark:text-warningDark' : 'text-foreground dark:text-foregroundDark'}`}>
                         {extractedPAN}
                       </span>
                     </div>
@@ -185,7 +185,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
                   {extractedAadhaar && (
                     <div className="flex justify-between items-start">
                       <span className="text-foregroundSecondary dark:text-foregroundSecondary">Aadhaar:</span>
-                      <span className={`font-mono font-medium ${invalidAadhaar ? 'text-amber-700 dark:text-amber-300' : 'text-foreground dark:text-surfaceDark'}`}>
+                      <span className={`font-mono font-medium ${invalidAadhaar ? 'text-warning dark:text-warningDark' : 'text-foreground dark:text-foregroundDark'}`}>
                         {extractedAadhaar}
                       </span>
                     </div>
@@ -193,7 +193,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
                   {typeof nameSimilarity === 'number' && (
                     <div className="flex justify-between items-start">
                       <span className="text-foregroundSecondary dark:text-foregroundSecondary">Name Match:</span>
-                      <span className={`font-medium ${nameSimilarity >= 70 ? 'text-success-600 dark:text-success-400' : 'text-amber-700 dark:text-amber-300'}`}>
+                      <span className={`font-medium ${nameSimilarity >= 70 ? 'text-success dark:text-successDark' : 'text-warning dark:text-warningDark'}`}>
                         {nameSimilarity}% similar
                       </span>
                     </div>
@@ -201,7 +201,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
                   {confidence && (
                     <div className="flex justify-between items-start">
                       <span className="text-foregroundSecondary dark:text-foregroundSecondary">Confidence:</span>
-                      <span className="font-medium text-foreground dark:text-surfaceDark capitalize">
+                      <span className="font-medium text-foreground dark:text-foregroundDark capitalize">
                         {confidence}
                       </span>
                     </div>
@@ -211,20 +211,20 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
 
               {/* Name Comparison */}
               {nameMismatch && registeredName && extractedName && (
-                <div className="p-2 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                  <p className="text-xs font-semibold text-amber-900 dark:text-amber-200 mb-2">
+                <div className="p-2 bg-warning-50 dark:bg-warning-900/20 border border-warning-200 dark:border-warning-800 rounded-lg">
+                  <p className="text-xs font-semibold text-warning dark:text-warningDark mb-2">
                     Name Mismatch Detected:
                   </p>
                   <div className="space-y-1 text-xs">
                     <div className="flex justify-between">
-                      <span className="text-amber-700 dark:text-amber-300">Registered:</span>
-                      <span className="font-medium text-amber-900 dark:text-amber-100">
+                      <span className="text-warning-700 dark:text-warning-300">Registered:</span>
+                      <span className="font-medium text-warning-900 dark:text-warning-100">
                         {registeredName}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-amber-700 dark:text-amber-300">Extracted:</span>
-                      <span className="font-medium text-amber-900 dark:text-amber-100">
+                      <span className="text-warning-700 dark:text-warning-300">Extracted:</span>
+                      <span className="font-medium text-warning-900 dark:text-warning-100">
                         {extractedName}
                       </span>
                     </div>
@@ -240,7 +240,7 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
                   </p>
                   <ul className="space-y-1">
                     {flags.map((flag) => (
-                      <li key={flag} className="flex items-start gap-2 text-xs text-amber-800 dark:text-amber-300">
+                      <li key={flag} className="flex items-start gap-2 text-xs text-warning dark:text-warningDark">
                         <AlertTriangle className="h-3 w-3 mt-0.5 flex-shrink-0" />
                         <span>{flag}</span>
                       </li>

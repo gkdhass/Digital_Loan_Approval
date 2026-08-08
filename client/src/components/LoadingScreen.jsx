@@ -124,7 +124,7 @@ const LoadingScreen = ({ fullScreen = true, message = 'Loading...' }) => {
             {/* Card Content */}
             <div className="relative z-10 h-full p-6 flex flex-col justify-between">
               {/* Chip in upper-left */}
-              <div className="w-[30px] h-[24px] bg-gradient-to-br from-secondary to-primary rounded-sm opacity-80" />
+              <div className="w-[30px] h-[24px] bg-gradient-to-br from-primary to-secondary rounded-sm opacity-80" />
 
               {/* Center Logo/Icon */}
               <div className="flex items-center justify-center">

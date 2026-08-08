@@ -96,8 +96,8 @@ const Dashboard = () => {
     return (
       <div className="container-custom py-8">
         <div className="max-w-md mx-auto text-center py-16">
-          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="h-16 w-16 bg-errorBadge dark:bg-errorBadgeDark rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-error dark:text-errorDark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
@@ -105,7 +105,7 @@ const Dashboard = () => {
           <p className="text-foregroundSecondary mb-6">{error}</p>
           <button
             onClick={fetchDashboard}
-            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -130,7 +130,7 @@ const Dashboard = () => {
     >
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-foreground dark:text-surfaceDark mb-2">
+        <h1 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">
           Welcome back, {user?.fullName}!
         </h1>
         <p className="text-foregroundSecondary dark:text-foregroundSecondary">
@@ -144,28 +144,28 @@ const Dashboard = () => {
           icon={FileText}
           label="Total Applications"
           value={overview.totalApplications || 0}
-          color="text-blue-600"
+          color="text-primary"
           delay={0}
         />
         <StatCard
           icon={Clock}
           label="Pending Applications"
           value={overview.pendingApplications || 0}
-          color="text-amber-600"
+          color="text-warning"
           delay={1}
         />
         <StatCard
           icon={CheckCircle}
           label="Approved Loans"
           value={overview.approvedApplications || 0}
-          color="text-emerald-600"
+          color="text-success"
           delay={2}
         />
         <StatCard
           icon={DollarSign}
           label="Total EMI/Month"
           value={formatCurrency(loanStats.totalEMI || 0)}
-          color="text-purple-600"
+          color="text-accent"
           delay={3}
         />
       </div>
@@ -179,20 +179,20 @@ const Dashboard = () => {
           className="card"
         >
           <div className="flex items-center justify-between mb-4">
-            <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark">Loan Summary</h3>
+            <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark">Loan Summary</h3>
             <TrendingUp className="h-5 w-5 text-foreground dark:text-foregroundSecondaryDark" />
           </div>
           <div className="space-y-4">
             <div>
               <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary mb-1">Total Requested</p>
-              <p className="text-2xl font-bold text-foreground dark:text-surfaceDark">
+              <p className="text-2xl font-bold text-foreground dark:text-foregroundDark">
                 {formatCurrency(loanStats.totalRequested || 0)}
               </p>
             </div>
             <div className="h-px bg-border dark:bg-foregroundDark" />
             <div>
               <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary mb-1">Total Approved</p>
-              <p className="text-2xl font-bold text-success-600 dark:text-success-400">
+              <p className="text-2xl font-bold text-success dark:text-successDark">
                 {formatCurrency(loanStats.totalApproved || 0)}
               </p>
             </div>
@@ -204,7 +204,7 @@ const Dashboard = () => {
           initial="hidden"
           animate="visible"
           custom={1}
-          className="bg-gradient-to-br from-secondary to-primary rounded-2xl p-6 text-white shadow-lg"
+          className="bg-gradient-to-br from-primary to-primaryDarkMode rounded-2xl p-6 text-white shadow-lg"
         >
           <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
           <div className="space-y-3">
@@ -239,7 +239,7 @@ const Dashboard = () => {
         className="card"
       >
         <div className="flex items-center justify-between mb-6">
-          <h3 className="text-lg font-bold text-foreground dark:text-surfaceDark">Recent Applications</h3>
+          <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark">Recent Applications</h3>
           <Link
             to="/applications"
             className="text-sm text-foreground dark:text-foregroundSecondaryDark hover:text-foreground dark:hover:text-foregroundSecondary font-semibold flex items-center gap-1"
@@ -268,7 +268,7 @@ const Dashboard = () => {
                         <FileText className="h-5 w-5 text-foreground dark:text-foregroundSecondaryDark" />
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground dark:text-surfaceDark">
+                        <p className="font-semibold text-foreground dark:text-foregroundDark">
                           {app.loanType?.name}
                         </p>
                         <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary">
@@ -280,12 +280,12 @@ const Dashboard = () => {
                   </div>
                   <div className="flex items-center justify-between text-sm">
                     <span className="text-foregroundSecondary dark:text-foregroundSecondary">
-                      Amount: <span className="font-semibold text-foreground dark:text-surfaceDark">
+                      Amount: <span className="font-semibold text-foreground dark:text-foregroundDark">
                         {formatCurrency(app.loanAmount)}
                       </span>
                     </span>
                     <span className="text-foregroundSecondary dark:text-foregroundSecondary">
-                      EMI: <span className="font-semibold text-foreground dark:text-surfaceDark">
+                      EMI: <span className="font-semibold text-foreground dark:text-foregroundDark">
                         {formatCurrency(app.emi)}
                       </span>
                     </span>

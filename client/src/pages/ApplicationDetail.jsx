@@ -90,16 +90,16 @@ const ApplicationDetail = () => {
     return (
       <div className="min-h-screen bg-surface py-12">
         <div className="max-w-md mx-auto text-center">
-          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="h-16 w-16 bg-error-50 dark:bg-error-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-error-600 dark:text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
           <h2 className="text-xl font-bold text-foreground mb-2">Failed to load application</h2>
-          <p className="text-gray-600 mb-6">{error}</p>
+          <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark mb-6">{error}</p>
           <button
             onClick={() => { fetchApplication(); fetchDocuments(); }}
-            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary to-primaryDark text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -121,7 +121,7 @@ const ApplicationDetail = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <button
           onClick={() => navigate('/applications')}
-          className="flex items-center gap-2 text-foregroundSecondary hover:text-primary-600 mb-6"
+          className="flex items-center gap-2 text-foregroundSecondary hover:text-primary dark:hover:text-primaryDarkMode mb-6"
         >
           <ArrowLeft size={20} />
           Back to Applications
@@ -134,20 +134,20 @@ const ApplicationDetail = () => {
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
-              className="card mb-6 bg-emerald-50 border-2 border-emerald-200 text-center"
+              className="card mb-6 bg-success-50 dark:bg-success-900/10 border-2 border-success-200 dark:border-success-800 text-center"
             >
               <motion.div
                 variants={checkmarkVariants}
                 initial="initial"
                 animate="animate"
-                className="inline-flex items-center justify-center w-16 h-16 bg-emerald-600 rounded-full mb-4"
+                className="inline-flex items-center justify-center w-16 h-16 bg-success-600 dark:bg-success-500 rounded-full mb-4"
               >
                 <CheckCircle className="text-white" size={32} />
               </motion.div>
-              <h3 className="text-xl font-bold text-emerald-900 mb-2">
+              <h3 className="text-xl font-bold text-success-900 dark:text-success-100 mb-2">
                 Application Submitted!
               </h3>
-              <p className="text-emerald-700 mb-4">
+              <p className="text-success-700 dark:text-success-300 mb-4">
                 Your application {application.applicationNumber} has been submitted successfully.
               </p>
               <button
@@ -182,7 +182,7 @@ const ApplicationDetail = () => {
               </div>
               <div>
                 <p className="text-sm text-foregroundSecondary mb-1">Monthly EMI</p>
-                <p className="text-xl font-bold text-primary-600">
+                <p className="text-xl font-bold text-primary dark:text-primaryDarkMode">
                   ₹{application.emi.toLocaleString()}
                 </p>
               </div>
@@ -225,12 +225,12 @@ const ApplicationDetail = () => {
 
           {application.rejectionReason && (
             <div className="mt-6 pt-6 border-t border-border dark:border-borderDark">
-              <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+              <div className="bg-error-50 dark:bg-error-900/20 border border-error-200 dark:border-error-800 rounded-xl p-4">
                 <div className="flex items-start gap-3">
-                  <AlertCircle className="text-red-600 flex-shrink-0 mt-0.5" size={20} />
+                  <AlertCircle className="text-error-600 dark:text-error-400 flex-shrink-0 mt-0.5" size={20} />
                   <div>
-                    <p className="font-semibold text-red-900 mb-1">Rejection Reason</p>
-                    <p className="text-red-700 text-sm">{application.rejectionReason}</p>
+                    <p className="font-semibold text-error-900 dark:text-error-100 mb-1">Rejection Reason</p>
+                    <p className="text-error-700 dark:text-error-300 text-sm">{application.rejectionReason}</p>
                   </div>
                 </div>
               </div>
@@ -282,13 +282,13 @@ const ApplicationDetail = () => {
                           <p className="text-xs text-foregroundSecondary">
                             Uploaded {new Date(uploadedDoc.uploadedAt).toLocaleDateString()}
                             {uploadedDoc.verificationStatus === 'verified' && (
-                              <span className="ml-2 text-emerald-600">✓ Verified</span>
+                              <span className="ml-2 text-success-600 dark:text-success-400">✓ Verified</span>
                             )}
                             {uploadedDoc.verificationStatus === 'rejected' && (
                               <>
-                                <span className="ml-2 text-red-600">✗ Rejected</span>
+                                <span className="ml-2 text-error-600 dark:text-error-400">✗ Rejected</span>
                                 {uploadedDoc.rejectionReason && (
-                                  <span className="ml-2 text-red-500 italic">({uploadedDoc.rejectionReason})</span>
+                                  <span className="ml-2 text-error-500 dark:text-error-300 italic">({uploadedDoc.rejectionReason})</span>
                                 )}
                               </>
                             )}

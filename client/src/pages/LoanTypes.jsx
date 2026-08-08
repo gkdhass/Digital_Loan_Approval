@@ -83,8 +83,8 @@ const LoanTypes = () => {
     return (
       <div className="container-custom py-8">
         <div className="max-w-md mx-auto text-center py-16">
-          <div className="h-16 w-16 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="h-8 w-8 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="h-16 w-16 bg-error-50 dark:bg-error-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="h-8 w-8 text-error-600 dark:text-error-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
           </div>
@@ -92,7 +92,7 @@ const LoanTypes = () => {
           <p className="text-foregroundSecondary mb-6">{error}</p>
           <button
             onClick={fetchLoanTypes}
-            className="px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
+            className="px-6 py-3 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-shadow"
           >
             Retry
           </button>
@@ -109,7 +109,7 @@ const LoanTypes = () => {
       className="container-custom py-8"
     >
       <div className="mb-12 text-center max-w-3xl mx-auto">
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground dark:text-surfaceDark mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground dark:text-foregroundDark mb-4">
           Choose Your Loan Type
         </h1>
         <p className="text-xl text-foregroundSecondary dark:text-foregroundSecondary">
@@ -152,7 +152,7 @@ const LoanTypes = () => {
                 </div>
               </div>
 
-              <h3 className="text-2xl font-bold text-foreground dark:text-surfaceDark mb-2">
+              <h3 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-2">
                 {loanType.name}
               </h3>
               <p className="text-foregroundSecondary dark:text-foregroundSecondary mb-4 line-clamp-2">
@@ -162,19 +162,19 @@ const LoanTypes = () => {
               <div className="space-y-2 mb-6">
                 <div className="flex justify-between text-sm">
                   <span className="text-foregroundSecondary dark:text-foregroundSecondary">Max Amount</span>
-                  <span className="font-semibold text-foreground dark:text-surfaceDark">
+                  <span className="font-semibold text-foreground dark:text-foregroundDark">
                     {formatCurrency(loanType.maxAmount)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-foregroundSecondary dark:text-foregroundSecondary">Min Income</span>
-                  <span className="font-semibold text-foreground dark:text-surfaceDark">
+                  <span className="font-semibold text-foreground dark:text-foregroundDark">
                     {formatCurrency(loanType.minIncome)}
                   </span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-foregroundSecondary dark:text-foregroundSecondary">Max Duration</span>
-                  <span className="font-semibold text-foreground dark:text-surfaceDark">
+                  <span className="font-semibold text-foreground dark:text-foregroundDark">
                     {loanType.maxDurationMonths} months
                   </span>
                 </div>

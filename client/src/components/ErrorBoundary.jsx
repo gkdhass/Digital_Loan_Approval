@@ -57,7 +57,7 @@ class ErrorBoundary extends Component {
             >
               <AlertTriangle
                 size={40}
-                style={{ color: '#EF4444' }}
+                style={{ color: '#DC2626' }}
               />
             </div>
 

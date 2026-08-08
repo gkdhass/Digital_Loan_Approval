@@ -81,7 +81,7 @@ const AdminUsers = () => {
           className="card mb-6"
         >
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-foregroundMuted dark:text-foregroundMutedDark" />
             <input
               type="text"
               placeholder="Search by name, email, or phone..."
@@ -124,22 +124,22 @@ const AdminUsers = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.05 }}
-                        className="border-b border-border100 hover:bg-gray-50 dark:hover:bg-cardSecondaryDark"
+                        className="border-b border-border hover:bg-input dark:hover:bg-cardSecondaryDark"
                       >
                         <td className="py-4 px-4">
                           <div>
                             <p className="font-semibold text-foreground">{user.fullName}</p>
-                            <p className="text-sm text-gray-600">{user.email}</p>
+                            <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{user.email}</p>
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">
                             <Phone size={14} />
                             {user.phone}
                           </div>
                         </td>
                         <td className="py-4 px-4">
-                          <div className="flex items-center gap-2 text-sm text-gray-600">
+                          <div className="flex items-center gap-2 text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">
                             <Calendar size={14} />
                             {new Date(user.createdAt).toLocaleDateString()}
                           </div>
@@ -149,7 +149,7 @@ const AdminUsers = () => {
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                             onClick={() => setDeleteConfirm(user._id)}
-                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                            className="p-2 text-error dark:text-errorDark hover:bg-errorBadge dark:hover:bg-errorDark/20 rounded-lg transition-colors"
                           >
                             <Trash2 size={18} />
                           </motion.button>
@@ -204,19 +204,19 @@ const AdminUsers = () => {
             onClick={(e) => e.stopPropagation()}
           >
             <h3 className="text-xl font-bold text-foreground mb-4">Delete User</h3>
-            <p className="text-gray-600 mb-6">
+            <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark mb-6">
               Are you sure you want to delete this user? This action cannot be undone.
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteConfirm(null)}
-                className="flex-1 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+                className="flex-1 px-4 py-2 bg-input dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={() => handleDelete(deleteConfirm)}
-                className="flex-1 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                className="flex-1 px-4 py-2 bg-error text-white rounded-lg hover:bg-errorDark transition-colors"
               >
                 Delete
               </button>

@@ -83,26 +83,26 @@ const Notifications = () => {
   const getNotificationIcon = (type) => {
     switch (type) {
       case 'success':
-        return <CheckCircle className="h-5 w-5 text-emerald-600" />;
+        return <CheckCircle className="h-5 w-5 text-success dark:text-successDark" />;
       case 'error':
-        return <AlertCircle className="h-5 w-5 text-red-600" />;
+        return <AlertCircle className="h-5 w-5 text-error dark:text-errorDark" />;
       case 'warning':
-        return <AlertTriangle className="h-5 w-5 text-amber-600" />;
+        return <AlertTriangle className="h-5 w-5 text-warning dark:text-warningDark" />;
       default:
-        return <Info className="h-5 w-5 text-blue-600" />;
+        return <Info className="h-5 w-5 text-accent dark:text-accentDarkMode" />;
     }
   };
 
   const getNotificationColor = (type) => {
     switch (type) {
       case 'success':
-        return 'bg-emerald-50 border-emerald-200';
+        return 'bg-successBadge border-successBorder dark:bg-successBadgeDark dark:border-successBorderDark';
       case 'error':
-        return 'bg-red-50 border-red-200';
+        return 'bg-errorBadge border-errorBorder dark:bg-errorBadgeDark dark:border-errorBorderDark';
       case 'warning':
-        return 'bg-amber-50 border-amber-200';
+        return 'bg-warningBadge border-warningBorder dark:bg-warningBadgeDark dark:border-warningBorderDark';
       default:
-        return 'bg-blue-50 border-blue-200';
+        return 'bg-accent-50 border-accent-200 dark:bg-accent-900/20 dark:border-accent-800';
     }
   };
 
@@ -113,14 +113,14 @@ const Notifications = () => {
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-cardDark rounded-lg transition-colors"
+        className="relative p-2 text-foregroundSecondary dark:text-foregroundSecondaryDark hover:bg-input dark:hover:bg-cardDark rounded-lg transition-colors"
       >
         <Bell className="h-5 w-5" />
         {unreadCount > 0 && (
           <motion.div
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
-            className="absolute -top-1 -right-1 h-5 w-5 bg-red-500 rounded-full flex items-center justify-center text-white text-xs font-bold"
+            className="absolute -top-1 -right-1 h-5 w-5 bg-error rounded-full flex items-center justify-center text-white text-xs font-bold"
           >
             {unreadCount > 9 ? '9+' : unreadCount}
           </motion.div>
@@ -143,7 +143,7 @@ const Notifications = () => {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               transition={{ duration: 0.15 }}
-              className="absolute right-0 mt-2 w-96 bg-white rounded-xl shadow-soft-lg border border-border z-50 max-h-[80vh] overflow-hidden"
+              className="absolute right-0 mt-2 w-96 bg-card dark:bg-cardDark rounded-xl shadow-soft-lg border border-border dark:border-borderDark z-50 max-h-[80vh] overflow-hidden"
             >
               {/* Header */}
               <div className="p-4 border-b border-border flex items-center justify-between">
@@ -153,7 +153,7 @@ const Notifications = () => {
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={markAllAsRead}
-                    className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+                    className="text-sm text-primary hover:text-primaryHover font-medium"
                   >
                     Mark all as read
                   </motion.button>
@@ -164,18 +164,18 @@ const Notifications = () => {
               <div className="overflow-y-auto max-h-96">
                 {notifications.length === 0 ? (
                   <div className="p-8 text-center">
-                    <Bell className="h-12 w-12 text-gray-300 mx-auto mb-3" />
-                    <p className="text-gray-600">No notifications</p>
+                    <Bell className="h-12 w-12 text-foregroundMuted dark:text-foregroundMutedDark mx-auto mb-3" />
+                    <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">No notifications</p>
                   </div>
                 ) : (
-                  <div className="divide-y divide-gray-100">
+                  <div className="divide-y divide-border dark:divide-borderDark">
                     {notifications.map((notification) => (
                       <motion.div
                         key={notification._id}
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className={`p-4 hover:bg-gray-50 dark:hover:bg-cardDark transition-colors ${
-                          !notification.isRead ? 'bg-blue-50/50' : ''
+                        className={`p-4 hover:bg-input dark:hover:bg-cardDark transition-colors ${
+                          !notification.isRead ? 'bg-cyan-50/50 dark:bg-cyan-900/20' : ''
                         }`}
                       >
                         <div className="flex gap-3">
@@ -188,10 +188,10 @@ const Notifications = () => {
                                 <p className="font-semibold text-foreground text-sm">
                                   {notification.title}
                                 </p>
-                                <p className="text-sm text-gray-600 mt-1 line-clamp-2">
+                                <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mt-1 line-clamp-2">
                                   {notification.message}
                                 </p>
-                                <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
+                                <p className="text-xs text-foregroundMuted dark:text-foregroundMutedDark mt-2 flex items-center gap-1">
                                   <Clock size={12} />
                                   {notification.createdAt ? formatDate(notification.createdAt) : 'N/A'}
                                 </p>
@@ -202,7 +202,7 @@ const Notifications = () => {
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
                                     onClick={() => markAsRead(notification._id)}
-                                    className="p-1 text-gray-400 hover:text-primary-600 transition-colors"
+                                    className="p-1 text-foregroundMuted dark:text-foregroundMutedDark hover:text-primary dark:hover:text-primaryDark transition-colors"
                                     title="Mark as read"
                                   >
                                     <Check size={14} />
@@ -212,7 +212,7 @@ const Notifications = () => {
                                   whileHover={{ scale: 1.1 }}
                                   whileTap={{ scale: 0.9 }}
                                   onClick={() => deleteNotification(notification._id)}
-                                  className="p-1 text-gray-400 hover:text-red-600 transition-colors"
+                                  className="p-1 text-foregroundMuted dark:text-foregroundMutedDark hover:text-error dark:hover:text-errorDark transition-colors"
                                   title="Delete"
                                 >
                                   <X size={14} />
@@ -227,20 +227,20 @@ const Notifications = () => {
                 )}
               </div>
 
-              {/* Footer */}
-              {notifications.length > 0 && (
-                <div className="p-4 border-t border-border">
-                  <button
-                    onClick={() => {
-                      setIsOpen(false);
-                      // Navigate to full notifications page if needed
-                    }}
-                    className="w-full text-center text-sm text-primary-600 hover:text-primary-700 font-medium"
-                  >
-                    View all notifications
-                  </button>
-                </div>
-              )}
+                {/* Footer */}
+                {notifications.length > 0 && (
+                  <div className="p-4 border-t border-border dark:border-borderDark">
+                    <button
+                      onClick={() => {
+                        setIsOpen(false);
+                        // Navigate to full notifications page if needed
+                      }}
+                      className="w-full text-center text-sm text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium"
+                    >
+                      View all notifications
+                    </button>
+                  </div>
+                )}
             </motion.div>
           </>
         )}

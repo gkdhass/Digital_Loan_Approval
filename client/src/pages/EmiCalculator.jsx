@@ -82,9 +82,9 @@ const EmiCalculator = () => {
     return (
       <div className="container-custom py-8">
         <div className="animate-pulse">
-          <div className="h-8 bg-gray-200 dark:bg-cardDark rounded w-1/3 mb-4" />
-          <div className="h-4 bg-gray-200 dark:bg-cardDark rounded w-1/4 mb-8" />
-          <div className="h-64 bg-gray-200 dark:bg-cardDark rounded-xl" />
+          <div className="h-8 bg-border dark:bg-cardDark rounded w-1/3 mb-4" />
+          <div className="h-4 bg-border dark:bg-cardDark rounded w-1/4 mb-8" />
+          <div className="h-64 bg-border dark:bg-cardDark rounded-xl" />
         </div>
       </div>
     );
@@ -103,11 +103,11 @@ const EmiCalculator = () => {
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ delay: 0.2 }}
-          className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-primary-600 to-primary-700 rounded-2xl mb-4 shadow-soft"
+          className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-primary to-primaryDark rounded-2xl mb-4 shadow-soft"
         >
           <Calculator className="h-8 w-8 text-white" />
         </motion.div>
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4">
+        <h1 className="text-4xl md:text-5xl font-bold text-foreground dark:text-foregroundDark mb-4">
           EMI Calculator
         </h1>
         <p className="text-xl text-foregroundSecondary max-w-2xl mx-auto">
@@ -123,7 +123,7 @@ const EmiCalculator = () => {
           animate="visible"
           className="card p-8"
         >
-          <h2 className="text-2xl font-bold text-foreground mb-6">Loan Parameters</h2>
+          <h2 className="text-2xl font-bold text-foreground dark:text-foregroundDark mb-6">Loan Parameters</h2>
 
           {/* Loan Type Selection */}
           <div className="mb-8">
@@ -152,7 +152,7 @@ const EmiCalculator = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-3">
               <label className="label mb-0">Loan Amount</label>
-              <span className="text-lg font-bold text-primary-600">
+              <span className="text-lg font-bold text-primary dark:text-primaryDark">
                 {formatCurrency(principal)}
               </span>
             </div>
@@ -163,7 +163,7 @@ const EmiCalculator = () => {
               step="10000"
               value={principal}
               onChange={handlePrincipalChange}
-              className="w-full h-2 bg-gray-200 dark:bg-cardDark rounded-lg appearance-none cursor-pointer primary-primary-600"
+              className="w-full h-2 bg-border dark:bg-cardDark rounded-lg appearance-none cursor-pointer primary-primary-600"
             />
             <div className="flex justify-between text-xs text-foregroundSecondary mt-1">
               <span>₹10,000</span>
@@ -175,7 +175,7 @@ const EmiCalculator = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-3">
               <label className="label mb-0">Interest Rate (p.a.)</label>
-              <span className="text-lg font-bold text-primary-600">
+              <span className="text-lg font-bold text-primary dark:text-primaryDark">
                 {interestRate}%
               </span>
             </div>
@@ -186,7 +186,7 @@ const EmiCalculator = () => {
               step="0.1"
               value={interestRate}
               onChange={(e) => setInterestRate(parseFloat(e.target.value))}
-              className="w-full h-2 bg-gray-200 dark:bg-cardDark rounded-lg appearance-none cursor-pointer primary-primary-600"
+              className="w-full h-2 bg-border dark:bg-cardDark rounded-lg appearance-none cursor-pointer primary-primary-600"
             />
             <div className="flex justify-between text-xs text-foregroundSecondary mt-1">
               <span>5%</span>
@@ -198,7 +198,7 @@ const EmiCalculator = () => {
           <div className="mb-8">
             <div className="flex justify-between items-center mb-3">
               <label className="label mb-0">Loan Tenure</label>
-              <span className="text-lg font-bold text-primary-600">
+              <span className="text-lg font-bold text-primary dark:text-primaryDark">
                 {duration} months
               </span>
             </div>
@@ -209,7 +209,7 @@ const EmiCalculator = () => {
               step="1"
               value={duration}
               onChange={handleDurationChange}
-              className="w-full h-2 bg-gray-200 dark:bg-cardDark rounded-lg appearance-none cursor-pointer primary-primary-600"
+              className="w-full h-2 bg-border dark:bg-cardDark rounded-lg appearance-none cursor-pointer primary-primary-600"
             />
             <div className="flex justify-between text-xs text-foregroundSecondary mt-1">
               <span>12 months</span>
@@ -226,7 +226,7 @@ const EmiCalculator = () => {
             initial="hidden"
             animate="visible"
             custom={1}
-            className="card p-8 bg-gradient-to-br from-primary-600 to-primary-700 text-white"
+            className="card p-8 bg-gradient-to-br from-primary to-primaryDark text-white"
           >
             <div className="flex items-center gap-3 mb-4">
               <Calculator className="h-6 w-6" />
@@ -255,7 +255,7 @@ const EmiCalculator = () => {
               className="card p-6"
             >
               <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="h-5 w-5 text-primary-600" />
+                <DollarSign className="h-5 w-5 text-primary dark:text-primaryDarkMode" />
                 <h4 className="text-sm font-semibold text-foregroundSecondary">Principal</h4>
               </div>
               <p className="text-2xl font-bold text-foreground">
@@ -271,10 +271,10 @@ const EmiCalculator = () => {
               className="card p-6"
             >
               <div className="flex items-center gap-2 mb-3">
-                <TrendingUp className="h-5 w-5 text-emerald-600" />
+                <TrendingUp className="h-5 w-5 text-success" />
                 <h4 className="text-sm font-semibold text-foregroundSecondary">Total Interest</h4>
               </div>
-              <p className="text-2xl font-bold text-emerald-600">
+              <p className="text-2xl font-bold text-success">
                 {formatCurrency(animatedInterest)}
               </p>
             </motion.div>
@@ -287,10 +287,10 @@ const EmiCalculator = () => {
               className="card p-6"
             >
               <div className="flex items-center gap-2 mb-3">
-                <PieChart className="h-5 w-5 text-purple-600" />
+                <PieChart className="h-5 w-5 text-secondary" />
                 <h4 className="text-sm font-semibold text-foregroundSecondary">Total Payable</h4>
               </div>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-2xl font-bold text-secondary">
                 {formatCurrency(animatedTotal)}
               </p>
             </motion.div>
@@ -303,10 +303,10 @@ const EmiCalculator = () => {
               className="card p-6"
             >
               <div className="flex items-center gap-2 mb-3">
-                <Clock className="h-5 w-5 text-amber-600" />
+                <Clock className="h-5 w-5 text-warning" />
                 <h4 className="text-sm font-semibold text-foregroundSecondary">Tenure</h4>
               </div>
-              <p className="text-2xl font-bold text-amber-600">
+              <p className="text-2xl font-bold text-warning">
                 {duration} months
               </p>
             </motion.div>
@@ -321,14 +321,14 @@ const EmiCalculator = () => {
             className="card p-6"
           >
             <h4 className="text-sm font-semibold text-foregroundSecondary mb-4">Interest to Principal Ratio</h4>
-            <div className="relative h-4 bg-gray-200 dark:bg-cardDark rounded-full overflow-hidden">
+            <div className="relative h-4 bg-border dark:bg-cardDark rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ 
                   width: `${(emiResult?.interestAmount / emiResult?.totalPayable * 100) || 0}%` 
                 }}
                 transition={{ duration: 0.8 }}
-                className="h-full bg-gradient-to-r from-primary-600 to-primary-700"
+                className="h-full bg-gradient-to-r from-primary to-primaryHover"
               />
             </div>
             <div className="flex justify-between mt-2 text-sm">
@@ -346,7 +346,7 @@ const EmiCalculator = () => {
           >
             <a
               href="/loan-types"
-              className="block w-full px-6 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
+              className="block w-full px-6 py-4 bg-gradient-to-r from-primary to-primaryHover text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all"
             >
               Apply for This Loan
             </a>

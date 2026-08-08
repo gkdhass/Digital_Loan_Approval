@@ -23,7 +23,7 @@ const LoadingSpinner = ({ size = 'md', text = '' }) => {
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-sm text-gray-600"
+          className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark"
         >
           {text}
         </motion.p>
