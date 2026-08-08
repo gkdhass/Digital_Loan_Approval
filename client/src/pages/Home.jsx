@@ -114,7 +114,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="inline-flex items-center gap-2 px-4 py-2 bg-secondary/10 border border-secondary/30 rounded-full text-foregroundSecondary text-sm font-medium mb-6"
+              className="inline-flex items-center gap-2 px-4 py-2 bg-white/15 backdrop-blur-md border border-white/30 rounded-full text-white text-sm font-medium mb-6"
             >
               <Award className="h-4 w-4" />
               <span>Trusted by 10,000+ customers</span>
@@ -131,7 +131,7 @@ const Home = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.6 }}
-                className="block bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent"
+                className="block bg-gradient-to-r from-accent to-accentHover bg-clip-text text-transparent"
               >
                 Our Priority
               </motion.span>
@@ -141,7 +141,7 @@ const Home = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
-              className="text-xl text-foregroundSecondary dark:text-foregroundSecondaryDark mb-8 leading-relaxed"
+              className="text-xl text-white/95 mb-8 leading-relaxed"
             >
               Experience hassle-free loan approvals with our digital platform. 
               From personal loans to home mortgages, we've got you covered.
@@ -160,7 +160,7 @@ const Home = () => {
                     boxShadow: '0 0 25px rgba(79, 70, 229, 0.5)'
                   }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-4 bg-primary hover:bg-primaryHover text-white rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all"
+                  className="px-8 py-4 bg-white text-primary rounded-xl font-semibold flex items-center gap-2 shadow-lg transition-all hover:shadow-xl"
                 >
                   Explore Loans
                   <ArrowRight className="h-5 w-5" />
