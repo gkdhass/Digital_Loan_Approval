@@ -29,8 +29,8 @@ const StatCard = ({ icon: Icon, label, value, color, delay = 0 }) => {
     >
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-sm text-foregroundSecondary mb-2">{label}</p>
-          <p className="text-3xl font-bold text-foreground">
+          <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-2">{label}</p>
+          <p className="text-3xl font-bold text-foreground dark:text-foregroundDark">
             {label.includes('Amount') || label.includes('Disbursed')
               ? `₹${(animatedValue / 100000).toFixed(1)}L`
               : animatedValue}
@@ -120,11 +120,11 @@ const AdminDashboard = () => {
   const COLORS = ['#16A34A', '#F59E0B', '#0E7490', '#DC2626', '#EAB308'];
 
   return (
-    <div className="min-h-screen bg-background py-8">
+    <div className="min-h-screen bg-background dark:bg-backgroundDark py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Admin Dashboard</h1>
-          <p className="text-foregroundSecondary">Overview of loan applications and system metrics</p>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">Admin Dashboard</h1>
+          <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Overview of loan applications and system metrics</p>
         </div>
 
         {/* Stats Grid */}
@@ -189,7 +189,7 @@ const AdminDashboard = () => {
             transition={{ delay: 0.7 }}
             className="card"
           >
-            <h2 className="text-xl font-bold text-foreground mb-6">Status Distribution</h2>
+            <h2 className="text-xl font-bold text-foreground dark:text-foregroundDark mb-6">Status Distribution</h2>
             {statusDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -223,7 +223,7 @@ const AdminDashboard = () => {
             transition={{ delay: 0.8 }}
             className="card"
           >
-            <h2 className="text-xl font-bold text-foreground mb-6">Loan Type Distribution</h2>
+            <h2 className="text-xl font-bold text-foreground dark:text-foregroundDark mb-6">Loan Type Distribution</h2>
             {loanTypeDistribution.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={loanTypeDistribution}>
@@ -247,8 +247,8 @@ const AdminDashboard = () => {
           className="card"
         >
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-bold text-foreground">Recent Applications</h2>
-            <Link to="/admin/applications" className="text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium">
+            <h2 className="text-xl font-bold text-foreground dark:text-foregroundDark">Recent Applications</h2>
+            <Link to="/admin/applications" className="text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium transition-colors duration-200">
               View All
             </Link>
           </div>
@@ -264,18 +264,18 @@ const AdminDashboard = () => {
                 <Link
                   key={app._id}
                   to={`/admin/applications/${app._id}`}
-                  className="block p-4 rounded-xl border border-border dark:border-borderDark hover:border-primary-500 hover:shadow-md transition-all"
+                  className="block p-4 rounded-xl border border-border dark:border-borderDark hover:border-primary dark:hover:border-primaryDark hover:shadow-md transition-all"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 bg-primary-100 rounded-xl flex items-center justify-center">
-                        <FileText className="text-primary dark:text-primaryDarkMode" size={20} />
+                      <div className="w-10 h-10 bg-primary/10 dark:bg-primaryDark/20 rounded-xl flex items-center justify-center">
+                        <FileText className="text-primary dark:text-primaryDark" size={20} />
                       </div>
                       <div>
-                        <p className="font-semibold text-foreground">
+                        <p className="font-semibold text-foreground dark:text-foregroundDark">
                           {app.user?.fullName}
                         </p>
-                        <p className="text-sm text-foregroundSecondary">
+                        <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">
                           {app.loanType?.name} • {app.applicationNumber}
                         </p>
                       </div>
@@ -283,10 +283,10 @@ const AdminDashboard = () => {
                     <StatusBadge status={app.status} />
                   </div>
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-foregroundSecondary">
+                    <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
                       ₹{app.loanAmount.toLocaleString()} • {app.durationMonths}m
                     </span>
-                    <span className="text-surface0 dark:text-surface0Dark">
+                    <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
                       {new Date(app.createdAt).toLocaleDateString()}
                     </span>
                   </div>

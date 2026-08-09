@@ -289,10 +289,10 @@ const LoanHistory = () => {
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                         onClick={() => downloadPDF(app._id, app.applicationNumber)}
-                        className="flex items-center gap-2 px-4 py-2 bg-secondary text-white rounded-lg hover:bg-background transition-colors whitespace-nowrap"
+                        className="flex items-center gap-2 px-4 py-2 bg-secondary dark:bg-secondaryDark text-white rounded-lg hover:bg-secondary/90 dark:hover:bg-secondaryDark/90 transition-colors duration-200 whitespace-nowrap"
                       >
-                        <Download size={16} />
-                        Download Agreement
+                        <Download size={16} className="flex-shrink-0" />
+                        <span>Download Agreement</span>
                       </motion.button>
                     )}
                   </div>

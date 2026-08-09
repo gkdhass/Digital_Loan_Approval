@@ -182,10 +182,10 @@ const LoanTypes = () => {
 
               <Link
                 to={isAuthenticated ? `/apply-loan/${loanType._id}` : '/login'}
-                className="block w-full px-4 py-3 bg-secondary hover:bg-background text-white rounded-xl font-semibold text-center hover:shadow-lg transition-all flex items-center justify-center gap-2"
+                className="block w-full px-4 py-3 bg-secondary dark:bg-secondaryDark text-white rounded-xl font-semibold text-center hover:bg-secondary/90 dark:hover:bg-secondaryDark/90 hover:shadow-lg transition-all duration-200 flex items-center justify-center gap-2"
               >
-                Apply Now
-                <ArrowRight className="h-4 w-4" />
+                <span>Apply Now</span>
+                <ArrowRight className="h-4 w-4 flex-shrink-0" />
               </Link>
             </motion.div>
           );

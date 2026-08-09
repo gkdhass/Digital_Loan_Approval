@@ -110,7 +110,7 @@ const Applications = () => {
         </div>
         <Link
           to="/loan-types"
-          className="px-6 py-3 bg-primary hover:bg-primaryHover text-white rounded-xl font-semibold hover:shadow-lg transition-all"
+          className="px-6 py-3 bg-primary dark:bg-primaryDark hover:bg-primaryHover dark:hover:bg-primaryHoverDark text-white rounded-xl font-semibold hover:shadow-lg transition-all duration-200"
         >
           New Application
         </Link>

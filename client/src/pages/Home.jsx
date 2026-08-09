@@ -307,7 +307,7 @@ const Home = () => {
                 variants={buttonVariants}
                 whileHover="hover"
                 whileTap="tap"
-                className="px-8 py-4 bg-secondary hover:bg-background rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all"
+                className="px-8 py-4 bg-secondary dark:bg-secondaryDark text-white hover:bg-secondary/90 dark:hover:bg-secondaryDark/90 rounded-xl font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-200"
               >
                 Apply Now
               </motion.button>
