@@ -814,18 +814,18 @@ const AdminApplicationDetail = () => {
               initial={{ scale: 0.95, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.95, opacity: 0 }}
-              className="bg-white rounded-2xl p-6 max-w-md w-full"
+              className="bg-white dark:bg-cardDark rounded-2xl p-6 max-w-md w-full shadow-xl"
               onClick={(e) => e.stopPropagation()}
             >
-              <h3 className="text-xl font-bold text-foreground mb-4">Update Application Status</h3>
+              <h3 className="text-xl font-bold text-foreground dark:text-foregroundDark mb-4">Update Application Status</h3>
               
               <div className="space-y-4 mb-6">
                 <div>
-                  <label className="label mb-2">Select Action</label>
+                  <label className="block text-sm font-semibold text-foreground dark:text-foregroundDark mb-2">Select Action</label>
                   <select
                     value={decisionType}
                     onChange={(e) => setDecisionType(e.target.value)}
-                    className="input-field"
+                    className="w-full px-4 py-2 bg-white dark:bg-cardElevatedDark border border-border dark:border-borderDark rounded-lg text-foreground dark:text-foregroundDark focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark transition-colors"
                   >
                     <option value="">Select an action</option>
                     <option value="under_review">Under Review</option>
@@ -837,11 +837,11 @@ const AdminApplicationDetail = () => {
                 </div>
                 
                 <div>
-                  <label className="label mb-2">Reason/Notes</label>
+                  <label className="block text-sm font-semibold text-foreground dark:text-foregroundDark mb-2">Reason/Notes</label>
                   <textarea
                     value={decisionReason}
                     onChange={(e) => setDecisionReason(e.target.value)}
-                    className="input-field"
+                    className="w-full px-4 py-2 bg-white dark:bg-cardElevatedDark border border-border dark:border-borderDark rounded-lg text-foreground dark:text-foregroundDark placeholder:text-foregroundMuted dark:placeholder:text-foregroundMutedDark focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark transition-colors resize-none"
                     rows="3"
                     placeholder="Add any notes or reasons for this decision..."
                   />
@@ -851,14 +851,14 @@ const AdminApplicationDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowDecisionModal(false)}
-                  className="flex-1 px-4 py-2 bg-input dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors"
+                  className="flex-1 px-4 py-2 bg-input dark:bg-cardElevatedDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors duration-200 font-medium"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDecision}
                   disabled={!decisionType}
-                  className="flex-1 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="flex-1 px-4 py-2 bg-primary dark:bg-primaryDark text-white rounded-lg hover:bg-primaryHover dark:hover:bg-primaryHoverDark disabled:opacity-50 disabled:cursor-not-allowed transition-colors duration-200 font-medium"
                 >
                   Update Status
                 </button>

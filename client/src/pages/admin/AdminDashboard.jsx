@@ -120,7 +120,7 @@ const AdminDashboard = () => {
   const COLORS = ['#16A34A', '#F59E0B', '#0E7490', '#DC2626', '#EAB308'];
 
   return (
-    <div className="min-h-screen bg-background dark:bg-backgroundDark py-8">
+    <div className="min-h-screen bg-background dark:bg-transparent py-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">Admin Dashboard</h1>

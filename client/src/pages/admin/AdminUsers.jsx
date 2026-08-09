@@ -65,7 +65,7 @@ const AdminUsers = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-background dark:bg-backgroundDark py-8"
+      className="min-h-screen bg-background dark:bg-transparent py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
