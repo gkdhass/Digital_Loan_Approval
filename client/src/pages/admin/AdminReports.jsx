@@ -152,19 +152,19 @@ const AdminReports = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-background py-8"
+      className="min-h-screen bg-background dark:bg-backgroundDark py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">Reports & Analytics</h1>
-            <p className="text-foregroundSecondary">Comprehensive insights into loan operations</p>
+            <h1 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">Reports & Analytics</h1>
+            <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Comprehensive insights into loan operations</p>
           </div>
           <div className="flex items-center gap-3">
             <select
               value={period}
               onChange={(e) => setPeriod(e.target.value)}
-              className="px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+              className="px-4 py-2 bg-white dark:bg-cardDark border border-border dark:border-borderDark rounded-lg text-foreground dark:text-foregroundDark focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark transition-colors duration-200"
             >
               <option value="1m">Last Month</option>
               <option value="3m">Last 3 Months</option>
@@ -175,7 +175,7 @@ const AdminReports = () => {
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handleExport}
-              className="flex items-center gap-2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-primary dark:bg-primaryDark text-white rounded-lg hover:bg-primaryHover dark:hover:bg-primaryHoverDark transition-colors duration-200"
             >
               <Download size={16} />
               Export
@@ -193,13 +193,13 @@ const AdminReports = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-foregroundSecondary mb-2">Total Applications</p>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-2">Total Applications</p>
+                <p className="text-3xl font-bold text-foreground dark:text-foregroundDark">
                   {applicationTrends.reduce((sum, t) => sum + (t.totalApplications || 0), 0)}
                 </p>
               </div>
               <div className="w-12 h-12 bg-cyan-100 dark:bg-cyan-900/30 rounded-xl flex items-center justify-center">
-                <FileText className="text-accent dark:text-accentDarkMode" size={24} />
+                <FileText className="text-primary dark:text-primaryDark" size={24} />
               </div>
             </div>
           </motion.div>
@@ -213,7 +213,7 @@ const AdminReports = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-foregroundSecondary mb-2">Approved Amount</p>
+                <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-2">Approved Amount</p>
                 <p className="text-3xl font-bold text-success dark:text-successDark">
                   ₹{(applicationTrends.reduce((sum, t) => sum + (t.approvedAmount || 0), 0) / 100000).toFixed(1)}L
                 </p>
@@ -233,8 +233,8 @@ const AdminReports = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-foregroundSecondary mb-2">Avg Processing Time</p>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-2">Avg Processing Time</p>
+                <p className="text-3xl font-bold text-foreground dark:text-foregroundDark">
                   {processingTimes.avgProcessingDays?.toFixed(1) || 0}d
                 </p>
               </div>
@@ -253,13 +253,13 @@ const AdminReports = () => {
           >
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-foregroundSecondary mb-2">Active Users</p>
-                <p className="text-3xl font-bold text-foreground">
+                <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark mb-2">Active Users</p>
+                <p className="text-3xl font-bold text-foreground dark:text-foregroundDark">
                   {topUsers.length}
                 </p>
               </div>
               <div className="w-12 h-12 bg-warningBadge dark:bg-warningBadgeDark rounded-xl flex items-center justify-center">
-                <Users className="text-warningText dark:text-warningTextDark" size={24} />
+                <Users className="text-warning dark:text-warningDark" size={24} />
               </div>
             </div>
           </motion.div>
@@ -275,17 +275,29 @@ const AdminReports = () => {
             custom={4}
             className="card"
           >
-            <h3 className="text-lg font-bold text-foreground mb-6">Application Trends</h3>
+            <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark mb-6">Application Trends</h3>
             {applicationTrends.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={applicationTrends}>
                   <XAxis 
                     dataKey="_id" 
-                    tickFormatter={(value) => `${value.month}/${value.year}`}
+                    tickFormatter={(value) => {
+                      // FIX: Handle undefined values and format properly
+                      if (!value || typeof value !== 'object') return 'N/A';
+                      const month = value.month || 'N/A';
+                      const year = value.year || 'N/A';
+                      return `${month}/${year}`;
+                    }}
                   />
                   <YAxis />
                   <Tooltip 
-                    labelFormatter={(value) => `Month: ${value.month}/${value.year}`}
+                    labelFormatter={(value) => {
+                      // FIX: Handle undefined values in tooltip
+                      if (!value || typeof value !== 'object') return 'Month: N/A';
+                      const month = value.month || 'N/A';
+                      const year = value.year || 'N/A';
+                      return `Month: ${month}/${year}`;
+                    }}
                     formatter={(value, name) => [value, name]}
                   />
                   <Bar dataKey="totalApplications" fill="#059669" name="Total" />
@@ -294,7 +306,7 @@ const AdminReports = () => {
                 </BarChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-center text-foregroundSecondary py-12">No data available</p>
+              <p className="text-center text-foregroundSecondary dark:text-foregroundSecondaryDark py-12">No data available</p>
             )}
           </motion.div>
 
@@ -306,7 +318,7 @@ const AdminReports = () => {
             custom={5}
             className="card"
           >
-            <h3 className="text-lg font-bold text-foreground mb-6">Loan Type Performance</h3>
+            <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark mb-6">Loan Type Performance</h3>
             {loanTypePerformance.length > 0 ? (
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
@@ -327,7 +339,7 @@ const AdminReports = () => {
                 </PieChart>
               </ResponsiveContainer>
             ) : (
-              <p className="text-center text-foregroundSecondary py-12">No data available</p>
+              <p className="text-center text-foregroundSecondary dark:text-foregroundSecondaryDark py-12">No data available</p>
             )}
           </motion.div>
         </div>
@@ -340,18 +352,18 @@ const AdminReports = () => {
           custom={6}
           className="card"
         >
-          <h3 className="text-lg font-bold text-foreground mb-6">Loan Type Breakdown</h3>
+          <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark mb-6">Loan Type Breakdown</h3>
           {loanTypePerformance.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-4 px-4 font-semibold text-foreground">Loan Type</th>
-                    <th className="text-right py-4 px-4 font-semibold text-foreground">Total</th>
-                    <th className="text-right py-4 px-4 font-semibold text-foreground">Approved</th>
-                    <th className="text-right py-4 px-4 font-semibold text-foreground">Rejected</th>
-                    <th className="text-right py-4 px-4 font-semibold text-foreground">Approval Rate</th>
-                    <th className="text-right py-4 px-4 font-semibold text-foreground">Avg Score</th>
+                  <tr className="border-b border-border dark:border-borderDark">
+                    <th className="text-left py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Loan Type</th>
+                    <th className="text-right py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Total</th>
+                    <th className="text-right py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Approved</th>
+                    <th className="text-right py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Rejected</th>
+                    <th className="text-right py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Approval Rate</th>
+                    <th className="text-right py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Avg Score</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -361,25 +373,25 @@ const AdminReports = () => {
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
-                      className="border-b border-border hover:bg-input dark:bg-cardSecondaryDark"
+                      className="border-b border-border dark:border-borderDark hover:bg-input dark:hover:bg-cardSecondaryDark transition-colors duration-200"
                     >
-                      <td className="py-4 px-4 font-medium text-foreground">{type._id}</td>
-                      <td className="py-4 px-4 text-right">{type.totalApplications}</td>
+                      <td className="py-4 px-4 font-medium text-foreground dark:text-foregroundDark">{type._id}</td>
+                      <td className="py-4 px-4 text-right text-foreground dark:text-foregroundDark">{type.totalApplications}</td>
                       <td className="py-4 px-4 text-right text-success dark:text-successDark">{type.approvedApplications}</td>
                       <td className="py-4 px-4 text-right text-error dark:text-errorDark">{type.rejectedApplications}</td>
                       <td className="py-4 px-4 text-right">
-                        <span className="px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-accent dark:text-accentDarkMode rounded-full text-sm font-medium">
+                        <span className="px-2 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-primary dark:text-primaryDark rounded-full text-sm font-medium">
                           {type.approvalRate.toFixed(1)}%
                         </span>
                       </td>
-                      <td className="py-4 px-4 text-right">{type.avgEligibilityScore}</td>
+                      <td className="py-4 px-4 text-right text-foreground dark:text-foregroundDark">{type.avgEligibilityScore}</td>
                     </motion.tr>
                   ))}
                 </tbody>
               </table>
             </div>
           ) : (
-            <p className="text-center text-foregroundSecondary py-12">No data available</p>
+            <p className="text-center text-foregroundSecondary dark:text-foregroundSecondaryDark py-12">No data available</p>
           )}
         </motion.div>
 
@@ -391,7 +403,7 @@ const AdminReports = () => {
           custom={7}
           className="card mt-6"
         >
-          <h3 className="text-lg font-bold text-foreground mb-6">Top Users by Applications</h3>
+          <h3 className="text-lg font-bold text-foreground dark:text-foregroundDark mb-6">Top Users by Applications</h3>
           {topUsers.length > 0 ? (
             <div className="space-y-4">
               {topUsers.map((user, index) => (
@@ -403,29 +415,29 @@ const AdminReports = () => {
                   className="flex items-center justify-between p-4 bg-input dark:bg-cardSecondaryDark rounded-xl"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center font-bold text-primary-700 dark:text-primary-300">
+                    <div className="w-10 h-10 bg-primary/10 dark:bg-primaryDark/30 rounded-full flex items-center justify-center font-bold text-primary dark:text-primaryDark">
                       {index + 1}
                     </div>
                     <div>
-                      <p className="font-semibold text-foreground">{user.fullName}</p>
+                      <p className="font-semibold text-foreground dark:text-foregroundDark">{user.fullName}</p>
                       <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{user.email}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-6">
                     <div className="text-right">
                       <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Applications</p>
-                      <p className="font-bold text-foreground">{user.applicationCount}</p>
+                      <p className="font-bold text-foreground dark:text-foregroundDark">{user.applicationCount}</p>
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">Total Amount</p>
-                      <p className="font-bold text-primary-700 dark:text-primary-300">₹{(user.totalAmount / 100000).toFixed(1)}L</p>
+                      <p className="font-bold text-primary dark:text-primaryDark">₹{(user.totalAmount / 100000).toFixed(1)}L</p>
                     </div>
                   </div>
                 </motion.div>
               ))}
             </div>
           ) : (
-            <p className="text-center text-foregroundSecondary py-12">No data available</p>
+            <p className="text-center text-foregroundSecondary dark:text-foregroundSecondaryDark py-12">No data available</p>
           )}
         </motion.div>
       </div>

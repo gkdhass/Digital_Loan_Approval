@@ -88,12 +88,12 @@ const AdminAuditLogs = () => {
       variants={pageVariants}
       initial="initial"
       animate="animate"
-      className="min-h-screen bg-background py-8"
+      className="min-h-screen bg-background dark:bg-backgroundDark py-8"
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-foreground mb-2">Audit Logs</h1>
-          <p className="text-foregroundSecondary">Track all system activities and changes</p>
+          <h1 className="text-3xl font-bold text-foreground dark:text-foregroundDark mb-2">Audit Logs</h1>
+          <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Track all system activities and changes</p>
         </div>
 
         {/* Search and Filters */}
@@ -111,7 +111,7 @@ const AdminAuditLogs = () => {
                 placeholder="Search by action..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                className="w-full pl-10 pr-4 py-2 bg-white dark:bg-cardDark border border-border dark:border-borderDark rounded-lg text-foreground dark:text-foregroundDark placeholder:text-foregroundMuted dark:placeholder:text-foregroundMutedDark focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark transition-colors duration-200"
               />
             </div>
 
@@ -119,12 +119,12 @@ const AdminAuditLogs = () => {
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center gap-2 px-4 py-2 bg-surface text-foreground rounded-lg hover:bg-border transition-colors"
+              className="flex items-center gap-2 px-4 py-2 bg-surface dark:bg-cardDark text-foreground dark:text-foregroundDark rounded-lg hover:bg-border dark:hover:bg-borderDark transition-colors duration-200"
             >
               <Filter size={16} />
               Filters
               {(actionFilter || entityFilter) && (
-                <span className="h-2 w-2 bg-primary-600 rounded-full" />
+                <span className="h-2 w-2 bg-primary dark:bg-primaryDark rounded-full" />
               )}
             </motion.button>
 
@@ -133,7 +133,7 @@ const AdminAuditLogs = () => {
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 onClick={clearFilters}
-                className="px-4 py-2 text-error-600 dark:text-error-400 hover:bg-error-50 dark:hover:bg-error-900/20 rounded-lg transition-colors"
+                className="px-4 py-2 text-error dark:text-errorDark hover:bg-errorBadge dark:hover:bg-errorDark/20 rounded-lg transition-colors duration-200"
               >
                 Clear
               </motion.button>
@@ -150,7 +150,7 @@ const AdminAuditLogs = () => {
                 <select
                   value={actionFilter}
                   onChange={(e) => setActionFilter(e.target.value)}
-                  className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="px-3 py-2 bg-white dark:bg-cardDark border border-border dark:border-borderDark rounded-lg text-sm text-foreground dark:text-foregroundDark focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark transition-colors duration-200"
                 >
                   <option value="">All Actions</option>
                   <option value="create">Create</option>
@@ -162,7 +162,7 @@ const AdminAuditLogs = () => {
                 <select
                   value={entityFilter}
                   onChange={(e) => setEntityFilter(e.target.value)}
-                  className="px-3 py-2 border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                  className="px-3 py-2 bg-white dark:bg-cardDark border border-border dark:border-borderDark rounded-lg text-sm text-foreground dark:text-foregroundDark focus:outline-none focus:ring-2 focus:ring-primary dark:focus:ring-primaryDark transition-colors duration-200"
                 >
                   <option value="">All Entities</option>
                   <option value="user">User</option>
@@ -193,11 +193,11 @@ const AdminAuditLogs = () => {
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-4 px-4 font-semibold text-foreground">User</th>
-                      <th className="text-left py-4 px-4 font-semibold text-foreground">Action</th>
-                      <th className="text-left py-4 px-4 font-semibold text-foreground">Entity</th>
-                      <th className="text-left py-4 px-4 font-semibold text-foreground">Timestamp</th>
+                    <tr className="border-b border-border dark:border-borderDark">
+                      <th className="text-left py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">User</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Action</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Entity</th>
+                      <th className="text-left py-4 px-4 font-semibold text-foreground dark:text-foregroundDark">Timestamp</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -207,12 +207,12 @@ const AdminAuditLogs = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: index * 0.02 }}
-                        className="border-b border-border hover:bg-input dark:hover:bg-cardSecondaryDark"
+                        className="border-b border-border dark:border-borderDark hover:bg-input dark:hover:bg-cardSecondaryDark transition-colors duration-200"
                       >
                         <td className="py-4 px-4">
                           <div className="flex items-center gap-2">
                             <User size={16} className="text-foregroundMuted dark:text-foregroundMutedDark" />
-                            <span className="font-medium text-foreground">
+                            <span className="font-medium text-foreground dark:text-foregroundDark">
                               {log.user?.fullName || 'System'}
                             </span>
                           </div>
@@ -242,22 +242,22 @@ const AdminAuditLogs = () => {
 
               {/* Pagination */}
               {totalPages > 1 && (
-                <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-border">
+                <div className="flex items-center justify-center gap-4 mt-6 pt-6 border-t border-border dark:border-borderDark">
                   <button
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
-                    className="btn-secondary flex items-center gap-2"
+                    className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <ChevronLeft size={16} />
                     Previous
                   </button>
-                  <span className="text-foregroundSecondary">
+                  <span className="text-foregroundSecondary dark:text-foregroundSecondaryDark">
                     Page {currentPage} of {totalPages}
                   </span>
                   <button
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
-                    className="btn-secondary flex items-center gap-2"
+                    className="btn-secondary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     Next
                     <ChevronRight size={16} />
