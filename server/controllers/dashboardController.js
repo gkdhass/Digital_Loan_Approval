@@ -87,13 +87,40 @@ exports.getUserDashboard = async (req, res, next) => {
 // @access  Private/Admin
 exports.getAdminDashboard = async (req, res, next) => {
   try {
+    console.log('=== ADMIN DASHBOARD STATS CALCULATION ===');
+    
     // Total counts
     const totalApplications = await LoanApplication.countDocuments();
+    console.log('[AdminDashboard] Total Applications:', totalApplications);
+    
     const totalUsers = await User.countDocuments({ role: 'customer' });
-    const pendingApplications = await LoanApplication.countDocuments({ status: 'submitted' });
-    const pendingDocuments = await Document.countDocuments({ status: 'pending' });
+    console.log('[AdminDashboard] Total Customers:', totalUsers);
+    
+    // Pending Review: includes 'submitted' and 'under_review' statuses
+    const pendingApplications = await LoanApplication.countDocuments({ 
+      status: { $in: ['submitted', 'under_review'] } 
+    });
+    console.log('[AdminDashboard] Pending Review (submitted + under_review):', pendingApplications);
+    
+    // Approved: counts ONLY applications currently in 'approved' status (not yet disbursed)
+    const approvedApplications = await LoanApplication.countDocuments({ status: 'approved' });
+    console.log('[AdminDashboard] Approved (current status = approved):', approvedApplications);
+    
+    // Rejected: counts applications with 'rejected' status
+    const rejectedApplications = await LoanApplication.countDocuments({ status: 'rejected' });
+    console.log('[AdminDashboard] Rejected:', rejectedApplications);
+    
+    // Disbursed count (for separate tracking)
+    const disbursedApplications = await LoanApplication.countDocuments({ status: 'disbursed' });
+    console.log('[AdminDashboard] Disbursed:', disbursedApplications);
+    
+    // Pending Documents: documents with 'pending' or 'submitted' status
+    const pendingDocuments = await Document.countDocuments({ 
+      status: { $in: ['pending', 'submitted'] } 
+    });
+    console.log('[AdminDashboard] Pending Documents:', pendingDocuments);
 
-    // Applications by status
+    // Applications by status - get ALL statuses for distribution
     const applicationsByStatus = await LoanApplication.aggregate([
       {
         $group: {
@@ -102,22 +129,32 @@ exports.getAdminDashboard = async (req, res, next) => {
         }
       }
     ]);
+    console.log('[AdminDashboard] Applications by status:', JSON.stringify(applicationsByStatus));
 
-    // Total loan amounts
+    // Total loan amounts with proper business logic
     const loanStats = await LoanApplication.aggregate([
       {
         $group: {
           _id: null,
           totalRequested: { $sum: '$loanAmount' },
+          // Total Approved Amount: sum of all approved + disbursed applications
           totalApproved: {
             $sum: { $cond: [{ $in: ['$status', ['approved', 'disbursed']] }, '$loanAmount', 0] }
           },
+          // Total Disbursed Amount: sum of only disbursed applications
           totalDisbursed: {
             $sum: { $cond: [{ $eq: ['$status', 'disbursed'] }, '$loanAmount', 0] }
           }
         }
       }
     ]);
+    
+    const stats = loanStats[0] || {
+      totalRequested: 0,
+      totalApproved: 0,
+      totalDisbursed: 0
+    };
+    console.log('[AdminDashboard] Loan Stats:', JSON.stringify(stats));
 
     // Recent applications
     const recentApplications = await LoanApplication.find()
@@ -125,6 +162,7 @@ exports.getAdminDashboard = async (req, res, next) => {
       .populate('loanType', 'name')
       .sort('-createdAt')
       .limit(10);
+    console.log('[AdminDashboard] Recent Applications Count:', recentApplications.length);
 
     // Applications by loan type
     const applicationsByLoanType = await LoanApplication.aggregate([
@@ -146,6 +184,7 @@ exports.getAdminDashboard = async (req, res, next) => {
       },
       { $sort: { count: -1 } }
     ]);
+    console.log('[AdminDashboard] Loan Type Distribution:', JSON.stringify(applicationsByLoanType));
 
     // Monthly trends (last 6 months)
     const sixMonthsAgo = new Date();
@@ -162,39 +201,41 @@ exports.getAdminDashboard = async (req, res, next) => {
           count: { $sum: 1 },
           totalAmount: { $sum: '$loanAmount' },
           approvedCount: {
-            $sum: { $cond: [{ $eq: ['$status', 'approved'] }, 1, 0] }
+            $sum: { $cond: [{ $in: ['$status', ['approved', 'disbursed']] }, 1, 0] }
           }
         }
       },
       { $sort: { '_id.year': 1, '_id.month': 1 } }
     ]);
 
+    const responseData = {
+      overview: {
+        totalApplications,
+        totalUsers,
+        pendingApplications, // submitted + under_review
+        approvedApplications, // only current status = approved
+        rejectedApplications,
+        pendingDocuments
+      },
+      loanStats: stats,
+      applicationsByStatus: applicationsByStatus.reduce((acc, curr) => {
+        acc[curr._id] = curr.count;
+        return acc;
+      }, {}),
+      applicationsByLoanType,
+      monthlyTrends,
+      recentApplications
+    };
+    
+    console.log('[AdminDashboard] Final Response Overview:', JSON.stringify(responseData.overview));
+    console.log('=== END ADMIN DASHBOARD STATS ===');
+
     res.json({
       success: true,
-      data: {
-        overview: {
-          totalApplications,
-          totalUsers,
-          pendingApplications,
-          pendingDocuments,
-          approvedApplications: applicationsByStatus.find(s => s._id === 'approved')?.count || 0,
-          rejectedApplications: applicationsByStatus.find(s => s._id === 'rejected')?.count || 0
-        },
-        loanStats: loanStats[0] || {
-          totalRequested: 0,
-          totalApproved: 0,
-          totalDisbursed: 0
-        },
-        applicationsByStatus: applicationsByStatus.reduce((acc, curr) => {
-          acc[curr._id] = curr.count;
-          return acc;
-        }, {}),
-        applicationsByLoanType,
-        monthlyTrends,
-        recentApplications
-      }
+      data: responseData
     });
   } catch (error) {
+    console.error('[AdminDashboard] ERROR:', error);
     next(error);
   }
 };
