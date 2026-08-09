@@ -22,7 +22,7 @@ const Toast = ({ message, type = 'info', onClose, duration = 5000 }) => {
     info: {
       icon: Info,
       className: 'bg-accent-50 text-accent-700 border-accent-200 dark:bg-accent-900/20 dark:text-accent-300 dark:border-accent-800',
-      iconColor: 'text-accent dark:text-accentDarkMode'
+      iconColor: 'text-accent dark:text-accentDark'
     }
   };
 

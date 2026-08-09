@@ -84,6 +84,17 @@
     @apply w-full px-4 py-3 bg-input dark:bg-inputDark border border-border dark:border-borderDark rounded-xl text-foreground dark:text-foregroundDark placeholder:text-foregroundMuted dark:placeholder:text-foregroundMutedDark focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200 dark:focus:ring-primaryDark dark:focus:border-primaryDark;
   }
 
+  /* Error state - must override focus states */
+  .input.input-error,
+  .input-field.input-error {
+    @apply border-error dark:border-errorDark;
+  }
+  
+  .input.input-error:focus,
+  .input-field.input-error:focus {
+    @apply ring-error border-error dark:ring-errorDark dark:border-errorDark;
+  }
+
   .input-error {
     @apply border-error focus:ring-error focus:border-error dark:border-errorDark dark:focus:ring-errorDark dark:focus:border-errorDark;
   }

@@ -204,7 +204,7 @@ const Dashboard = () => {
           initial="hidden"
           animate="visible"
           custom={1}
-          className="bg-gradient-to-br from-primary to-primaryDarkMode rounded-2xl p-6 text-white shadow-lg"
+          className="bg-gradient-to-br from-primary to-primaryDark rounded-2xl p-6 text-white shadow-lg"
         >
           <h3 className="text-lg font-bold mb-4">Quick Actions</h3>
           <div className="space-y-3">

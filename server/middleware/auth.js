@@ -37,9 +37,28 @@ const authenticate = async (req, res, next) => {
     next();
   } catch (error) {
     console.error('Auth middleware error:', error);
+    
+    // Handle specific JWT errors
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Session expired, please log in again',
+        errorCode: 'TOKEN_EXPIRED',
+      });
+    }
+    
+    if (error.name === 'JsonWebTokenError') {
+      return res.status(401).json({
+        success: false,
+        message: 'Invalid token, please log in again',
+        errorCode: 'TOKEN_INVALID',
+      });
+    }
+    
     return res.status(401).json({
       success: false,
       message: 'Not authorized, token failed',
+      errorCode: 'AUTH_FAILED',
     });
   }
 };

@@ -14,6 +14,7 @@ import ErrorBoundary from './components/ErrorBoundary';
 import SplashScreen from './components/SplashScreen';
 import AnimatedBackground from './components/AnimatedBackground';
 import CustomCursor from './components/CustomCursor';
+import withRouteErrorBoundary from './components/withRouteErrorBoundary';
 
 // Pages
 import Home from './pages/Home';
@@ -35,6 +36,26 @@ import AdminAuditLogs from './pages/admin/AdminAuditLogs';
 import AdminReports from './pages/admin/AdminReports';
 import AdminLoanTypes from './pages/admin/AdminLoanTypes';
 
+// Wrap pages with route-level error boundaries
+const HomeWithBoundary = withRouteErrorBoundary(Home, 'Home', '/');
+const LoginWithBoundary = withRouteErrorBoundary(Login, 'Login', '/');
+const RegisterWithBoundary = withRouteErrorBoundary(Register, 'Register', '/login');
+const DashboardWithBoundary = withRouteErrorBoundary(Dashboard, 'Dashboard', '/');
+const LoanTypesWithBoundary = withRouteErrorBoundary(LoanTypes, 'Loan Types', '/');
+const ApplyLoanWithBoundary = withRouteErrorBoundary(ApplyLoan, 'Apply for Loan', '/loan-types');
+const ApplicationsWithBoundary = withRouteErrorBoundary(Applications, 'Applications', '/dashboard');
+const ApplicationDetailWithBoundary = withRouteErrorBoundary(ApplicationDetail, 'Application Details', '/applications');
+const EmiCalculatorWithBoundary = withRouteErrorBoundary(EmiCalculator, 'EMI Calculator', '/');
+const LoanHistoryWithBoundary = withRouteErrorBoundary(LoanHistory, 'Loan History', '/dashboard');
+const ProfileWithBoundary = withRouteErrorBoundary(Profile, 'Profile', '/dashboard');
+const AdminDashboardWithBoundary = withRouteErrorBoundary(AdminDashboard, 'Admin Dashboard', '/admin/dashboard');
+const AdminApplicationsWithBoundary = withRouteErrorBoundary(AdminApplications, 'Admin Applications', '/admin/dashboard');
+const AdminApplicationDetailWithBoundary = withRouteErrorBoundary(AdminApplicationDetail, 'Admin Application Details', '/admin/applications');
+const AdminUsersWithBoundary = withRouteErrorBoundary(AdminUsers, 'User Management', '/admin/dashboard');
+const AdminAuditLogsWithBoundary = withRouteErrorBoundary(AdminAuditLogs, 'Audit Logs', '/admin/dashboard');
+const AdminReportsWithBoundary = withRouteErrorBoundary(AdminReports, 'Reports', '/admin/dashboard');
+const AdminLoanTypesWithBoundary = withRouteErrorBoundary(AdminLoanTypes, 'Loan Types Management', '/admin/dashboard');
+
 // Animated Routes Component
 function AnimatedRoutes() {
   const location = useLocation();
@@ -43,18 +64,18 @@ function AnimatedRoutes() {
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
         {/* Public Routes */}
-        <Route path="/" element={<Home />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/loan-types" element={<LoanTypes />} />
-        <Route path="/emi-calculator" element={<EmiCalculator />} />
+        <Route path="/" element={<HomeWithBoundary />} />
+        <Route path="/login" element={<LoginWithBoundary />} />
+        <Route path="/register" element={<RegisterWithBoundary />} />
+        <Route path="/loan-types" element={<LoanTypesWithBoundary />} />
+        <Route path="/emi-calculator" element={<EmiCalculatorWithBoundary />} />
 
         {/* Protected Customer Routes */}
         <Route
           path="/dashboard"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <DashboardWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -62,7 +83,7 @@ function AnimatedRoutes() {
           path="/apply-loan/:loanTypeId"
           element={
             <ProtectedRoute>
-              <ApplyLoan />
+              <ApplyLoanWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -70,7 +91,7 @@ function AnimatedRoutes() {
           path="/applications"
           element={
             <ProtectedRoute>
-              <Applications />
+              <ApplicationsWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -78,7 +99,7 @@ function AnimatedRoutes() {
           path="/applications/:id"
           element={
             <ProtectedRoute>
-              <ApplicationDetail />
+              <ApplicationDetailWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -86,7 +107,7 @@ function AnimatedRoutes() {
           path="/loan-history"
           element={
             <ProtectedRoute>
-              <LoanHistory />
+              <LoanHistoryWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -94,7 +115,7 @@ function AnimatedRoutes() {
           path="/profile"
           element={
             <ProtectedRoute>
-              <Profile />
+              <ProfileWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -104,7 +125,7 @@ function AnimatedRoutes() {
           path="/admin/dashboard"
           element={
             <ProtectedRoute adminOnly>
-              <AdminDashboard />
+              <AdminDashboardWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -112,7 +133,7 @@ function AnimatedRoutes() {
           path="/admin/applications"
           element={
             <ProtectedRoute adminOnly>
-              <AdminApplications />
+              <AdminApplicationsWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -120,7 +141,7 @@ function AnimatedRoutes() {
           path="/admin/applications/:id"
           element={
             <ProtectedRoute adminOnly>
-              <AdminApplicationDetail />
+              <AdminApplicationDetailWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -128,7 +149,7 @@ function AnimatedRoutes() {
           path="/admin/users"
           element={
             <ProtectedRoute adminOnly>
-              <AdminUsers />
+              <AdminUsersWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -136,7 +157,7 @@ function AnimatedRoutes() {
           path="/admin/audit-logs"
           element={
             <ProtectedRoute adminOnly>
-              <AdminAuditLogs />
+              <AdminAuditLogsWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -144,7 +165,7 @@ function AnimatedRoutes() {
           path="/admin/reports"
           element={
             <ProtectedRoute adminOnly>
-              <AdminReports />
+              <AdminReportsWithBoundary />
             </ProtectedRoute>
           }
         />
@@ -152,7 +173,7 @@ function AnimatedRoutes() {
           path="/admin/loan-types"
           element={
             <ProtectedRoute adminOnly>
-              <AdminLoanTypes />
+              <AdminLoanTypesWithBoundary />
             </ProtectedRoute>
           }
         />

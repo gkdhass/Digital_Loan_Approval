@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, AlertCircle, LogIn } from 'lucide-react';
@@ -14,12 +14,22 @@ const Login = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [selectedRole, setSelectedRole] = useState('customer'); // 'customer' or 'admin'
+  const [sessionMessage, setSessionMessage] = useState('');
 
   const { login, user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
   const from = location.state?.from?.pathname || (user?.role === 'admin' ? '/admin/dashboard' : '/dashboard');
+  
+  // Check for session expired message
+  useEffect(() => {
+    const authMessage = sessionStorage.getItem('authMessage');
+    if (authMessage) {
+      setSessionMessage(authMessage);
+      sessionStorage.removeItem('authMessage');
+    }
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -125,6 +135,17 @@ const Login = () => {
               </button>
             </div>
           </div>
+
+          {sessionMessage && (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="mb-6 p-4 bg-warningBadge text-warningText border border-warningBorder dark:bg-warningBadgeDark dark:text-warningTextDark dark:border-warningBorderDark rounded-xl flex items-start gap-3"
+            >
+              <AlertCircle className="h-5 w-5 text-warning dark:text-warningDark flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-warningText dark:text-warningTextDark">{sessionMessage}</p>
+            </motion.div>
+          )}
 
           {error && (
             <motion.div

@@ -255,7 +255,7 @@ const EmiCalculator = () => {
               className="card p-6"
             >
               <div className="flex items-center gap-2 mb-3">
-                <DollarSign className="h-5 w-5 text-primary dark:text-primaryDarkMode" />
+                <DollarSign className="h-5 w-5 text-primary dark:text-primaryDark" />
                 <h4 className="text-sm font-semibold text-foregroundSecondary">Principal</h4>
               </div>
               <p className="text-2xl font-bold text-foreground">

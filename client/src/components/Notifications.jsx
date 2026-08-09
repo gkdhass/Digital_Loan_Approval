@@ -103,7 +103,7 @@ const Notifications = () => {
       case 'warning':
         return <AlertTriangle className="h-5 w-5 text-warning dark:text-warningDark" />;
       default:
-        return <Info className="h-5 w-5 text-accent dark:text-accentDarkMode" />;
+        return <Info className="h-5 w-5 text-accent dark:text-accentDark" />;
     }
   };
 

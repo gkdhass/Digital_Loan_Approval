@@ -157,7 +157,7 @@ const LoanHistory = () => {
             placeholder="Search by application number, loan type, status, or date..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-backgroundDark border border-border dark:border-borderDark dark:border-foregroundDark rounded-xl text-foreground dark:text-foregroundDark placeholder:text-foregroundSecondary dark:placeholder:text-surface0 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
+            className="w-full pl-10 pr-4 py-3 bg-white dark:bg-cardDark border border-border dark:border-borderDark dark:border-foregroundDark rounded-xl text-foreground dark:text-foregroundDark placeholder:text-foregroundSecondary dark:placeholder:text-surface0 focus:outline-none focus:ring-2 focus:ring-secondary focus:border-secondary transition-all"
           />
           {searchQuery && (
             <button
@@ -275,7 +275,7 @@ const LoanHistory = () => {
                     )}
 
                     {app.adminNotes && (
-                      <div className="mt-4 p-4 bg-surface dark:bg-backgroundDark/30 rounded-lg">
+                      <div className="mt-4 p-4 bg-surface dark:bg-transparent rounded-lg">
                         <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondary mb-1">Admin Notes</p>
                         <p className="text-foreground dark:text-foregroundDark">{app.adminNotes}</p>
                       </div>

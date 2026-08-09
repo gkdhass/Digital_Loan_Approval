@@ -140,11 +140,27 @@ exports.uploadDocument = async (req, res, next) => {
  * @param {string} registeredName - User's registered name
  */
 async function processDocumentOCR(documentId, fileBuffer, fileName, documentType, registeredName) {
+  const OCR_PROCESSING_TIMEOUT = 5 * 60 * 1000; // 5 minutes
+  let timeoutId;
+  
   try {
     console.log(`🔍 Starting OCR verification for document ${documentId}`);
 
-    // Call OCR service
-    const ocrResult = await verifyDocumentOCR(fileBuffer, fileName, documentType, registeredName);
+    // Set a timeout to fallback to manual review if OCR takes too long
+    const timeoutPromise = new Promise((_, reject) => {
+      timeoutId = setTimeout(() => {
+        reject(new Error('OCR processing timeout - fallback to manual review'));
+      }, OCR_PROCESSING_TIMEOUT);
+    });
+
+    // Race between OCR processing and timeout
+    const ocrResult = await Promise.race([
+      verifyDocumentOCR(fileBuffer, fileName, documentType, registeredName),
+      timeoutPromise
+    ]);
+
+    // Clear timeout if OCR completed successfully
+    clearTimeout(timeoutId);
 
     // Update document with OCR results
     const document = await Document.findById(documentId);
@@ -169,16 +185,55 @@ async function processDocumentOCR(documentId, fileBuffer, fileName, documentType
     console.log(`✅ OCR verification completed for document ${documentId}`);
     console.log(`   Status: ${document.ocrVerification?.ocrStatus || 'N/A'}`);
   } catch (error) {
+    clearTimeout(timeoutId);
     console.error('❌ Error processing OCR:', error.message);
     
-    // Update document with failed status
+    // Update document with manual review required status
     try {
-      await Document.findByIdAndUpdate(documentId, {
-        $set: {
-          'ocrVerification.ocrStatus': 'failed',
-          'ocrVerification.processedAt': new Date(),
-        },
-      });
+      const document = await Document.findById(documentId);
+      if (!document) {
+        console.error('Document not found for OCR error update:', documentId);
+        return;
+      }
+
+      // Check if this is a timeout error
+      const isTimeout = error.message.includes('timeout');
+      
+      if (isTimeout) {
+        console.warn(`⏱️  OCR timeout for document ${documentId} - marking for manual review`);
+        
+        document.ocrVerification = {
+          ...document.ocrVerification,
+          ocrStatus: 'manual_review_required',
+          processedAt: new Date(),
+          errorMessage: 'OCR processing took too long. Document requires manual admin review.',
+        };
+        
+        // Set document verification status to pending so admin knows to review
+        document.verificationStatus = 'pending';
+        
+        await document.save();
+        
+        // Create notification for admin
+        await Notification.create({
+          user: document.user,
+          document: document._id,
+          application: document.application,
+          title: 'Document Under Manual Review',
+          message: `Your document "${document.fileName}" is being reviewed by our team. This typically takes 1-2 business days.`,
+          type: 'info',
+        });
+      } else {
+        // Regular OCR failure
+        document.ocrVerification = {
+          ...document.ocrVerification,
+          ocrStatus: 'failed',
+          processedAt: new Date(),
+          errorMessage: error.message,
+        };
+        
+        await document.save();
+      }
     } catch (updateError) {
       console.error('Failed to update document with OCR error status:', updateError.message);
     }
@@ -211,8 +266,8 @@ exports.getApplicationDocuments = async (req, res, next) => {
     const documents = await Document.find({ application: applicationId })
       .sort('-uploadedAt');
 
-    // Auto-fail OCR for documents stuck in 'pending' for more than 60 seconds
-    const OCR_TIMEOUT_MS = 60 * 1000; // 60 seconds
+    // Auto-fail OCR for documents stuck in 'pending' for more than the timeout threshold
+    const OCR_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
     const now = new Date();
     
     for (const doc of documents) {
@@ -221,18 +276,44 @@ exports.getApplicationDocuments = async (req, res, next) => {
         const timeSinceUpload = now - uploadedAt;
         
         if (timeSinceUpload > OCR_TIMEOUT_MS) {
-          console.log(`⏱️  Auto-failing OCR for document ${doc._id} (stuck for ${Math.floor(timeSinceUpload / 1000)}s)`);
+          console.warn(`⏱️  OCR timeout detected for document ${doc._id} (stuck for ${Math.floor(timeSinceUpload / 1000)}s)`);
+          console.warn(`   Marking document as requiring manual review`);
           
-          await Document.findByIdAndUpdate(doc._id, {
-            $set: {
-              'ocrVerification.ocrStatus': 'failed',
-              'ocrVerification.processedAt': new Date(),
+          const updatedDoc = await Document.findByIdAndUpdate(
+            doc._id,
+            {
+              $set: {
+                'ocrVerification.ocrStatus': 'manual_review_required',
+                'ocrVerification.processedAt': new Date(),
+                'ocrVerification.errorMessage': 'OCR processing exceeded time limit. Document requires manual admin review.',
+                'verificationStatus': 'pending',
+              },
             },
+            { new: true }
+          );
+          
+          // Update local document object to reflect changes
+          Object.assign(doc, updatedDoc.toObject());
+          
+          // Create notification for user (only once)
+          const existingNotification = await Notification.findOne({
+            user: doc.user,
+            document: doc._id,
+            title: 'Document Under Manual Review',
           });
           
-          // Update local document object
-          doc.ocrVerification.ocrStatus = 'failed';
-          doc.ocrVerification.processedAt = new Date();
+          if (!existingNotification) {
+            await Notification.create({
+              user: doc.user,
+              document: doc._id,
+              application: doc.application,
+              title: 'Document Under Manual Review',
+              message: `Your document "${doc.fileName}" is being reviewed by our team. This typically takes 1-2 business days.`,
+              type: 'info',
+            });
+            
+            console.log(`   Created user notification for manual review`);
+          }
         }
       }
     }

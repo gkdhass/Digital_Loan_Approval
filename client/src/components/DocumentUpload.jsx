@@ -182,7 +182,7 @@ const DocumentUpload = ({
               exit={{ opacity: 0 }}
               className="space-y-4"
             >
-              <Loader2 className="h-12 w-12 text-primary dark:text-primaryDarkMode mx-auto animate-spin" />
+              <Loader2 className="h-12 w-12 text-primary dark:text-primaryDark mx-auto animate-spin" />
               <div>
                 <p className="font-semibold text-foreground dark:text-foregroundDark">Uploading...</p>
                 <p className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">{uploadProgress}%</p>

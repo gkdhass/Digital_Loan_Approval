@@ -213,7 +213,7 @@ const EligibilityScore = ({ eligibilityScore }) => {
 
       {/* Weight Information */}
       <div className="mt-4 p-3 bg-accent-50 dark:bg-accent-900/20 border border-accent-200 dark:border-accent-800 rounded-lg">
-        <p className="text-xs text-accent dark:text-accentDarkMode">
+        <p className="text-xs text-accent dark:text-accentDark">
           <strong>Scoring Weights:</strong> Income (40%), Employment Stability (30%), Debt-to-Income Ratio (30%)
         </p>
       </div>

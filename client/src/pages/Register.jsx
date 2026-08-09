@@ -15,31 +15,133 @@ const Register = () => {
     confirmPassword: ''
   });
   const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
   const { register } = useAuth();
   const navigate = useNavigate();
 
+  const validateField = (name, value) => {
+    const errors = { ...fieldErrors };
+    
+    switch (name) {
+      case 'fullName':
+        if (value.trim().length < 3) {
+          errors.fullName = 'Name must be at least 3 characters';
+        } else if (!/^[a-zA-Z\s]+$/.test(value)) {
+          errors.fullName = 'Name can only contain letters and spaces';
+        } else {
+          delete errors.fullName;
+        }
+        break;
+        
+      case 'email':
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+          errors.email = 'Please enter a valid email address';
+        } else {
+          delete errors.email;
+        }
+        break;
+        
+      case 'phone':
+        const cleanPhone = value.replace(/\D/g, '');
+        if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+          errors.phone = 'Please enter a valid 10-digit Indian mobile number (starting with 6-9)';
+        } else {
+          delete errors.phone;
+        }
+        break;
+        
+      case 'password':
+        if (value.length < 6) {
+          errors.password = 'Password must be at least 6 characters';
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+          errors.password = 'Password must contain uppercase, lowercase and number';
+        } else {
+          delete errors.password;
+        }
+        
+        // Also validate confirmPassword if it's already filled
+        if (formData.confirmPassword && value !== formData.confirmPassword) {
+          errors.confirmPassword = 'Passwords do not match';
+        } else if (formData.confirmPassword) {
+          delete errors.confirmPassword;
+        }
+        break;
+        
+      case 'confirmPassword':
+        if (value !== formData.password) {
+          errors.confirmPassword = 'Passwords do not match';
+        } else {
+          delete errors.confirmPassword;
+        }
+        break;
+    }
+    
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
   const handleChange = (e) => {
+    const { name, value } = e.target;
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
     setError('');
+    
+    // Validate field on change (debounced effect would be better in production)
+    if (value) {
+      validateField(name, value);
+    } else {
+      const errors = { ...fieldErrors };
+      delete errors[name];
+      setFieldErrors(errors);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    // Validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      return;
+    // Validate all fields before submission
+    const newErrors = {};
+    
+    // Full Name
+    if (formData.fullName.trim().length < 3) {
+      newErrors.fullName = 'Name must be at least 3 characters';
+    } else if (!/^[a-zA-Z\s]+$/.test(formData.fullName)) {
+      newErrors.fullName = 'Name can only contain letters and spaces';
     }
-
+    
+    // Email
+    if (!formData.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+    }
+    
+    // Phone
+    const cleanPhone = formData.phone.replace(/\D/g, '');
+    if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+      newErrors.phone = 'Please enter a valid 10-digit Indian mobile number (starting with 6-9)';
+    }
+    
+    // Password
     if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
+      newErrors.password = 'Password must be at least 6 characters';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase and number';
+    }
+    
+    // Confirm Password
+    if (formData.confirmPassword !== formData.password) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+    
+    // Set all errors at once
+    setFieldErrors(newErrors);
+    
+    if (Object.keys(newErrors).length > 0) {
+      setError('Please fix the errors below before submitting');
       return;
     }
 
@@ -71,7 +173,7 @@ const Register = () => {
           transition={{ delay: 0.2 }}
           className="text-center mb-8"
         >
-          <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-primary to-primaryDarkMode rounded-2xl mb-4 shadow-soft">
+          <div className="inline-flex items-center justify-center h-16 w-16 bg-gradient-to-br from-primary to-primaryDark rounded-2xl mb-4 shadow-soft">
             <UserPlus className="h-8 w-8 text-white" />
           </div>
           <h2 className="text-3xl font-bold text-foreground mb-2">
@@ -112,10 +214,13 @@ const Register = () => {
                   value={formData.fullName}
                   onChange={handleChange}
                   required
-                  className="input pl-11"
+                  className={`input pl-11 ${fieldErrors.fullName ? 'input-error' : ''}`}
                   placeholder="John Doe"
                 />
               </div>
+              {fieldErrors.fullName && (
+                <p className="text-error dark:text-errorDark text-sm mt-1">{fieldErrors.fullName}</p>
+              )}
             </div>
 
             <div>
@@ -130,10 +235,13 @@ const Register = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="input pl-11"
+                  className={`input pl-11 ${fieldErrors.email ? 'input-error' : ''}`}
                   placeholder="you@example.com"
                 />
               </div>
+              {fieldErrors.email && (
+                <p className="text-error dark:text-errorDark text-sm mt-1">{fieldErrors.email}</p>
+              )}
             </div>
 
             <div>
@@ -148,10 +256,16 @@ const Register = () => {
                   value={formData.phone}
                   onChange={handleChange}
                   required
-                  className="input pl-11"
-                  placeholder="+91 98765 43210"
+                  className={`input pl-11 ${fieldErrors.phone ? 'input-error' : ''}`}
+                  placeholder="9876543210"
                 />
               </div>
+              {fieldErrors.phone && (
+                <p className="text-error dark:text-errorDark text-sm mt-1">{fieldErrors.phone}</p>
+              )}
+              <p className="text-xs text-foregroundMuted dark:text-foregroundMutedDark mt-1">
+                Enter 10-digit mobile number (no country code needed)
+              </p>
             </div>
 
             <div>
@@ -166,11 +280,14 @@ const Register = () => {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className="input pl-11"
+                  className={`input pl-11 ${fieldErrors.password ? 'input-error' : ''}`}
                   placeholder="••••••••"
                   minLength={6}
                 />
               </div>
+              {fieldErrors.password && (
+                <p className="text-error dark:text-errorDark text-sm mt-1">{fieldErrors.password}</p>
+              )}
             </div>
 
             <div>
@@ -185,25 +302,28 @@ const Register = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  className="input pl-11"
+                  className={`input pl-11 ${fieldErrors.confirmPassword ? 'input-error' : ''}`}
                   placeholder="••••••••"
                 />
               </div>
+              {fieldErrors.confirmPassword && (
+                <p className="text-error dark:text-errorDark text-sm mt-1">{fieldErrors.confirmPassword}</p>
+              )}
             </div>
 
             <div className="flex items-start gap-2">
               <input
                 type="checkbox"
                 required
-                className="mt-1 rounded border-border300 text-primary dark:text-primaryDarkMode focus:ring-primary"
+                className="mt-1 rounded border-border300 text-primary dark:text-primaryDark focus:ring-primary"
               />
               <label className="text-sm text-foregroundSecondary dark:text-foregroundSecondaryDark">
                 I agree to the{' '}
-                <Link to="/terms" className="text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium">
+                <Link to="/terms" className="text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium">
                   Terms of Service
                 </Link>{' '}
                 and{' '}
-                <Link to="/privacy" className="text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium">
+                <Link to="/privacy" className="text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-medium">
                   Privacy Policy
                 </Link>
               </label>
@@ -226,7 +346,7 @@ const Register = () => {
               Already have an account?{' '}
               <Link
                 to="/login"
-                className="text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark font-semibold"
+                className="text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark font-semibold"
               >
                 Sign in
               </Link>

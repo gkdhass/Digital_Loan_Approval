@@ -188,7 +188,7 @@ const Home = () => {
       </section>
 
       {/* Features Section */}
-      <section className="py-20 bg-white dark:bg-backgroundDark">
+      <section className="py-20 bg-white dark:bg-transparent">
         <div className="container-custom">
           <motion.div
             variants={staggerContainer}
@@ -239,7 +239,7 @@ const Home = () => {
       </section>
 
       {/* How It Works Section */}
-      <section className="py-20 bg-surface dark:bg-backgroundDark">
+      <section className="py-20 bg-surface dark:bg-transparent">
         <div className="container-custom">
           <motion.div
             variants={staggerContainer}

@@ -217,7 +217,7 @@ const AdminApplicationDetail = () => {
             <p className="text-foregroundSecondary dark:text-foregroundSecondaryDark">Application not found</p>
             <Link
               to="/admin/applications"
-              className="inline-flex items-center gap-2 mt-4 text-primary dark:text-primaryDarkMode hover:text-primaryHover dark:hover:text-primaryHoverDark"
+              className="inline-flex items-center gap-2 mt-4 text-primary dark:text-primaryDark hover:text-primaryHover dark:hover:text-primaryHoverDark"
             >
               <ArrowLeft size={16} />
               Back to Applications
@@ -546,7 +546,7 @@ const AdminApplicationDetail = () => {
                         fetchDocuments().finally(() => setRefreshingDocs(false));
                       }}
                       disabled={refreshingDocs}
-                      className="flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-cyan-900/20 text-accent dark:text-accentDarkMode rounded-lg text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 disabled:opacity-50"
+                      className="flex items-center gap-2 px-3 py-1.5 bg-cyan-50 dark:bg-cyan-900/20 text-accent dark:text-accentDark rounded-lg text-sm font-medium hover:bg-cyan-100 dark:hover:bg-cyan-900/30 disabled:opacity-50"
                     >
                       <motion.div
                         animate={{ rotate: refreshingDocs ? 360 : 0 }}
@@ -592,7 +592,7 @@ const AdminApplicationDetail = () => {
                               href={doc.fileUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-accent dark:text-accentDarkMode rounded-lg text-sm font-medium hover:bg-cyan-200 dark:hover:bg-cyan-900/40 flex items-center gap-1"
+                              className="px-3 py-1 bg-cyan-100 dark:bg-cyan-900/30 text-accent dark:text-accentDark rounded-lg text-sm font-medium hover:bg-cyan-200 dark:hover:bg-cyan-900/40 flex items-center gap-1"
                             >
                               <Download size={14} />
                               View

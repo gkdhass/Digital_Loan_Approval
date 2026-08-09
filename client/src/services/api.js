@@ -36,8 +36,30 @@ api.interceptors.response.use(
     return response.data;
   },
   (error) => {
-    // Don't auto-redirect on 401 - let components handle auth errors
-    // The ProtectedRoute already handles authentication state
+    // Handle token expiry
+    if (error.response?.status === 401) {
+      const errorCode = error.response?.data?.errorCode;
+      
+      if (errorCode === 'TOKEN_EXPIRED' || errorCode === 'TOKEN_INVALID') {
+        // Clear local storage
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        
+        // Show user-friendly message
+        const message = error.response?.data?.message || 'Session expired, please log in again';
+        
+        // Store the message for display on login page
+        sessionStorage.setItem('authMessage', message);
+        
+        // Redirect to login page
+        window.location.href = '/login';
+        
+        // Return a custom error to prevent further processing
+        return Promise.reject(new Error(message));
+      }
+    }
+    
+    // For other errors, pass them through
     return Promise.reject(error);
   }
 );

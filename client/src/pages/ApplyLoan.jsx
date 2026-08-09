@@ -47,6 +47,8 @@ const ApplyLoan = () => {
       monthlyIncome: '',
     },
   });
+  
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const steps = [
     { title: 'Loan Details', icon: FileText },
@@ -250,6 +252,76 @@ const ApplyLoan = () => {
     }
   };
 
+  const validateField = (name, value) => {
+    const errors = { ...fieldErrors };
+    
+    if (name === 'loanAmount') {
+      const amount = parseFloat(value);
+      const selectedType = loanTypes.find((lt) => lt._id === formData.loanType);
+      
+      if (!value || isNaN(amount)) {
+        errors.loanAmount = 'Please enter a valid loan amount';
+      } else if (selectedType && amount < selectedType.minAmount) {
+        errors.loanAmount = `Minimum loan amount is ₹${selectedType.minAmount.toLocaleString()}`;
+      } else if (selectedType && amount > selectedType.maxAmount) {
+        errors.loanAmount = `Maximum loan amount is ₹${selectedType.maxAmount.toLocaleString()}`;
+      } else {
+        delete errors.loanAmount;
+      }
+    } else if (name === 'durationMonths') {
+      const months = parseInt(value);
+      const selectedType = loanTypes.find((lt) => lt._id === formData.loanType);
+      
+      if (!value || isNaN(months)) {
+        errors.durationMonths = 'Please enter a valid duration';
+      } else if (selectedType && months < selectedType.minDuration) {
+        errors.durationMonths = `Minimum duration is ${selectedType.minDuration} months`;
+      } else if (selectedType && months > selectedType.maxDuration) {
+        errors.durationMonths = `Maximum duration is ${selectedType.maxDuration} months`;
+      } else {
+        delete errors.durationMonths;
+      }
+    } else if (name === 'purpose') {
+      if (!value || value.trim().length < 10) {
+        errors.purpose = 'Purpose must be at least 10 characters';
+      } else {
+        delete errors.purpose;
+      }
+    } else if (name === 'employment.companyName') {
+      if (!value || value.trim().length < 2) {
+        errors.companyName = 'Company name is required';
+      } else {
+        delete errors.companyName;
+      }
+    } else if (name === 'employment.designation') {
+      if (!value || value.trim().length < 2) {
+        errors.designation = 'Designation is required';
+      } else {
+        delete errors.designation;
+      }
+    } else if (name === 'employment.workExperienceYears') {
+      const years = parseFloat(value);
+      if (!value || isNaN(years) || years < 0) {
+        errors.workExperienceYears = 'Please enter valid work experience';
+      } else if (years > 50) {
+        errors.workExperienceYears = 'Work experience seems too high';
+      } else {
+        delete errors.workExperienceYears;
+      }
+    } else if (name === 'employment.monthlyIncome') {
+      const income = parseFloat(value);
+      if (!value || isNaN(income) || income <= 0) {
+        errors.monthlyIncome = 'Please enter a valid monthly income';
+      } else if (income < 5000) {
+        errors.monthlyIncome = 'Monthly income must be at least ₹5,000';
+      } else {
+        delete errors.monthlyIncome;
+      }
+    }
+    
+    setFieldErrors(errors);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.startsWith('employment.')) {
@@ -261,8 +333,10 @@ const ApplyLoan = () => {
           [field]: value,
         },
       });
+      validateField(name, value);
     } else {
       setFormData({ ...formData, [name]: value });
+      validateField(name, value);
     }
   };
 
@@ -312,7 +386,7 @@ const ApplyLoan = () => {
   };
 
   return (
-    <div className="min-h-screen bg-surface dark:bg-backgroundDark py-12">
+    <div className="min-h-screen bg-surface dark:bg-transparent py-12">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Progress Indicator */}
         <div className="mb-8">
@@ -396,14 +470,17 @@ const ApplyLoan = () => {
                       name="loanAmount"
                       value={formData.loanAmount}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.loanAmount ? 'border-error' : ''}`}
                       placeholder="500000"
                       required
                     />
-                    {selectedLoanType && (
+                    {selectedLoanType && !fieldErrors.loanAmount && (
                       <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-1">
                         Max: ₹{selectedLoanType.maxAmount.toLocaleString()}
                       </p>
+                    )}
+                    {fieldErrors.loanAmount && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.loanAmount}</p>
                     )}
                   </div>
 
@@ -414,14 +491,17 @@ const ApplyLoan = () => {
                       name="durationMonths"
                       value={formData.durationMonths}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.durationMonths ? 'border-error' : ''}`}
                       placeholder="12"
                       required
                     />
-                    {selectedLoanType && (
+                    {selectedLoanType && !fieldErrors.durationMonths && (
                       <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-1">
                         Max: {selectedLoanType.maxDurationMonths} months
                       </p>
+                    )}
+                    {fieldErrors.durationMonths && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.durationMonths}</p>
                     )}
                   </div>
 
@@ -431,11 +511,14 @@ const ApplyLoan = () => {
                       name="purpose"
                       value={formData.purpose}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.purpose ? 'border-error' : ''}`}
                       rows="3"
-                      placeholder="Describe the purpose of this loan"
+                      placeholder="Describe the purpose of this loan (at least 10 characters)"
                       required
                     />
+                    {fieldErrors.purpose && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.purpose}</p>
+                    )}
                   </div>
 
                   {emiCalculation && (
@@ -511,9 +594,12 @@ const ApplyLoan = () => {
                       name="employment.companyName"
                       value={formData.employmentDetails.companyName}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.companyName ? 'border-error' : ''}`}
                       required
                     />
+                    {fieldErrors.companyName && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.companyName}</p>
+                    )}
                   </div>
 
                   <div>
@@ -523,9 +609,12 @@ const ApplyLoan = () => {
                       name="employment.designation"
                       value={formData.employmentDetails.designation}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.designation ? 'border-error' : ''}`}
                       required
                     />
+                    {fieldErrors.designation && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.designation}</p>
+                    )}
                   </div>
 
                   <div>
@@ -535,9 +624,12 @@ const ApplyLoan = () => {
                       name="employment.workExperienceYears"
                       value={formData.employmentDetails.workExperienceYears}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.workExperienceYears ? 'border-error' : ''}`}
                       required
                     />
+                    {fieldErrors.workExperienceYears && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.workExperienceYears}</p>
+                    )}
                   </div>
 
                   <div>
@@ -547,14 +639,17 @@ const ApplyLoan = () => {
                       name="employment.monthlyIncome"
                       value={formData.employmentDetails.monthlyIncome}
                       onChange={handleChange}
-                      className="input-field"
+                      className={`input-field ${fieldErrors.monthlyIncome ? 'border-error' : ''}`}
                       placeholder="50000"
                       required
                     />
-                    {selectedLoanType && (
+                    {selectedLoanType && !fieldErrors.monthlyIncome && (
                       <p className="text-xs text-foregroundSecondary dark:text-foregroundSecondary mt-1">
                         Minimum required: ₹{selectedLoanType.minIncome.toLocaleString()}
                       </p>
+                    )}
+                    {fieldErrors.monthlyIncome && (
+                      <p className="text-error text-sm mt-1">{fieldErrors.monthlyIncome}</p>
                     )}
                   </div>
                 </div>
@@ -674,7 +769,7 @@ const ApplyLoan = () => {
                 </h2>
 
                 <div className="mb-6 p-4 bg-cyan-50 dark:bg-cyan-900/20 border border-cyan-200 dark:border-cyan-800 rounded-xl">
-                  <p className="text-sm text-accent dark:text-accentDarkMode">
+                  <p className="text-sm text-accent dark:text-accentDark">
                     <strong>Required Documents:</strong> Please upload the following documents for your {selectedLoanType?.name} application.
                   </p>
                 </div>
@@ -717,7 +812,7 @@ const ApplyLoan = () => {
                 </h2>
 
                 <div className="space-y-6">
-                  <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
+                  <div className="bg-surface dark:bg-transparent rounded-xl p-6">
                     <h3 className="font-bold text-foreground dark:text-foregroundDark mb-4">Loan Details</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
@@ -739,7 +834,7 @@ const ApplyLoan = () => {
                     </div>
                   </div>
 
-                  <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
+                  <div className="bg-surface dark:bg-transparent rounded-xl p-6">
                     <h3 className="font-bold text-foreground dark:text-foregroundDark mb-4">Employment Details</h3>
                     <div className="space-y-2 text-sm">
                       <div className="flex justify-between">
@@ -767,7 +862,7 @@ const ApplyLoan = () => {
                     </div>
                   </div>
 
-                  <div className="bg-surface dark:bg-backgroundDark/30 rounded-xl p-6">
+                  <div className="bg-surface dark:bg-transparent rounded-xl p-6">
                     <h3 className="font-bold text-foreground dark:text-foregroundDark mb-4">Uploaded Documents</h3>
                     {documents.length > 0 ? (
                       <div className="space-y-2 text-sm">

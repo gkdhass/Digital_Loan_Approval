@@ -35,10 +35,19 @@ const OCRStatusBadge = ({ ocrVerification, registeredName, compact = false }) =>
     statusConfig = {
       icon: Loader2,
       label: 'Processing...',
-      color: 'text-primary dark:text-primaryDarkMode',
+      color: 'text-primary dark:text-primaryDark',
       bg: 'bg-primary-50 dark:bg-primary-900/20',
       border: 'border-primary-200 dark:border-primary-800',
       spin: true,
+    };
+  } else if (ocrStatus === 'manual_review_required') {
+    statusConfig = {
+      icon: AlertCircle,
+      label: 'Under Manual Review',
+      color: 'text-primary dark:text-primaryDark',
+      bg: 'bg-primary-50 dark:bg-primary-900/20',
+      border: 'border-primary-200 dark:border-primary-800',
+      subtitle: 'Our team is reviewing this document',
     };
   } else if (ocrStatus === 'processed') {
     if (hasFlags) {

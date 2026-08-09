@@ -50,8 +50,8 @@ const generateLoanAgreement = (application, user, loanType) => {
       const textColor = '#000000';
       const secondaryColor = '#64748B';
 
-      // Set Times Roman font for entire document
-      doc.font('Times-Roman');
+      // Use Helvetica font for entire document (better Unicode support including ₹)
+      doc.font('Helvetica');
 
       // HEADER
       console.log('[pdfGenerator] Adding header...');
@@ -79,12 +79,12 @@ const generateLoanAgreement = (application, user, loanType) => {
 
       // Company name and contact info
       doc.fontSize(14)
-         .font('Times-Bold')
+         .font('Helvetica-Bold')
          .fillColor(primaryColor)
          .text('Digital Loan Approval', logoX + 40, logoY + 5);
       
       doc.fontSize(9)
-         .font('Times-Roman')
+         .font('Helvetica')
          .fillColor(secondaryColor)
          .text('support@digitalloanapproval.com', logoX + 40, logoY + 20);
       doc.text('+91 1800-XXX-XXXX', logoX + 40, logoY + 30);
@@ -101,7 +101,7 @@ const generateLoanAgreement = (application, user, loanType) => {
       const loanTypeName = loanType?.name || 'Personal';
       
       doc.fontSize(22)
-         .font('Times-Bold')
+         .font('Helvetica-Bold')
          .fillColor(textColor)
          .text(`${loanTypeName} Loan Agreement`, pageWidth / 2, yPos, { align: 'center' });
       
@@ -114,7 +114,7 @@ const generateLoanAgreement = (application, user, loanType) => {
         : new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
       
       doc.fontSize(11)
-         .font('Times-Roman')
+         .font('Helvetica')
          .fillColor(textColor)
          .text(
           `This Agreement is entered into on ${appliedDate} between Digital Loan Approval (hereinafter referred to as "Lender") and ${user.fullName} (hereinafter referred to as "Borrower").`,
@@ -140,12 +140,12 @@ const generateLoanAgreement = (application, user, loanType) => {
         {
           number: 1,
           title: 'Loan Details',
-          content: `Loan Type: ${loanTypeName}. Principal Amount: Rs. ${loanAmount.toLocaleString('en-IN')}. Interest Rate: ${interestRate}% per annum. Application Number: ${application.applicationNumber}.`
+          content: `Loan Type: ${loanTypeName}. Principal Amount: ₹${loanAmount.toLocaleString('en-IN')}. Interest Rate: ${interestRate}% per annum. Application Number: ${application.applicationNumber}.`
         },
         {
           number: 2,
           title: 'Repayment Terms',
-          content: `Tenure: ${durationMonths} months. Monthly EMI: Rs. ${emi.toLocaleString('en-IN')}. Total Payable Amount: Rs. ${totalPayable.toLocaleString('en-IN')}.`
+          content: `Tenure: ${durationMonths} months. Monthly EMI: ₹${emi.toLocaleString('en-IN')}. Total Payable Amount: ₹${totalPayable.toLocaleString('en-IN')}.`
         },
         {
           number: 3,
@@ -172,7 +172,7 @@ const generateLoanAgreement = (application, user, loanType) => {
       sections.forEach((section) => {
         // Section number and title
         doc.fontSize(12)
-           .font('Times-Bold')
+           .font('Helvetica-Bold')
            .fillColor(textColor)
            .text(`${section.number}. ${section.title}`, margin, yPos);
         
@@ -180,7 +180,7 @@ const generateLoanAgreement = (application, user, loanType) => {
         
         // Section content
         doc.fontSize(11)
-           .font('Times-Roman')
+           .font('Helvetica')
            .fillColor(textColor)
            .text(section.content, margin, yPos, { width: contentWidth, align: 'justify' });
         
@@ -195,7 +195,7 @@ const generateLoanAgreement = (application, user, loanType) => {
       
       // Left column - Borrower
       doc.fontSize(11)
-         .font('Times-Bold')
+         .font('Helvetica-Bold')
          .fillColor(textColor)
          .text(`${user.fullName}, Borrower:`, margin, yPos);
       
@@ -205,13 +205,13 @@ const generateLoanAgreement = (application, user, loanType) => {
          .stroke(textColor);
       
       doc.fontSize(10)
-         .font('Times-Roman')
+         .font('Helvetica')
          .fillColor(secondaryColor)
          .text(`Date: ${appliedDate}`, margin, yPos + 22);
       
       // Right column - Lender
       doc.fontSize(11)
-         .font('Times-Bold')
+         .font('Helvetica-Bold')
          .fillColor(textColor)
          .text('Digital Loan Approval, Lender:', margin + sigColWidth + 60, yPos);
       
@@ -221,7 +221,7 @@ const generateLoanAgreement = (application, user, loanType) => {
          .stroke(textColor);
       
       doc.fontSize(10)
-         .font('Times-Roman')
+         .font('Helvetica')
          .fillColor(secondaryColor)
          .text(`Date: ${appliedDate}`, margin + sigColWidth + 60, yPos + 22);
 
@@ -232,7 +232,7 @@ const generateLoanAgreement = (application, user, loanType) => {
       const footerY = pageHeight - margin - 30;
       
       doc.fontSize(8)
-         .font('Times-Roman')
+         .font('Helvetica')
          .fillColor(secondaryColor)
          .text('Digital Loan Approval | digitalloanapproval.com', pageWidth / 2, footerY, { align: 'center' });
       

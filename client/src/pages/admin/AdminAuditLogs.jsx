@@ -55,7 +55,7 @@ const AdminAuditLogs = () => {
   const getActionColor = (action) => {
     if (action.includes('delete')) return 'text-error dark:text-errorDark bg-errorBadge dark:bg-errorDark/20';
     if (action.includes('create')) return 'text-success dark:text-successDark bg-successBadge dark:bg-successBadgeDark';
-    if (action.includes('update')) return 'text-primary dark:text-primaryDarkMode bg-cyan-50 dark:bg-cyan-900/20';
+    if (action.includes('update')) return 'text-primary dark:text-primaryDark bg-cyan-50 dark:bg-cyan-900/20';
     if (action.includes('verify')) return 'text-accent dark:text-accentDark bg-warningBadge dark:bg-warningBadgeDark';
     return 'text-foregroundSecondary dark:text-foregroundSecondaryDark bg-input dark:bg-cardSecondaryDark';
   };

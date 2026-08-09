@@ -121,7 +121,7 @@ const ApplicationDetail = () => {
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <button
           onClick={() => navigate('/applications')}
-          className="flex items-center gap-2 text-foregroundSecondary hover:text-primary dark:hover:text-primaryDarkMode mb-6"
+          className="flex items-center gap-2 text-foregroundSecondary hover:text-primary dark:hover:text-primaryDark mb-6"
         >
           <ArrowLeft size={20} />
           Back to Applications
@@ -182,7 +182,7 @@ const ApplicationDetail = () => {
               </div>
               <div>
                 <p className="text-sm text-foregroundSecondary mb-1">Monthly EMI</p>
-                <p className="text-xl font-bold text-primary dark:text-primaryDarkMode">
+                <p className="text-xl font-bold text-primary dark:text-primaryDark">
                   ₹{application.emi.toLocaleString()}
                 </p>
               </div>

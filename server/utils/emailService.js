@@ -13,26 +13,41 @@ const createTransporter = () => {
   });
 };
 
-// Send email helper
-const sendEmail = async (options) => {
-  try {
-    const transporter = createTransporter();
-    
-    const mailOptions = {
-      from: process.env.EMAIL_FROM || '"Digital Loan Approval" <noreply@digitalloan.com>',
-      to: options.to,
-      subject: options.subject,
-      html: options.html,
-      text: options.text,
-    };
+// Send email helper with retry logic
+const sendEmail = async (options, retries = 3) => {
+  let lastError;
+  
+  for (let attempt = 1; attempt <= retries; attempt++) {
+    try {
+      const transporter = createTransporter();
+      
+      const mailOptions = {
+        from: process.env.EMAIL_FROM || '"Digital Loan Approval" <noreply@digitalloan.com>',
+        to: options.to,
+        subject: options.subject,
+        html: options.html,
+        text: options.text,
+      };
 
-    const info = await transporter.sendMail(mailOptions);
-    console.log('Email sent:', info.messageId);
-    return info;
-  } catch (error) {
-    console.error('Email error:', error);
-    throw error;
+      const info = await transporter.sendMail(mailOptions);
+      console.log(`[Email] Sent successfully on attempt ${attempt}:`, info.messageId);
+      return info;
+    } catch (error) {
+      lastError = error;
+      console.error(`[Email] Attempt ${attempt}/${retries} failed:`, error.message);
+      
+      // If this is not the last attempt, wait before retrying (exponential backoff)
+      if (attempt < retries) {
+        const delay = Math.pow(2, attempt) * 1000; // 2s, 4s, 8s
+        console.log(`[Email] Retrying in ${delay}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
   }
+  
+  // All retries exhausted
+  console.error(`[Email] All ${retries} attempts failed. Last error:`, lastError.message);
+  throw lastError;
 };
 
 // Email templates

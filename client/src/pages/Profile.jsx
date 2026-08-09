@@ -13,6 +13,7 @@ const Profile = () => {
   const [loading, setLoading] = useState(false);
   const [uploadingPicture, setUploadingPicture] = useState(false);
   const [previewUrl, setPreviewUrl] = useState(user?.profilePicture || '');
+  const [fieldErrors, setFieldErrors] = useState({});
   const [formData, setFormData] = useState({
     fullName: user?.fullName || '',
     phone: user?.phone || '',
@@ -24,6 +25,32 @@ const Profile = () => {
     },
   });
 
+  const validateField = (name, value) => {
+    const errors = { ...fieldErrors };
+    
+    if (name === 'phone') {
+      if (value && !/^[6-9]\d{9}$/.test(value.replace(/\D/g, ''))) {
+        errors.phone = 'Please enter a valid 10-digit Indian mobile number';
+      } else {
+        delete errors.phone;
+      }
+    } else if (name === 'address.pincode') {
+      if (value && !/^\d{6}$/.test(value)) {
+        errors.pincode = 'Please enter a valid 6-digit pincode';
+      } else {
+        delete errors.pincode;
+      }
+    } else if (name === 'fullName') {
+      if (!value || value.trim().length < 3) {
+        errors.fullName = 'Name must be at least 3 characters';
+      } else {
+        delete errors.fullName;
+      }
+    }
+    
+    setFieldErrors(errors);
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.startsWith('address.')) {
@@ -32,13 +59,27 @@ const Profile = () => {
         ...formData,
         address: { ...formData.address, [addressField]: value },
       });
+      validateField(name, value);
     } else {
       setFormData({ ...formData, [name]: value });
+      validateField(name, value);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Validate all fields before submission
+    validateField('fullName', formData.fullName);
+    validateField('phone', formData.phone);
+    validateField('address.pincode', formData.address.pincode);
+    
+    // Check if there are any errors
+    if (Object.keys(fieldErrors).length > 0) {
+      showToast('Please fix validation errors', 'error');
+      return;
+    }
+    
     setLoading(true);
 
     try {
@@ -46,6 +87,7 @@ const Profile = () => {
       updateUser(response.data);
       showToast('Profile updated successfully', 'success');
       setIsEditing(false);
+      setFieldErrors({});
     } catch (error) {
       showToast(error.message || 'Failed to update profile', 'error');
     } finally {
@@ -65,6 +107,7 @@ const Profile = () => {
       },
     });
     setPreviewUrl(user?.profilePicture || '');
+    setFieldErrors({});
     setIsEditing(false);
   };
 
@@ -184,11 +227,14 @@ const Profile = () => {
                     value={formData.fullName}
                     onChange={handleChange}
                     disabled={!isEditing}
-                    className="input-field pl-11"
+                    className={`input-field pl-11 ${fieldErrors.fullName ? 'border-error' : ''}`}
                     placeholder="Enter your full name"
                     required
                   />
                 </div>
+                {fieldErrors.fullName && (
+                  <p className="text-error text-sm mt-1">{fieldErrors.fullName}</p>
+                )}
               </div>
 
               {/* Phone */}
@@ -202,11 +248,14 @@ const Profile = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     disabled={!isEditing}
-                    className="input-field pl-11"
+                    className={`input-field pl-11 ${fieldErrors.phone ? 'border-error' : ''}`}
                     placeholder="Enter your phone number"
                     required
                   />
                 </div>
+                {fieldErrors.phone && (
+                  <p className="text-error text-sm mt-1">{fieldErrors.phone}</p>
+                )}
               </div>
 
               {/* Address */}
@@ -261,9 +310,13 @@ const Profile = () => {
                   value={formData.address.pincode}
                   onChange={handleChange}
                   disabled={!isEditing}
-                  className="input-field"
+                  className={`input-field ${fieldErrors.pincode ? 'border-error' : ''}`}
                   placeholder="Pincode"
+                  maxLength="6"
                 />
+                {fieldErrors.pincode && (
+                  <p className="text-error text-sm mt-1">{fieldErrors.pincode}</p>
+                )}
               </div>
 
               {/* Account Info (Read-only) */}
