@@ -355,12 +355,15 @@ For support and questions, please contact the development team.
 | Problem Name | Difficulty |
 | ------- | ------- |
 | [0700-search-in-a-binary-search-tree](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/0700-search-in-a-binary-search-tree/) | Easy |
+| [0701-insert-into-a-binary-search-tree](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/0701-insert-into-a-binary-search-tree/) | Medium |
 ## Binary Search Tree
 | Problem Name | Difficulty |
 | ------- | ------- |
 | [0700-search-in-a-binary-search-tree](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/0700-search-in-a-binary-search-tree/) | Easy |
+| [0701-insert-into-a-binary-search-tree](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/0701-insert-into-a-binary-search-tree/) | Medium |
 ## Binary Tree
 | Problem Name | Difficulty |
 | ------- | ------- |
 | [0700-search-in-a-binary-search-tree](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/0700-search-in-a-binary-search-tree/) | Easy |
+| [0701-insert-into-a-binary-search-tree](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/0701-insert-into-a-binary-search-tree/) | Medium |
 <!---LeetCode Topics End-->
