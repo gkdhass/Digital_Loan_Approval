@@ -324,3 +324,31 @@ This project is licensed under the ISC License.
 ## Support
 
 For support and questions, please contact the development team.
+
+<!---LeetCode Topics Start-->
+# LeetCode Topics
+## Array
+| Problem Name | Difficulty |
+| ------- | ------- |
+| [1122-relative-sort-array](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/1122-relative-sort-array/) | Easy |
+## Hash Table
+| Problem Name | Difficulty |
+| ------- | ------- |
+| [1122-relative-sort-array](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/1122-relative-sort-array/) | Easy |
+## Sorting
+| Problem Name | Difficulty |
+| ------- | ------- |
+| [1122-relative-sort-array](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/1122-relative-sort-array/) | Easy |
+## Counting Sort
+| Problem Name | Difficulty |
+| ------- | ------- |
+| [1122-relative-sort-array](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/1122-relative-sort-array/) | Easy |
+## Quicksort
+| Problem Name | Difficulty |
+| ------- | ------- |
+| [1122-relative-sort-array](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/1122-relative-sort-array/) | Easy |
+## Bubble Sort
+| Problem Name | Difficulty |
+| ------- | ------- |
+| [1122-relative-sort-array](https://github.com/gkdhass/Digital_Loan_Approval/tree/main/1122-relative-sort-array/) | Easy |
+<!---LeetCode Topics End-->
